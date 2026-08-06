@@ -78,6 +78,20 @@ To score a candidate you already have, from inside this repo:
 npm run check -- 5 my-attempt.dfy       # add --json for a machine-readable verdict
 ```
 
+To pick one, `npm run list-tasks` prints the corpus banded by how much proof the
+reference solution needed — 1 to 575 lines, median 54:
+
+```
+small (1–10 proof lines) — 6 tasks
+medium (11–50)           — 9 tasks
+large (51–150)           — 11 tasks
+very large (151+)        — 7 tasks
+```
+
+Added non-blank non-comment lines is a crude signal — a three-line `assert` with
+a nonobvious witness outranks a sixty-line mechanical induction — but it is the
+best one available short of solving the tasks. `--markdown` emits the full table.
+
 ## How tasks are made
 
 Each case study repository carries a `LemmaScript-files.txt` listing the
@@ -174,6 +188,77 @@ solutions, so the two can't drift apart.
 Of the 65 pairs in the case studies, one adds preconditions to a generated
 declaration and is excluded for it — see DESIGN.md. That is the report
 working as intended: it is an upstream to-do, not a benchmark defect.
+
+## What the validator does not catch
+
+Additions-only is a **transparency property, not a soundness boundary**. It makes
+every submission auditable — the diff is the whole story — and the checks reject
+the cheats a model is likely to reach for. It does not make gaming impossible,
+and it cannot: "this candidate only added proof" is a property of the *parsed*
+program, and the validator checks text.
+
+Three known escapes, each reproduced against Dafny 4.11.0 on a real task:
+
+**Executable statements added to a generated body.** A candidate may insert
+statements into a method the generator wrote:
+
+```diff
+ method decodeAndValidatePath(rawPath: string) returns (res: Option<string>)
+   ensures (match res { case Some(v) => … case None => true })
+ {
++  return None;
+   var filename: string := *;
+```
+
+The method now always returns `None`, the specification's `None` branch is
+trivially true, and it verifies. Nothing was deleted, no banned token appears,
+and Dafny emits no diagnostic at all. It needs a specification with a trivially
+satisfiable branch — six of the 33 tasks have one — but the general form is
+unrestricted: an early return, an assignment, a conditional, a loop, a call.
+
+**Continuations of a generated expression outside a declaration signature.**
+Dafny treats newlines as whitespace, so an added line can extend an expression
+the generator wrote:
+
+```diff
+ predicate Safe(x: int)
+ {
+   x > 0
++  || true
+ }
+```
+
+Every `ensures Safe(…)` in the file is now trivial. Inside a declaration's
+signature this is rejected; inside a predicate body, an assertion, or a
+quantifier it is not. Loop invariants happen to resist it — weakening one makes
+it useless at loop exit, so the proof fails anyway — but that is luck, not a
+defence.
+
+**Attributes split across lines.** The banned-pattern scan is line-wise, so
+
+```dafny
+lemma {:
+  axiom
+} Oracle()
+  ensures …
+```
+
+spells `{:axiom}` without any line containing it. Comparing the attributes in
+the candidate against those in the `.dfy.gen` would close it, except that six
+task files already contain a generated `{:axiom}`, so a name-based comparison is
+blind exactly where it matters. A counting version would work and has not been
+judged worth the machinery.
+
+Closing the first two properly means a parser-backed structural comparison:
+every node originating in the `.dfy.gen` preserved unchanged, and the executable
+projections of the two programs equal after erasing proof material. That is real
+work maintained against Dafny's internals, and it is not currently planned.
+
+Two consequences for anyone using this benchmark. **Publish the diff alongside
+any result** — it is already computed, and `|| true` is obvious to a human
+reading it. And treat published tasks as a development set: the reference
+solutions live in public repositories that `metadata.json` names, so headline
+comparisons want a private task set.
 
 ## Regenerating the benchmark
 

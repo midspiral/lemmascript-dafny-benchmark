@@ -725,14 +725,25 @@ cheap.
   L()` with no postcondition verifies silently, no warning. It is also
   vacuous in practice — such a lemma proves nothing, so leaving it unfilled
   gains a candidate nothing — so this stays a note rather than a hole.
-- **Executable additions inside generated bodies.** A candidate can add
-  `return None;`, an assignment, or control flow to the body of a generated
-  method. Confirmed working against a real task, and Dafny emits no diagnostic
-  for it. Everything above governs specifications; nothing governs statements.
-  Closing it means comparing the two programs with proof content erased —
-  assertions, lemma calls, ghost declarations and specification clauses removed
-  — and requiring the executable projections to match. That is real work and is
-  scoped separately.
+- **Three confirmed escapes, left open by choice.** Executable statements added
+  to a generated body (`return None;` and its family); continuations of a
+  generated expression outside a declaration signature (a `|| true` under a
+  generated predicate body makes every `ensures Safe(…)` trivial); and
+  attributes split across lines, which the line-wise denylist cannot see.
+
+  The first two need a parser-backed structural comparison — every node from the
+  `.dfy.gen` preserved, and the executable projections equal after erasing proof
+  material. Note that erasure alone is *not* sufficient: the predicate-body case
+  mutates ghost content, which an executable projection discards. Both halves
+  are required.
+
+  The third could be closed by comparing the attributes in the candidate against
+  those in the `.gen`, but six task files already contain a generated
+  `{:axiom}`, so a name-based comparison is blind exactly where it matters; a
+  counting version would work and has not been judged worth the machinery.
+
+  These are documented in the README as limitations rather than defended
+  against. See *What the validator does not catch*.
 - **Reproducibility of the verify step.** Wall-clock time limits make the
   admission gate depend on the machine and on how many verifications run at
   once. Two pairs sit near their limit today (`collab-todo` at 50s,

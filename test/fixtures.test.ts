@@ -57,6 +57,7 @@ const cases: Record<string, Expectation> = {
   "cheat-at-verify-false": { kind: "banned", patterns: ["at-verify-false"] },
   "cheat-at-verify-only": { kind: "banned", patterns: ["at-verify-only"] },
   "cheat-at-options": { kind: "banned", patterns: ["at-options"] },
+  "cheat-decreases-star": { kind: "banned", patterns: ["decreases-wildcard"] },
 
   // The line DESIGN.md cites against stripping `//` tails: the `//` is inside a
   // string, so the code continues after it. The quote guard must decline to

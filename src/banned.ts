@@ -35,6 +35,12 @@ export const bannedPatterns: BannedPattern[] = [
   { name: "at-verify-false", pattern: /@Verify\s*\(\s*false\s*\)/ },
   { name: "at-verify-only", pattern: /@VerifyOnly\b/ },
   { name: "at-options", pattern: /@Options\s*\(/ },
+
+  // `decreases *` tells Dafny not to prove termination. A method that never
+  // returns establishes its postcondition vacuously, and a candidate has no
+  // legitimate use for one: the wildcard is only legal on methods and loops,
+  // never on the lemmas and functions a proof is written with.
+  { name: "decreases-wildcard", pattern: /\bdecreases\s+\*/ },
 ];
 
 /**

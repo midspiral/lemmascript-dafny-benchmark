@@ -434,8 +434,11 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
       };
     }
 
+    // The exit code is checked alongside the parsed diagnostics: a run that
+    // emitted a status line and then failed for a reason we did not parse must
+    // not be reported as clean.
     return {
-      status: errors === 0 && disqualifyingWarnings.length === 0 ? "passed" : "failed",
+      status: run.code === 0 && errors === 0 && disqualifyingWarnings.length === 0 ? "passed" : "failed",
       errors,
       timeouts,
       errorSamples,

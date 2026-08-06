@@ -11,7 +11,8 @@
     "test": "tsx test/fixtures.test.ts",
     "typecheck": "tsc --noEmit",
     "make-attempt": "tsx bin/make-attempt.ts",
-    "check-artifacts": "tsx bin/check-artifacts.ts"
+    "check-artifacts": "tsx bin/check-artifacts.ts",
+    "list-tasks": "tsx bin/list-tasks.ts"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
