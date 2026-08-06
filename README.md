@@ -60,8 +60,10 @@ Move it anywhere, point a session or a person at `PROMPT.md`, and iterate:
 npx tsx .bench/check.ts     # both constraints; exit 0 only when both pass
 ```
 
-It needs `dafny` 4.11.0, `git`, and `node` with `tsx` on `PATH`. Nothing else —
-the validator has no npm dependencies.
+It needs **Dafny 4.11.0** ([install](https://github.com/dafny-lang/dafny/releases/tag/v4.11.0)),
+`git`, and `node` with `tsx` on `PATH`. Nothing else — the validator has no npm
+dependencies. The version matters: the warning categories are matched on Dafny's
+message text, so a different release can change what the validator accepts.
 
 **The directory deliberately has no path back to this repo.** That is not
 tidiness. `metadata.json` names the upstream repository and relpath of every
@@ -167,7 +169,8 @@ working as intended: it is an upstream to-do, not a benchmark defect.
 npm install
 npm run generate             # the whole benchmark: tasks/, metadata.json, index.json, report
 npm run reference-report     # just the report, leaving the benchmark alone
-npm test                     # the fixture suite
+npm test                     # the fixture suite (needs Dafny)
+npm run check-artifacts      # tasks/, metadata.json and index.json agree (no Dafny)
 ```
 
 Both clone any missing case study as a sibling; pass `--no-clone` to work with
@@ -186,8 +189,35 @@ report already on disk, in about a fifth of a second instead of ten minutes.
 It re-hashes every `.dfy.gen` against the report first and refuses if any has
 moved, so it can't emit tasks from a stale run.
 
+`check-artifacts` is the cheap guard: it asserts that `tasks/`, `metadata.json`
+and `index.json` are three consistent views of one thing, and that every task
+file still hashes to what metadata records — a stray edit there would silently
+change every verdict for that task. It needs no Dafny and no case studies, so
+CI runs it on every push, while a full regeneration runs weekly and on demand.
+
 See [DESIGN.md](DESIGN.md) for the reasoning, the exact token list, and
 the loopholes each check closes.
+
+## Licensing
+
+This repository is MIT — see [LICENSE](LICENSE). That covers the validator, the
+generator, the fixtures, and the metadata.
+
+It does **not** cover `tasks/`. Each task file is a Dafny skeleton compiled from
+TypeScript in another repository and is a derived work of it, governed by that
+repository's licence. [`tasks/ATTRIBUTION.md`](tasks/ATTRIBUTION.md) is generated
+alongside the tasks and maps every one of them to its upstream and licence.
+
+Two consequences worth stating plainly:
+
+* A case study whose licence cannot ship under MIT is excluded in
+  `config/repos.json` rather than quietly dropped. One is today: rallly is
+  AGPL-3.0, so its pair is validated and reported like any other but never
+  becomes a task.
+* Ten upstream repositories carry no LICENSE file at all. Their tasks are
+  included because those repositories share this one's owner, and
+  `ATTRIBUTION.md` says so at each of them. Adding a licence upstream is the
+  real fix.
 
 ## Repositories
 
@@ -210,10 +240,16 @@ commit pinning is more machinery than this needs right now.
 ## Status
 
 The validator, the reference report, and the emitted benchmark are all in
-place. Three pairs are excluded only because their proofs exceed the
-wall-clock limit their case study sets for CI — an upstream fix, and the
-reason IDs are issued to excluded pairs too, so those tasks keep their
-numbers when it lands.
+place: **35 tasks** from 65 pairs across 27 case studies.
+
+Two caveats a reader should have up front. Three pairs are excluded only
+because their proofs exceed the wall-clock limit their case study sets for CI,
+which is an upstream fix — and the reason IDs are issued to excluded pairs too,
+so those tasks keep their numbers when it lands. And because those limits are
+wall-clock, **which pairs are admitted depends on the machine**: a loaded box
+turns a passing proof into a reported timeout. One task today verifies with a
+one-second margin. Read a `verification-timeout` cause as "re-run it", not as
+"the solution is broken".
 
 The open questions are recorded at the end of DESIGN.md. The substantive one
 — whether adding preconditions to a generated declaration completes the proof

@@ -12,6 +12,14 @@ export interface RepoEntry {
   /** `owner/name`, as it appears in the CI matrix. */
   repo: string;
   branch: string;
+  /** SPDX identifier of the upstream repository, or `unlicensed`. A task is a
+   *  derived work of its upstream, so this is what `tasks/ATTRIBUTION.md` is
+   *  built from. Transcribed by hand into config/repos.json. */
+  license: string;
+  /** Set to bar this repo's pairs from becoming tasks while keeping them
+   *  visible in the reference report. The value is the cause recorded. */
+  exclude?: string;
+  excludeNote?: string;
 }
 
 export interface Config {

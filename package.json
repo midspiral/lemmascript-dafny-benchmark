@@ -10,11 +10,13 @@
     "check": "tsx bin/check.ts",
     "test": "tsx test/fixtures.test.ts",
     "typecheck": "tsc --noEmit",
-    "make-attempt": "tsx bin/make-attempt.ts"
+    "make-attempt": "tsx bin/make-attempt.ts",
+    "check-artifacts": "tsx bin/check-artifacts.ts"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
     "tsx": "^4.22.4",
     "typescript": "^5.7.0"
-  }
+  },
+  "license": "MIT"
 }

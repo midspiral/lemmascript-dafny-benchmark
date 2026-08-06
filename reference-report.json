@@ -8,23 +8,27 @@
     "branchesDeferred": [
       {
         "repo": "midspiral/guardians-lemmascript",
-        "branch": "generate-verify-execute"
+        "branch": "generate-verify-execute",
+        "license": "unlicensed"
       },
       {
         "repo": "midspiral/henri-lemmascript",
-        "branch": "generate-verify-execute"
+        "branch": "generate-verify-execute",
+        "license": "MIT"
       },
       {
         "repo": "midspiral/henri-lemmascript",
-        "branch": "session"
+        "branch": "session",
+        "license": "MIT"
       }
     ],
     "pairsSeen": 65,
-    "admitted": 36,
-    "excluded": 29,
+    "admitted": 35,
+    "excluded": 30,
     "excludedByCause": {
       "no-additions": 26,
       "verification-timeout": 3,
+      "excluded:license": 2,
       "weakened:requires": 1
     }
   },
@@ -3156,8 +3160,10 @@
       "repo": "midspiral/rallly-lemmascript",
       "branch": "lemmascript",
       "relpath": "apps/web/src/features/poll/scoring.ts",
-      "admitted": true,
-      "causes": [],
+      "admitted": false,
+      "causes": [
+        "excluded:license"
+      ],
       "verifyOptions": {
         "flags": []
       },
@@ -3207,7 +3213,8 @@
       "relpath": "apps/web/src/utils/redirect.ts",
       "admitted": false,
       "causes": [
-        "no-additions"
+        "no-additions",
+        "excluded:license"
       ],
       "verifyOptions": {
         "flags": []

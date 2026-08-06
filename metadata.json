@@ -9,7 +9,7 @@
   ],
   "dafnyVersion": "4.11.0",
   "configSource": "midspiral/LemmaScript@main .github/workflows/ci.yml#case-studies-dafny",
-  "taskCount": 36,
+  "taskCount": 35,
   "tasks": [
     {
       "id": 5,
@@ -768,32 +768,6 @@
       "addedLines": 275,
       "addedCodeLines": 200,
       "referenceVerifySeconds": 2
-    },
-    {
-      "id": 58,
-      "file": "tasks/0058.dfy",
-      "key": "midspiral/rallly-lemmascript:apps/web/src/features/poll/scoring.ts",
-      "repo": "midspiral/rallly-lemmascript",
-      "branch": "lemmascript",
-      "relpath": "apps/web/src/features/poll/scoring.ts",
-      "head": "db9d4d8a68e8c10ea44c5d7f7aab4c004c275dc4",
-      "verify": {
-        "flags": []
-      },
-      "gen": {
-        "bytes": 3350,
-        "lines": 70,
-        "sha256": "4c859e035fe44fd6d340e60872aaa094dec5471f7a9414728822a2312231634e"
-      },
-      "solution": {
-        "bytes": 3381,
-        "lines": 71,
-        "sha256": "b0dd570ddee644e62c651a5df3260652cb33c08d087630b6a5c297439cbf19b1"
-      },
-      "sizeDiffBytes": 31,
-      "addedLines": 1,
-      "addedCodeLines": 1,
-      "referenceVerifySeconds": 1
     },
     {
       "id": 60,

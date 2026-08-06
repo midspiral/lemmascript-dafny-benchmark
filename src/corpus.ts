@@ -124,6 +124,31 @@ async function pool<T>(items: T[], n: number, fn: (t: T) => Promise<void>) {
   );
 }
 
+
+/**
+ * Apply the `exclude` markers in `config/repos.json`.
+ *
+ * These bar a pair from becoming a task for a reason that has nothing to do
+ * with its proof — an upstream licence incompatible with this repo's, most
+ * likely. The pair is still validated and still reported, so the record says
+ * whether it *would* have qualified, and still gets an ID, so it keeps its
+ * number if the bar is ever lifted.
+ *
+ * Applied wherever a corpus is assembled, not only where one is validated:
+ * `--from-report` reuses stored verdicts, and an exclusion added to the config
+ * afterwards has to take effect there too. Idempotent for that reason.
+ */
+function applyExclusions(reports: PairReport[], repos: RepoEntry[]) {
+  const excluded = new Map(repos.filter(r => r.exclude).map(r => [r.repo, r.exclude!]));
+  for (const r of reports) {
+    const reason = excluded.get(r.repo);
+    if (!reason) continue;
+    const cause = `excluded:${reason}`;
+    if (!r.causes.includes(cause)) r.causes.push(cause);
+    r.admitted = false;
+  }
+}
+
 export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
   const log = opts.log ?? (() => {});
   const config = loadConfig(path.join(opts.repoRoot, "config", "repos.json"));
@@ -193,6 +218,7 @@ export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
     log(`  [${String(done).padStart(3)}/${work.length}] ${mark} ${pair.key} (${result.verify.seconds}s) ${detail}`);
   });
 
+  applyExclusions(reports, kept);
   reports.sort((a, b) => a.key.localeCompare(b.key));
   return {
     config,
@@ -325,5 +351,6 @@ export function corpusFromReport(repoRoot: string, reportPath: string): Corpus {
     );
   }
 
+  applyExclusions(reports, kept);
   return { config, reposUsed: kept, branchesDeferred: dropped, checkouts, reports, pairs, elapsedSeconds: 0 };
 }

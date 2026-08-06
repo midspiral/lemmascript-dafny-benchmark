@@ -3,42 +3,170 @@
     "Seeded by hand from midspiral/LemmaScript, .github/workflows/ci.yml, job",
     "`case-studies-dafny`, matrix.include. Order is the CI order; when a repo",
     "appears more than once the first entry wins (DESIGN.md > Repos).",
-    "Re-seed by hand when the CI matrix changes; the generator never parses CI."
+    "Re-seed by hand when the CI matrix changes; the generator never parses CI.",
+    "",
+    "`license` is the upstream repository's licence, transcribed by hand and used",
+    "to build tasks/ATTRIBUTION.md. A task is a derived work of its upstream, so",
+    "this has to be right; `unlicensed` means the repo carries no LICENSE file.",
+    "`exclude` keeps a repo in the list but bars its pairs from becoming tasks,",
+    "with the reason recorded in the reference report."
   ],
   "source": "midspiral/LemmaScript@main .github/workflows/ci.yml#case-studies-dafny",
   "seededAt": "2026-08-06",
   "dafnyVersion": "4.11.0",
   "parentDir": "..",
   "repos": [
-    { "repo": "midspiral/collab-todo-lemmascript", "branch": "main" },
-    { "repo": "midspiral/colorwheel-lemmascript", "branch": "main" },
-    { "repo": "midspiral/node-casbin-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/clear-split-lemmascript", "branch": "main" },
-    { "repo": "midspiral/hono-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/hono-rate-limiter-with-lemmascript", "branch": "main" },
-    { "repo": "CHARM-BDF/charmchat", "branch": "lemma" },
-    { "repo": "midspiral/xyflow-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/equality-game-lemmascript", "branch": "main" },
-    { "repo": "midspiral/github-star-checker-lemmascript", "branch": "main" },
-    { "repo": "midspiral/rallly-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/talktimer-lemmascript", "branch": "main" },
-    { "repo": "midspiral/opencode-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/anthropic-sdk-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/trace-solo-lemmascript", "branch": "main" },
-    { "repo": "midspiral/pi-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/flue-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/balanced-match-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/guardians-lemmascript", "branch": "main" },
-    { "repo": "midspiral/guardians-lemmascript", "branch": "generate-verify-execute" },
-    { "repo": "midspiral/quorum-lemmascript", "branch": "main" },
-    { "repo": "midspiral/quorum-tutorial-lemmascript", "branch": "main" },
-    { "repo": "midspiral/quota-lemmascript", "branch": "main" },
-    { "repo": "midspiral/henri-lemmascript", "branch": "main" },
-    { "repo": "midspiral/henri-lemmascript", "branch": "generate-verify-execute" },
-    { "repo": "midspiral/henri-lemmascript", "branch": "session" },
-    { "repo": "midspiral/eventab-lemmascript", "branch": "main" },
-    { "repo": "midspiral/eslint-plugin-with-lemmascript", "branch": "main" },
-    { "repo": "midspiral/infisical-lemmascript", "branch": "lemmascript" },
-    { "repo": "midspiral/mcp-sdk-lemmascript", "branch": "lemmascript" }
+    {
+      "repo": "midspiral/collab-todo-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/colorwheel-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/node-casbin-lemmascript",
+      "branch": "lemmascript",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "midspiral/clear-split-lemmascript",
+      "branch": "main",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/hono-lemmascript",
+      "branch": "lemmascript",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/hono-rate-limiter-with-lemmascript",
+      "branch": "main",
+      "license": "MIT"
+    },
+    {
+      "repo": "CHARM-BDF/charmchat",
+      "branch": "lemma",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/xyflow-lemmascript",
+      "branch": "lemmascript",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/equality-game-lemmascript",
+      "branch": "main",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/github-star-checker-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/rallly-lemmascript",
+      "branch": "lemmascript",
+      "license": "AGPL-3.0",
+      "exclude": "license",
+      "excludeNote": "rallly is AGPL-3.0; a derived task cannot ship under this repo's MIT licence"
+    },
+    {
+      "repo": "midspiral/talktimer-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/opencode-lemmascript",
+      "branch": "lemmascript",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/anthropic-sdk-lemmascript",
+      "branch": "lemmascript",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/trace-solo-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/pi-lemmascript",
+      "branch": "lemmascript",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/flue-lemmascript",
+      "branch": "lemmascript",
+      "license": "Apache-2.0"
+    },
+    {
+      "repo": "midspiral/balanced-match-lemmascript",
+      "branch": "lemmascript",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/guardians-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/guardians-lemmascript",
+      "branch": "generate-verify-execute",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/quorum-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/quorum-tutorial-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/quota-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/henri-lemmascript",
+      "branch": "main",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/henri-lemmascript",
+      "branch": "generate-verify-execute",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/henri-lemmascript",
+      "branch": "session",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/eventab-lemmascript",
+      "branch": "main",
+      "license": "unlicensed"
+    },
+    {
+      "repo": "midspiral/eslint-plugin-with-lemmascript",
+      "branch": "main",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/infisical-lemmascript",
+      "branch": "lemmascript",
+      "license": "MIT"
+    },
+    {
+      "repo": "midspiral/mcp-sdk-lemmascript",
+      "branch": "lemmascript",
+      "license": "MIT"
+    }
   ]
 }

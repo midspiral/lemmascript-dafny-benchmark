@@ -32,7 +32,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { boolFlag, flag } from "../src/cli.js";
 import { buildReport, corpusFromReport, printSummary, walkCorpus } from "../src/corpus.js";
-import { buildMetadata, emitTasks, loadIndex, reconcileIndex, writeIndex } from "../src/benchmark.js";
+import { buildAttribution, buildMetadata, emitTasks, loadIndex, reconcileIndex, writeIndex } from "../src/benchmark.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const update = boolFlag("update");
@@ -72,11 +72,14 @@ const emit = dryRun
   : emitTasks(path.join(repoRoot, "tasks"), tasks, corpus, { update, prune });
 
 if (!dryRun) {
+  writeFileSync(path.join(repoRoot, "tasks", "ATTRIBUTION.md"), buildAttribution(tasks, corpus.config.repos));
   writeIndex(indexPath, index);
   writeFileSync(path.join(repoRoot, "metadata.json"), JSON.stringify(doc, null, 2) + "\n");
-  // Rewriting the report from a corpus that was loaded *from* the report would
-  // be a no-op at best and a lossy round-trip at worst.
-  if (!fromReport) writeFileSync(reportPath, JSON.stringify(buildReport(corpus), null, 2) + "\n");
+  // Written on both paths. It round-trips faithfully, and it has to: a config
+  // exclusion added after the last full run changes verdicts on the emit path
+  // too, and a report that still called the pair admitted would contradict the
+  // metadata beside it. bin/check-artifacts.ts catches exactly that.
+  writeFileSync(reportPath, JSON.stringify(buildReport(corpus), null, 2) + "\n");
 }
 
 const tombstoned = index.entries.filter(e => e.tombstoned).length;
@@ -94,5 +97,5 @@ if (emit.stale.length) {
   console.log(`\n${emit.stale.length} task file(s) ${what}:`);
   for (const s of emit.stale) console.log(`  ${s}`);
 }
-const wrote = fromReport ? "tasks/, metadata.json, index.json" : "tasks/, metadata.json, index.json, reference-report.json";
+const wrote = "tasks/, tasks/ATTRIBUTION.md, metadata.json, index.json, reference-report.json";
 console.log(dryRun ? "\ndry run — nothing written" : `\nwrote ${wrote}`);
