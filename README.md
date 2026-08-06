@@ -28,6 +28,54 @@ verifies vacuously, and `requires false` under every generated declaration
 discharges every postcondition at once; without those constraints, a
 one-line transformation solves every task.
 
+## Attempting a task
+
+```sh
+npm run make-attempt -- 5
+```
+
+That builds a self-contained directory for task 5:
+
+```
+attempts/0005/
+  PROMPT.md         the task, the rules, and how to check
+  solution.dfy      the working copy — starts as an exact copy of the task
+  package.json      marks the directory as ESM so the checker runs standalone
+  .bench/
+    task.dfy.gen    pristine copy, what the diff is taken against
+    check.ts        the validator, with this task's Dafny budget inlined
+    validator.ts
+    banned.ts
+```
+
+The prompt comes from [`PROMPT.md`](PROMPT.md) at the root of this repo — edit
+the wording there and every future attempt directory picks it up; only the
+per-task facts (budget, extra flags) are substituted in. A placeholder the
+script doesn't recognise is an error rather than a literal `{{FOO}}` shipped to
+the attempter, so the template and the script can't drift apart.
+
+Move it anywhere, point a session or a person at `PROMPT.md`, and iterate:
+
+```sh
+npx tsx .bench/check.ts     # both constraints; exit 0 only when both pass
+```
+
+It needs `dafny` 4.11.0, `git`, and `node` with `tsx` on `PATH`. Nothing else —
+the validator has no npm dependencies.
+
+**The directory deliberately has no path back to this repo.** That is not
+tidiness. `metadata.json` names the upstream repository and relpath of every
+task, and the reference solutions live in sibling checkouts, so anything that
+can reach the benchmark can read the answer. The attempt directory carries a
+copy of the validator instead, and neither `metadata.json` nor the rest of
+`tasks/` goes with it.
+
+To score a candidate you already have, from inside this repo:
+
+```sh
+npm run check -- 5 my-attempt.dfy       # add --json for a machine-readable verdict
+```
+
 ## How tasks are made
 
 Each case study repository carries a `LemmaScript-files.txt` listing the
@@ -113,7 +161,7 @@ Of the 65 pairs in the case studies, one adds preconditions to a generated
 declaration and is excluded for it — see DESIGN.md. That is the report
 working as intended: it is an upstream to-do, not a benchmark defect.
 
-## Running it
+## Regenerating the benchmark
 
 ```sh
 npm install
@@ -126,12 +174,6 @@ Both clone any missing case study as a sibling; pass `--no-clone` to work with
 what's already there and `--jobs=N` to change how many verifications run at
 once. Keep `--jobs` low: the per-task time limits are wall-clock, so a loaded
 machine can turn a passing proof into a reported timeout.
-
-Checking a candidate against a task:
-
-```sh
-npm run check -- 42 my-attempt.dfy      # add --json for a machine-readable verdict
-```
 
 `generate` will not overwrite a task whose upstream `.dfy.gen` has moved, or
 delete one that stopped being admitted, unless you ask — `--update` and
