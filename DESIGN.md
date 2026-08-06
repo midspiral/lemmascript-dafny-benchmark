@@ -77,99 +77,81 @@ discourage. The residual cost is that a line mixing a string literal with a
 comment gets its comment scanned too; that is the conservative direction,
 and rare.
 
-### Frozen preconditions
+### Frozen signatures
 
-An added line matching
+Everything in this section is computed from the `.dfy.gen`, which is immutable.
+That is the point. If the regions were derived from the candidate, the candidate
+could move them — an unbalanced brace inside a comment, a string containing `{`,
+a declaration inserted to shift a boundary. Anchoring on the generated file
+removes the class rather than defending against each instance, and it costs
+nothing: the diff already carries generated-file line numbers.
+
+**Signature interval.** For each declaration in the `.dfy.gen`: from its
+declaration keyword through the last line before its body opens, or through its
+last specification line when it has no body.
+
+**Trusted declaration.** One carrying `{:axiom}`, `@Axiom`, `{:extern}`,
+`@Extern`, `{:verify false}` or `@Verify(false)`, or having no body. Dafny
+*assumes* such a declaration's postconditions rather than proving them.
+
+**Inert line.** After removing comments and string literals it contributes no
+tokens, *and* it leaves the lexer clean. A `//` line is inert; `/* …` is not.
+
+An added line inside a signature interval is accepted only if it is inert, or
+all of:
+
+- it **begins** with `ensures` or `decreases`;
+- **every** specification keyword on it is `ensures` or `decreases`;
+- it contains no wildcard `decreases`;
+- and, if it contributes an `ensures`, the declaration is not trusted.
+
+Each condition closes one thing, and none of them is about counting:
+
+| condition | rejects |
+|---|---|
+| begins an allowed clause | `\|\| true`, `&& false` — a fragment that merges into the clause above it |
+| every keyword allowed | `ensures true requires false` — a disallowed clause riding along on an allowed line |
+| no wildcard | `decreases *`, which drops the termination obligation |
+| `ensures` only on proved declarations | `ensures false` on `{:axiom} f(…)`, which is `assume false` by another route |
+
+The number of clauses on a line is deliberately unconstrained. `ensures A
+ensures B` is two lines written as one and both strengthen; what matters is the
+kind of each clause, not how many there are.
+
+**Why these two kinds.** A `decreases` clause is a termination measure and
+cannot weaken a postcondition. An `ensures` on a *proved* declaration increases
+what must be shown. On a trusted one it does the opposite, which is why the
+distinction is load-bearing rather than decorative: an axiom's postcondition is
+believed, so `ensures false` there hands the candidate `false` outright.
+
+**Why the continuation attack matters.** Newlines are ordinary whitespace in
+Dafny, so
 
 ```
-^\s*(requires|reads|modifies)\b
+ ensures P
++  || true
 ```
 
-is rejected unless the nearest **preceding** declaration keyword — `lemma`,
-`function`, `method`, `predicate`, `constructor`, `iterator` — is itself on
-an added line. In other words: a candidate may give its own helpers whatever
-contract it likes, and may not touch the contract of anything generated.
-
-This is what makes `requires false` a non-issue. Adding it under a generated
-lemma discharges every postcondition at once — the empty-submission cheat
-with one extra line per declaration — and a generated lemma nothing calls has
-no caller to break. Under this rule it is a diff violation, caught
-deterministically and without the solver.
-
-On a *new* helper the same clause is inert, which is why the exception is
-safe. Dafny makes every call site discharge the precondition from generated
-context the candidate cannot weaken:
-
-```dafny
-lemma Helper(s: seq<int>, x: int)
-  requires false
-  ensures Sum(s + [x]) == Sum(s) + x
-{ }
-
-lemma Target(s: seq<int>, x: int) ensures Sum(s + [x]) == Sum(s) + x
-{
-  Helper(s, x);   // Error: this is the precondition that could not be proved
-}
-```
-
-An unsatisfiable precondition makes a helper uncallable, and an uncallable
-helper proves nothing. The verifier enforces the exception for us.
-
-**`ensures` is deliberately not frozen.** Adding a postcondition to a
-generated declaration *strengthens* it: more to prove, not less. Five
-reference solutions do it as proof work — xyflow annotates the generated
-`isAcyclic` with `ensures res ==> acyclic(edges) // soundness` — and banning
-it would reject exactly the wrong thing. `decreases` and `invariant` are
-likewise proof hints, not contract, and stay allowed.
-
-**Why attribution is by nearest preceding declaration** rather than "a
-declaration keyword somewhere in the same run of added lines": the looser
-rule is order-blind, so a clause could borrow the keyword of a helper
-declared *after* it.
+is `ensures P || true` — one added line, and the generated theorem becomes
+trivial. Nothing in the diff looks unusual and Dafny emits no diagnostic at all.
+A line-prefix rule is not enough either, because
 
 ```
- lemma Generated(x: int)     ← unchanged
-+  requires false            ← added
-+lemma Sneaky() { }          ← added, supplies the keyword
-   ensures P(x)              ← unchanged
++  ensures true requires false
 ```
 
-That arrangement happens not to parse, but the rule should not depend on
-that. `fixtures/cheat-weakened-precondition-reordered.dfy` pins it.
+begins with an allowed keyword and still smuggles a precondition onto the
+generated declaration. Both are rejected above, for their own stated reasons.
 
-**Corpus cost: one pair, already excluded.** Across all 65 pairs, exactly one
-reference solution adds preconditions to a generated declaration —
-charmchat's `topologicalSort`:
+**Corpus cost: zero.** Across all 35 reference solutions, 76 added lines land
+inside a generated signature — 55 `decreases`, 12 `ensures`, 9 inert — and every
+one is accepted. No added clause lands on a trusted declaration, though six task
+files contain generated `{:axiom}` declarations, so that restriction is free
+too.
 
-```dafny
- method topologicalSort(nodes: seq<WorkflowNode>, deps: …) returns (res: …)
-+  requires forall i, j :: 0 <= i < j < |nodes| ==> nodes[i].id != nodes[j].id
-+  requires forall k :: k in deps ==> k in NodeIds(nodes)
-+  requires forall k, v :: k in deps && v in deps[k] ==> v in NodeIds(nodes)
-+  requires exists rank: map<string, nat> :: IsRanking(NodeIds(nodes), deps, rank)
-   ensures (|res| <= |nodes|)          ← generated
-+  ensures |res| == |nodes|            ← added
-```
-
-The motive is sympathetic: a topological sort really does need acyclicity to
-return every node, and the author added the hypotheses in order to prove the
-*stronger* postcondition. But the side effect is that the generated
-obligation `|res| <= |nodes|` is now conditional too — the candidate proves
-less about the generated theorem than the `.gen` asked for.
-
-This is an upstream to-do rather than a reason to soften the rule. The four
-hypotheses belong in `workflow.ts` as `//@ requires` (SPEC.md §2.2), which
-would put them in the `.gen`, make the task well-posed, and leave the
-solution additions-only. And softening is not available anyway: no rule can
-distinguish "acyclicity, honestly needed" from "false" without reading the
-proof, so any exemption reopens the one-line cheat.
-
-The pair is excluded for `verification-timeout` regardless, so the rule costs
-the benchmark no task it was not already losing.
-
-It also settles the largest question the design had open — whether the
-original specs are frozen. They are, in the direction that matters:
-weakening is banned, strengthening is fine.
+Outside signature intervals, added `requires` / `reads` / `modifies` clauses are
+still rejected when they attach to a generated declaration; see *Notes on the
+token list*.
 
 **2. Verifies clean.**
 
@@ -178,17 +160,29 @@ dafny verify --allow-warnings --warn-contradictory-assumptions --json-output \
   [--standard-libraries] [--verification-time-limit N] [task flags…] candidate.dfy
 ```
 
-Zero errors, and no *disqualifying* warning. Three categories disqualify,
-all regardless of location:
+Zero errors, and no *disqualifying* warning. Five categories disqualify:
 
-| warning | Dafny 4.11.0 message | disqualifies |
-|---|---|---|
-| bodyless declaration | `… is part of a bodyless method` | always |
-| bodyless `forall` | `this forall statement has no body` | always |
-| bodyless loop | `this loop has no body (loop frame: …)` | always |
+| warning | Dafny 4.11.0 message |
+|---|---|
+| bodyless declaration | `… is part of a bodyless method` |
+| bodyless `forall` | `this forall statement has no body` |
+| bodyless loop | `this loop has no body (loop frame: …)` |
+| `{:verify false}` | `The {:verify false} attribute should only be used…` |
+| vacuous theorem | `ensures clause proved using contradictory assumptions` |
 
-Contradictory-assumption warnings are counted and reported but do **not**
-disqualify; see *Why the vacuous check is only reported*.
+The last two each earn their place for a specific reason. Dafny announces
+`{:verify false}` itself, which is worth more than any token scan: the attribute
+can be split across lines,
+
+```
++lemma {:verify
++       false} Cheat()
+```
+
+so no line-wise denylist sees it, but the warning fires regardless of spelling.
+
+The vacuous-theorem category carries one exception — see *Vacuous theorems, and
+the one exception*.
 
 Every other warning Dafny emits — deprecated syntax, unused variables — is
 ignored. Run in a directory containing only the candidate.
@@ -197,7 +191,7 @@ ignored. Run in a directory containing only the candidate.
 line, `severity` 1 for errors and 2 for warnings, the text in
 `defaultFormatMessage`, related locations nested inside their diagnostic
 instead of arriving as separate ones. Error count is therefore exact.
-`errorId` is null for all three categories, so the categories are matched on
+`errorId` is null for these categories, so they are matched on
 message text — which is what makes the fixtures below load-bearing.
 
 ### The verify command is per task
@@ -297,24 +291,19 @@ The reference report (see Generator) is what tests this. If many reference
 solutions trip a category legitimately, the bar is wrong rather than the case
 studies. That is exactly what happened to the fourth category; see below.
 
-### Why the vacuous check is only reported
+### Vacuous theorems, and the one exception
 
-The first version of this design disqualified every contradictory-assumption
-warning, on the reasoning that `requires false` on an uncalled lemma verifies
-trivially and Dafny is the only thing that can see it. The reference report
-falsified that twice over, and the syntactic rule above replaced it.
-
-**Dafny emits the warning in two shapes.**
+Dafny emits the contradictory-assumption warning in two shapes, and only the
+first says the *theorem* was vacuous:
 
 ```
 ensures clause proved using contradictory assumptions
 proved using contradictory assumptions: <inner goal>
 ```
 
-The second says some obligation *inside* a proof — an assertion, an index
-bound, a loop invariant, a termination check — was discharged on an
-infeasible path. That is not a cheat; it is what proof by contradiction looks
-like from the verifier's side:
+The second reports an obligation discharged inside a proof on an infeasible
+path — an assertion, an index bound, a loop invariant, a termination check. That
+is what proof by contradiction looks like from the verifier's side:
 
 ```dafny
 if total > placed + n * G - 1 {
@@ -323,12 +312,14 @@ if total > placed + n * G - 1 {
 }
 ```
 
-The branch is infeasible precisely because the lemma is true. Nine files in
-the corpus contain one; five reference solutions were rejected by the broad
-match — `eventab`, `guardians` twice, `infisical`, `equality-game`.
+The branch is infeasible precisely because the lemma is true. Nine files in this
+corpus contain one, so matching the second shape rejects a standard technique.
+Only the first shape disqualifies.
 
-**Even the narrow shape has a legitimate reading.** hono-rate-limiter's
-`SlidingWindowBound` states that a set of hypotheses is unsatisfiable:
+**The exception.** A clause that is literally `ensures false` does not
+disqualify. Such a lemma asserts that its own hypotheses are unsatisfiable, so
+proving `false` from them *is* the theorem — the contrapositive idiom, which
+hono-rate-limiter uses:
 
 ```dafny
 lemma SlidingWindowBound(A: seq<int>, W: int, limit: int, s: int, p: int)
@@ -337,26 +328,19 @@ lemma SlidingWindowBound(A: seq<int>, W: int, limit: int, s: int, p: int)
   ensures false
 ```
 
-Proving `false` from contradictory assumptions *is* the theorem. Dafny cannot
-tell that apart from a vacuous one, and excluding a 242-line task over it is
-the wrong trade.
+The exception is safe because a candidate cannot put `ensures false` on a
+generated declaration: the signature rule rejects an added `ensures` on a
+trusted one, and on a proved one the clause has to be discharged like any other.
 
-**And the syntactic rule strictly dominates it.** Frozen preconditions block
-the cheat the warning existed for, deterministically; they also block ordinary
-non-vacuous weakening, which the warning never saw at all — a satisfiable but
-restrictive added `requires` produces no warning whatsoever.
-
-So the category is dropped and the count is kept. `--warn-contradictory-assumptions`
-stays on: it costs nothing measurable (10s versus 12s, and 6s versus 6s, on
-two corpus files) and the per-pair count is worth watching in case a shape
-appears that the freeze does not explain.
-
-State the residual honestly. The check was always heuristic — proof-dependency
-analysis uses solver-provided unsat cores, which aren't guaranteed minimal,
-and some contradiction-based proofs go unwarned. It was never *no vacuous
-proofs*, only *no warnings from the pinned Dafny version*. Now it is not even
-that; the claim is *no contract of a generated declaration was weakened*,
-which is a property of the diff and holds exactly.
+**This category was briefly dropped, and that was wrong.** The argument for
+dropping it was that the syntactic frozen-signature rule blocks the cheat it
+existed for, so the semantic check was redundant and only contributed false
+positives. Both halves were measured against reference solutions — which are
+honest, so they reveal the false-positive rate and say nothing about the
+false-negative rate. Three escapes were later found that it catches and nothing
+else does: the multiline `{:verify false}`, `decreases *` on a nonterminating
+loop, and `ensures false` on a generated `{:axiom}` declaration. Two of those now
+have their own defence; the category stays as the third.
 
 ### On the warning mechanics
 
@@ -383,10 +367,18 @@ The suite also asserts a *coverage* property: every pattern in the list, and
 every frozen contract clause, has a fixture naming it. A ban with no fixture
 fails the suite, so the list cannot grow past its own tests.
 
-Four fixtures cover the frozen contracts: `requires`, `reads` and `modifies`
-bolted onto a generated declaration, plus
-`cheat-weakened-precondition-reordered`, which pins attribution to the
-nearest *preceding* declaration rather than to the enclosing run.
+Four fixtures cover the frozen contracts outside signature intervals:
+`requires`, `reads` and `modifies` bolted onto a generated declaration, plus
+`cheat-weakened-precondition-reordered`, which pins attribution to the nearest
+*preceding* declaration rather than to the enclosing run.
+
+Five more cover the signature interval itself, and the suite asserts the
+*reason* each is rejected, so a fixture cannot pass for the wrong cause:
+`cheat-clause-continuation` (`|| true`), `cheat-clause-smuggle`
+(`ensures true requires false`), `cheat-frame-smuggle`, `cheat-decreases-wildcard`,
+and `cheat-ensures-on-trusted`. The last carries its own `.dfy.gen`, since the
+trusted declaration has to be in the generated file for its signature to be a
+generated one.
 
 Two fixtures began as canaries for a known v0 gap rather than as banned
 patterns: a **bodyless `forall`** and a **bodyless loop with invariants**.
@@ -406,7 +398,10 @@ Four more fixtures assert the opposite direction, that legitimate work is
 - `ok-contrapositive-lemma` — a helper whose `ensures false` is the theorem,
   the shape that used to exclude hono-rate-limiter;
 - `ok-new-helper-precondition` — a helper the candidate wrote, carrying its
-  own `requires`, which pins the exception in the freeze.
+  own `requires`, which pins the exception in the freeze;
+- `ok-added-ensures`, `ok-added-decreases`, `ok-signature-comment` — the two
+  clause kinds a candidate may add to a generated signature, and proof
+  commentary beside them.
 
 A validator with only negative fixtures drifts toward rejecting everything.
 These four are the counterweight, and each encodes a decision the corpus
@@ -497,8 +492,8 @@ not a pass.
 
 `additions` carries deleted-line count and samples, the banned matches
 (pattern name, index into the added lines, the line), the weakened contracts
-(clause, index, line), added-line count, and added non-blank non-comment
-count. `verify` carries error count, of which timeouts, error samples,
+(clause, index, line), the signature violations (which generated declaration,
+why, the line), added-line count, and added non-blank non-comment count. `verify` carries error count, of which timeouts, error samples,
 disqualifying warnings by category, contradiction warnings, other warnings,
 the argv used, and elapsed seconds. Both carry a `not-run` reason when they
 could not run at all — no git, no `dafny`, a candidate that could not be
@@ -594,12 +589,20 @@ Aggregate: pairs seen, admitted, excluded by cause. A pair can trip more
 than one cause, so the per-cause counts sum to at least the excluded count
 rather than exactly to it.
 
-**Pairs with no additions.** A solution byte-identical to its `.gen` passes
-both checks, because there is nothing to check: the skeleton already
-verifies. It is not a task — the empty submission solves it — so it is
-excluded under its own cause, `no-additions`, rather than shipped as a
-freebie or dropped silently. This is a large share of the corpus, and the
-report is where that fact belongs.
+**The skeleton has to fail.** A pair becomes a task only if the reference
+passes both checks *and the `.dfy.gen` fails them*. Two sub-cases:
+
+- **`no-additions`** — the solution is byte-identical to its `.gen`, so there
+  was never anything to prove. A large share of the corpus: 26 of 65 pairs.
+- **`already-verifies`** — the reference author wrote proof the solver did not
+  need. Measured at 2 of the 35 pairs that otherwise qualified, with 35 and 6
+  added code lines respectively.
+
+Both are excluded under their own cause rather than shipped as freebies. The
+second is the one that would otherwise corrupt the numbers: without it the
+empty submission scores 2/35, and every reported success rate is inflated by
+about six points. Only pairs that would otherwise be admitted pay for the extra
+Dafny run.
 
 This is how the design gets falsified. Every ban and every disqualifying
 warning category is a guess that the reference solutions clear it. If a
@@ -722,6 +725,14 @@ cheap.
   L()` with no postcondition verifies silently, no warning. It is also
   vacuous in practice — such a lemma proves nothing, so leaving it unfilled
   gains a candidate nothing — so this stays a note rather than a hole.
+- **Executable additions inside generated bodies.** A candidate can add
+  `return None;`, an assignment, or control flow to the body of a generated
+  method. Confirmed working against a real task, and Dafny emits no diagnostic
+  for it. Everything above governs specifications; nothing governs statements.
+  Closing it means comparing the two programs with proof content erased —
+  assertions, lemma calls, ghost declarations and specification clauses removed
+  — and requiring the executable projections to match. That is real work and is
+  scoped separately.
 - **Reproducibility of the verify step.** Wall-clock time limits make the
   admission gate depend on the machine and on how many verifications run at
   once. Two pairs sit near their limit today (`collab-todo` at 50s,

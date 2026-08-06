@@ -23,11 +23,12 @@
       }
     ],
     "pairsSeen": 65,
-    "admitted": 35,
-    "excluded": 30,
+    "admitted": 33,
+    "excluded": 32,
     "excludedByCause": {
       "no-additions": 26,
       "verification-timeout": 3,
+      "already-verifies": 2,
       "excluded:license": 2,
       "weakened:requires": 1
     }
@@ -37,7 +38,7 @@
       "repo": "midspiral/collab-todo-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "1839dfd3deb7907deaadade6467928907174779b",
+      "head": "b3133160a80c5ddbea68051dc37410798e41e432",
       "currentBranch": "main",
       "dirty": false
     },
@@ -45,7 +46,7 @@
       "repo": "midspiral/colorwheel-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "26d2ac4019619aaecbc0a27c83010f7f95f6f2e3",
+      "head": "a532b1d41e3b50f62cfd80871a0e5180c1c7e14d",
       "currentBranch": "main",
       "dirty": false
     },
@@ -109,7 +110,7 @@
       "repo": "midspiral/github-star-checker-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "2e6c792c479ff5bf95941bfc4700cf3b3cbecd44",
+      "head": "1ac991690bcbb3bfeee4d65adf610df448d7bc57",
       "currentBranch": "main",
       "dirty": false
     },
@@ -125,7 +126,7 @@
       "repo": "midspiral/talktimer-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "b83df2914e36c89a88d041fb2df91d393cf1b3cf",
+      "head": "2b50d690c64c644698f7ab46f071d8c5d7cd17b2",
       "currentBranch": "main",
       "dirty": false
     },
@@ -149,7 +150,7 @@
       "repo": "midspiral/trace-solo-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "14e3e4cb2459539f9a76d3aa88ecd36386cb134d",
+      "head": "8c908fa28b58dd45f11191fcc47c240c4fd6f99b",
       "currentBranch": "main",
       "dirty": false
     },
@@ -181,7 +182,7 @@
       "repo": "midspiral/guardians-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "13f428054b418209993a93600be4aa043e54f29c",
+      "head": "c1831635512a000d0734cd98c3a8722e11723012",
       "currentBranch": "main",
       "dirty": false
     },
@@ -189,7 +190,7 @@
       "repo": "midspiral/quorum-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "16db5b618210e8adfcbf001e7b5f8388d2b10c1c",
+      "head": "d0ab24ac85ba8e674a111fae37b218c8e5fd4696",
       "currentBranch": "main",
       "dirty": false
     },
@@ -197,7 +198,7 @@
       "repo": "midspiral/quorum-tutorial-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "b98527836c53983740f306a804f42549812e3701",
+      "head": "5f20b05fb5ebe138a2878c870971e99e69b78845",
       "currentBranch": "main",
       "dirty": false
     },
@@ -205,7 +206,7 @@
       "repo": "midspiral/quota-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "b946073e638a7fddbc199afa50703943c8813016",
+      "head": "f1318ecc8c2a4d53df12c9f129d5a98010796a61",
       "currentBranch": "main",
       "dirty": false
     },
@@ -221,7 +222,7 @@
       "repo": "midspiral/eventab-lemmascript",
       "branch": "main",
       "present": true,
-      "head": "342cd2efb792f7a80a0c47e15e4c5f613ecbf5c7",
+      "head": "f4b23eec54bf6cf9ccd8b3bdeb86f1199b93065f",
       "currentBranch": "main",
       "dirty": false
     },
@@ -279,6 +280,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -355,6 +357,32 @@
             "text": "  requires exists rank: map<string, nat> :: IsRanking(NodeIds(nodes), deps, rank)"
           }
         ],
+        "signatureViolations": [
+          {
+            "declarationLine": 27,
+            "declaration": "method topologicalSort(nodes: seq<WorkflowNode>, deps: map<string, set<s",
+            "why": "does not begin an `ensures` or `decreases` clause",
+            "text": "  requires forall i, j :: 0 <= i < j < |nodes| ==> nodes[i].id != nodes[j].id"
+          },
+          {
+            "declarationLine": 27,
+            "declaration": "method topologicalSort(nodes: seq<WorkflowNode>, deps: map<string, set<s",
+            "why": "does not begin an `ensures` or `decreases` clause",
+            "text": "  requires forall k :: k in deps ==> k in NodeIds(nodes)"
+          },
+          {
+            "declarationLine": 27,
+            "declaration": "method topologicalSort(nodes: seq<WorkflowNode>, deps: map<string, set<s",
+            "why": "does not begin an `ensures` or `decreases` clause",
+            "text": "  requires forall k, v :: k in deps && v in deps[k] ==> v in NodeIds(nodes)"
+          },
+          {
+            "declarationLine": 27,
+            "declaration": "method topologicalSort(nodes: seq<WorkflowNode>, deps: map<string, set<s",
+            "why": "does not begin an `ensures` or `decreases` clause",
+            "text": "  requires exists rank: map<string, nat> :: IsRanking(NodeIds(nodes), deps, rank)"
+          }
+        ],
         "addedLines": 699,
         "addedCodeLines": 647
       },
@@ -411,6 +439,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -465,6 +494,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 1194,
         "addedCodeLines": 872
       },
@@ -519,6 +549,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 32,
         "addedCodeLines": 30
       },
@@ -540,7 +571,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/collab-todo-lemmascript:src/domain.ts",
@@ -569,6 +601,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 54,
         "addedCodeLines": 54
       },
@@ -589,10 +622,11 @@
           "50",
           "domain.dfy"
         ],
-        "seconds": 51,
+        "seconds": 49,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/colorwheel-lemmascript:src/colorwheel.ts",
@@ -622,6 +656,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -674,6 +709,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 666,
         "addedCodeLines": 575
       },
@@ -696,10 +732,11 @@
           "--isolate-assertions",
           "equality.dfy"
         ],
-        "seconds": 19,
+        "seconds": 18,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/eslint-plugin-with-lemmascript:src/core.verified.ts",
@@ -727,6 +764,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 345,
         "addedCodeLines": 257
       },
@@ -749,7 +787,8 @@
         "seconds": 12,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/eventab-lemmascript:src/allocate.ts",
@@ -779,6 +818,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 157,
         "addedCodeLines": 120
       },
@@ -800,7 +840,7 @@
           "--standard-libraries",
           "allocate.dfy"
         ],
-        "seconds": 37,
+        "seconds": 36,
         "timedOut": false,
         "exitCode": 4
       }
@@ -833,6 +873,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -884,6 +925,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -935,6 +977,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -986,6 +1029,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -1037,6 +1081,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -1088,6 +1133,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -1137,6 +1183,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 80,
         "addedCodeLines": 66
       },
@@ -1155,10 +1202,11 @@
           "--json-output",
           "domain.dfy"
         ],
-        "seconds": 12,
+        "seconds": 11,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/guardians-lemmascript:src/automaton_core.ts",
@@ -1186,6 +1234,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 10,
         "addedCodeLines": 10
       },
@@ -1207,7 +1256,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/guardians-lemmascript:src/loop_core.ts",
@@ -1235,6 +1285,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 41,
         "addedCodeLines": 40
       },
@@ -1256,7 +1307,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/guardians-lemmascript:src/prov_core.ts",
@@ -1284,6 +1336,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 20,
         "addedCodeLines": 20
       },
@@ -1305,7 +1358,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/guardians-lemmascript:src/taint_core.ts",
@@ -1333,6 +1387,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 42,
         "addedCodeLines": 42
       },
@@ -1354,7 +1409,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/guardians-lemmascript:src/wf_core.ts",
@@ -1382,6 +1438,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 110,
         "addedCodeLines": 110
       },
@@ -1403,7 +1460,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/henri-lemmascript:src/edit.ts",
@@ -1431,6 +1489,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 130,
         "addedCodeLines": 119
       },
@@ -1452,7 +1511,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/henri-lemmascript:src/hooks.ts",
@@ -1480,6 +1540,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 176,
         "addedCodeLines": 154
       },
@@ -1501,7 +1562,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/henri-lemmascript:src/permissions.ts",
@@ -1529,6 +1591,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 124,
         "addedCodeLines": 90
       },
@@ -1550,7 +1613,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/henri-lemmascript:src/transcript.ts",
@@ -1578,6 +1642,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 129,
         "addedCodeLines": 117
       },
@@ -1599,7 +1664,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/hono-lemmascript:src/middleware/ip-restriction/matcher.verified.ts",
@@ -1627,6 +1693,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 62,
         "addedCodeLines": 48
       },
@@ -1649,7 +1716,8 @@
         "seconds": 6,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/hono-lemmascript:src/middleware/ip-restriction/verified.ts",
@@ -1679,6 +1747,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -1728,6 +1797,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 3,
         "addedCodeLines": 2
       },
@@ -1749,7 +1819,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/hono-lemmascript:src/utils/cookie.ts",
@@ -1779,6 +1850,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -1828,6 +1900,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 2,
         "addedCodeLines": 1
       },
@@ -1849,7 +1922,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/hono-lemmascript:src/utils/ipaddr.verified.ts",
@@ -1877,6 +1951,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 10,
         "addedCodeLines": 9
       },
@@ -1898,7 +1973,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/hono-rate-limiter-with-lemmascript:src/core.verified.ts",
@@ -1926,6 +2002,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 258,
         "addedCodeLines": 185
       },
@@ -1947,7 +2024,8 @@
         "seconds": 9,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/infisical-lemmascript:backend/src/lib/casl/glob-subset.ts",
@@ -1975,6 +2053,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 163,
         "addedCodeLines": 122
       },
@@ -1996,7 +2075,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/mcp-sdk-lemmascript:packages/client/src/client/probeClassifier.ts",
@@ -2026,6 +2106,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2077,6 +2158,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2128,6 +2210,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2179,6 +2262,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2230,6 +2314,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2281,6 +2366,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2330,6 +2416,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 31,
         "addedCodeLines": 24
       },
@@ -2349,10 +2436,11 @@
           "--standard-libraries",
           "subagent-permissions.dfy"
         ],
-        "seconds": 6,
+        "seconds": 5,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/opencode-lemmascript:packages/opencode/src/patch/index.ts",
@@ -2382,6 +2470,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2410,8 +2499,10 @@
       "repo": "midspiral/opencode-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/opencode/src/permission/arity.ts",
-      "admitted": true,
-      "causes": [],
+      "admitted": false,
+      "causes": [
+        "already-verifies"
+      ],
       "verifyOptions": {
         "flags": []
       },
@@ -2431,6 +2522,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 57,
         "addedCodeLines": 35
       },
@@ -2452,7 +2544,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": true
     },
     {
       "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/evaluate.ts",
@@ -2482,6 +2575,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2510,8 +2604,10 @@
       "repo": "midspiral/opencode-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/opencode/src/permission/index.ts",
-      "admitted": true,
-      "causes": [],
+      "admitted": false,
+      "causes": [
+        "already-verifies"
+      ],
       "verifyOptions": {
         "flags": []
       },
@@ -2531,6 +2627,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 10,
         "addedCodeLines": 6
       },
@@ -2552,7 +2649,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": true
     },
     {
       "key": "midspiral/opencode-lemmascript:packages/opencode/src/util/wildcard.ts",
@@ -2580,6 +2678,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 12,
         "addedCodeLines": 7
       },
@@ -2601,7 +2700,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/pi-lemmascript:packages/agent/src/harness/compaction/compaction.ts",
@@ -2631,6 +2731,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2682,6 +2783,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2733,6 +2835,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2785,6 +2888,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2836,6 +2940,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2887,6 +2992,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -2936,6 +3042,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 174,
         "addedCodeLines": 129
       },
@@ -2957,7 +3064,8 @@
         "seconds": 2,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/quorum-lemmascript:src/grid.ts",
@@ -2985,6 +3093,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 50,
         "addedCodeLines": 34
       },
@@ -3006,7 +3115,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/quorum-tutorial-lemmascript:src/domain.ts",
@@ -3034,6 +3144,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 538,
         "addedCodeLines": 482
       },
@@ -3055,7 +3166,8 @@
         "seconds": 3,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/quorum-tutorial-lemmascript:src/grid.ts",
@@ -3083,6 +3195,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 49,
         "addedCodeLines": 34
       },
@@ -3104,7 +3217,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/quota-lemmascript:src/domain.ts",
@@ -3132,6 +3246,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 275,
         "addedCodeLines": 200
       },
@@ -3153,7 +3268,8 @@
         "seconds": 2,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/rallly-lemmascript:apps/web/src/features/poll/scoring.ts",
@@ -3183,6 +3299,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 1,
         "addedCodeLines": 1
       },
@@ -3204,7 +3321,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/rallly-lemmascript:apps/web/src/utils/redirect.ts",
@@ -3235,6 +3353,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 0,
         "addedCodeLines": 0
       },
@@ -3284,6 +3403,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 56,
         "addedCodeLines": 54
       },
@@ -3306,7 +3426,8 @@
         "seconds": 8,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/trace-solo-lemmascript:src/games/g2048/engine.ts",
@@ -3334,6 +3455,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 134,
         "addedCodeLines": 105
       },
@@ -3355,7 +3477,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/trace-solo-lemmascript:src/platform/replay_core.ts",
@@ -3383,6 +3506,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 101,
         "addedCodeLines": 91
       },
@@ -3404,7 +3528,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/edges/general.ts",
@@ -3432,6 +3557,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 15,
         "addedCodeLines": 14
       },
@@ -3451,10 +3577,11 @@
           "--standard-libraries",
           "general.dfy"
         ],
-        "seconds": 5,
+        "seconds": 6,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/general.ts",
@@ -3482,6 +3609,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 1,
         "addedCodeLines": 1
       },
@@ -3503,7 +3631,8 @@
         "seconds": 1,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     },
     {
       "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/graph.ts",
@@ -3531,6 +3660,7 @@
         "deletedSamples": [],
         "bannedMatches": [],
         "weakenedContracts": [],
+        "signatureViolations": [],
         "addedLines": 387,
         "addedCodeLines": 309
       },
@@ -3553,7 +3683,8 @@
         "seconds": 7,
         "timedOut": false,
         "exitCode": 0
-      }
+      },
+      "skeletonVerifies": false
     }
   ]
 }

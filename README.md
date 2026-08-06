@@ -128,20 +128,26 @@ axiom check usually means an intentional axiom nobody marked as one.
 
 Two checks, run against the `.dfy.gen` and against Dafny — nothing else:
 
-1. The diff against the `.dfy.gen` contains no deletions; no added line
-   reaches for one of Dafny's trust escape hatches; and no added
-   `requires` / `reads` / `modifies` attaches to a generated declaration. A
-   line is scanned whole apart from a trailing `//` comment, and even that is
-   only dropped when no `"` appears before it — so a banned word inside a
-   string is still caught, while proof commentary is left alone.
-2. `dafny verify` reports no errors, and none of the three warnings that
-   indicate an unproven claim: a bodyless declaration, a bodyless `forall`,
-   or a bodyless loop.
+1. The diff against the `.dfy.gen` contains no deletions, no added line reaches
+   for one of Dafny's trust escape hatches, and the specifications the
+   generated file already states are left alone. Inside a generated
+   declaration's signature a candidate may add only a complete `ensures` or
+   `decreases` clause — and an `ensures` only where the declaration is actually
+   proved, never on an axiom, whose postconditions Dafny assumes. That is what
+   stops a lone `|| true` on its own line from turning a generated
+   postcondition into a tautology, since Dafny treats newlines as whitespace.
+2. `dafny verify` reports no errors, and none of the warnings that indicate an
+   unproven claim: a bodyless declaration, `forall` or loop, a `{:verify false}`
+   attribute, or a theorem proved from contradictory assumptions.
 
-Contradictory-assumption warnings are counted but do not disqualify. They
-fire on proof by contradiction, which is a technique rather than a cheat, and
-the vacuous proof they were meant to catch is blocked by check 1 instead —
-syntactically, and without the solver.
+The last has one exception: a lemma whose postcondition is literally
+`ensures false` asserts that its own hypotheses are unsatisfiable, so proving
+`false` from them *is* the theorem. Warnings about obligations discharged
+*inside* a proof are ignored entirely — that is what proof by contradiction
+looks like to the verifier, and nine files in the corpus rely on it.
+
+All regions are computed from the `.dfy.gen`, never from the candidate, so no
+addition can move the boundary it is judged against.
 
 Each task carries the verification options its case study uses — a time
 limit and any extra Dafny flags, taken from `LemmaScript-files.txt` — and
@@ -151,10 +157,12 @@ long Dafny looks, not what it will accept.
 The escape hatches are enumerated as patterns, and each one has a
 fixture: a small cheating `.dfy` that the test suite asserts is rejected.
 Dafny spells several of these more than one way, so the list is kept
-executable rather than documentary. Four fixtures run the other way and
+executable rather than documentary, and each fixture asserts the *reason* it is
+rejected rather than merely that it fails. Seven fixtures run the other way and
 assert that legitimate work passes: proof commentary containing the word
 "assume", a proof by contradiction, a lemma whose `ensures false` is the
-theorem, and a new helper carrying its own precondition.
+theorem, a new helper carrying its own precondition, and the clauses and
+comments a candidate may add to a generated signature.
 
 The same code path validates candidate solutions and admits reference
 solutions, so the two can't drift apart.

@@ -24,8 +24,25 @@ import {
   type BannedMatch,
   type WeakenedContract,
 } from "./banned.js";
+import {
+  beginsDeclaration,
+  isInert,
+  judgeSignatureLine,
+  scrub,
+  signatureIntervals,
+  type LexState,
+} from "./signature.js";
 
 export type CheckStatus = "passed" | "failed" | "not-run";
+
+export interface SignatureViolation {
+  /** 1-based line of the generated declaration the addition lands in. */
+  declarationLine: number;
+  /** The declaration, for the message. */
+  declaration: string;
+  why: string;
+  text: string;
+}
 
 export interface AdditionsCheck {
   status: CheckStatus;
@@ -36,8 +53,12 @@ export interface AdditionsCheck {
   deletedSamples: string[];
   bannedMatches: BannedMatch[];
   /** Added `requires` / `reads` / `modifies` clauses attached to a generated
-   *  declaration. See `checkAdditionsOnly` for how attachment is decided. */
+   *  declaration outside its signature interval. */
   weakenedContracts: WeakenedContract[];
+  /** Added lines inside a generated declaration's signature that are not an
+   *  allowed clause. This is what stops `|| true` from continuing a generated
+   *  postcondition into something trivial. */
+  signatureViolations: SignatureViolation[];
   addedLines: number;
   /** Added lines that are neither blank nor a whole-line `//` comment. */
   addedCodeLines: number;
@@ -46,7 +67,9 @@ export interface AdditionsCheck {
 export type WarningCategory =
   | "bodyless-declaration"
   | "bodyless-forall"
-  | "bodyless-loop";
+  | "bodyless-loop"
+  | "verify-false"
+  | "vacuous-theorem";
 
 /**
  * Disqualifying warnings, matched on Dafny's message text.
@@ -60,31 +83,38 @@ const warningCategories: { category: WarningCategory; match: RegExp }[] = [
   { category: "bodyless-declaration", match: /part of a bodyless/ },
   { category: "bodyless-forall", match: /forall statement has no body/ },
   { category: "bodyless-loop", match: /loop has no body/ },
+  // Dafny announces this one itself, which is worth more than any token scan:
+  // the attribute can be split across lines (`{:verify` / `false}`) and no
+  // line-wise denylist sees it, but the warning fires regardless of spelling.
+  { category: "verify-false", match: /\{:verify false\} attribute/ },
 ];
 
 /**
- * Contradictory-assumption warnings: reported, never disqualifying.
+ * A theorem proved from contradictory assumptions.
  *
- * These used to exclude a candidate. They no longer do, because the syntactic
- * rule that replaced them — frozen preconditions on generated declarations, see
- * `findWeakenedContracts` — blocks the cheat they existed for, deterministically
- * and without the solver. What the warning adds on top is false positives:
- *
- *   proved using contradictory assumptions: assertion always holds
- *
- * is what proof by contradiction looks like from the verifier's side, and nine
- * files in this corpus contain one. Even the narrow shape,
+ * Dafny emits this in two shapes, and only the first says the *theorem* was
+ * vacuous:
  *
  *   ensures clause proved using contradictory assumptions
+ *   proved using contradictory assumptions: <inner goal>
  *
- * fires on a deliberate contrapositive lemma — hono-rate-limiter's
- * `SlidingWindowBound` states that a set of hypotheses is unsatisfiable, so
- * `ensures false` proved from contradictory assumptions *is* the theorem.
+ * The second reports an obligation discharged on an infeasible path — an
+ * assertion, an index bound, a loop invariant — which is what proof by
+ * contradiction looks like from the verifier's side. Nine files in this corpus
+ * contain one, so matching it would reject a standard technique.
  *
- * The flag stays on because it costs nothing measurable and the count is worth
- * watching; the count is carried into the reference report.
+ * The first shape disqualifies, with one exception: a clause that is literally
+ * `ensures false`. Such a lemma asserts that its own hypotheses are
+ * unsatisfiable, so proving `false` from them *is* the theorem — the
+ * contrapositive idiom. The exception is safe because a candidate cannot write
+ * `ensures false` onto a generated declaration; the signature rule rejects an
+ * added `ensures` there unless the declaration is concretely verified, and a
+ * candidate's own lemma proving `false` from contradictory hypotheses is honest
+ * work.
  */
+const vacuousTheorem = /^ensures clause proved using contradictory assumptions/;
 const contradictionWarning = /proved using contradictory assumptions/;
+const literalEnsuresFalse = /^\s*ensures\s+false\s*(\/\/.*)?$/;
 
 export interface DisqualifyingWarning {
   category: WarningCategory;
@@ -134,13 +164,17 @@ export interface ValidationResult {
   diff: string;
 }
 
-/** `git diff --no-index`, whose exit status is 1 when the files differ. */
-function gitDiff(genPath: string, candidatePath: string): string {
+/** `git diff --no-index`, whose exit status is 1 when the files differ.
+ *  `context` is Infinity for the analysis pass: the classification needs every
+ *  generated line present, since an added line is located by the generated line
+ *  it follows. The compact diff is kept separately, for reporting. */
+function gitDiff(genPath: string, candidatePath: string, fullContext = false): string {
+  const ctx = fullContext ? ["-U1000000"] : [];
   try {
-    return execFileSync("git", ["diff", "--no-index", "--no-color", "--", genPath, candidatePath], {
+    return execFileSync("git", ["diff", "--no-index", "--no-color", ...ctx, "--", genPath, candidatePath], {
       encoding: "utf-8",
       stdio: ["ignore", "pipe", "ignore"],
-      maxBuffer: 64 * 1024 * 1024,
+      maxBuffer: 256 * 1024 * 1024,
     });
   } catch (e: any) {
     if (e?.stdout != null) return typeof e.stdout === "string" ? e.stdout : e.stdout.toString("utf-8");
@@ -162,6 +196,7 @@ export function checkAdditionsOnly(genPath: string, candidatePath: string): { ch
         deletedSamples: [],
         bannedMatches: [],
         weakenedContracts: [],
+        signatureViolations: [],
         addedLines: 0,
         addedCodeLines: 0,
       },
@@ -174,12 +209,17 @@ export function checkAdditionsOnly(genPath: string, candidatePath: string): { ch
 
   const bannedMatches = scanAddedLines(added);
   const weakenedContracts = findWeakenedContracts(lines);
+  const signatureViolations = findSignatureViolations(genPath, candidatePath);
   const addedCodeLines = added.filter(l => {
     const t = l.trim();
     return t !== "" && !t.startsWith("//");
   }).length;
 
-  const clean = deleted.length === 0 && bannedMatches.length === 0 && weakenedContracts.length === 0;
+  const clean =
+    deleted.length === 0 &&
+    bannedMatches.length === 0 &&
+    weakenedContracts.length === 0 &&
+    signatureViolations.length === 0;
   return {
     diff,
     check: {
@@ -188,10 +228,65 @@ export function checkAdditionsOnly(genPath: string, candidatePath: string): { ch
       deletedSamples: deleted.slice(0, 5),
       bannedMatches,
       weakenedContracts,
+      signatureViolations,
       addedLines: added.length,
       addedCodeLines,
     },
   };
+}
+
+/**
+ * Added lines that land inside a generated declaration's signature and are not
+ * one of the two clauses a candidate may add there.
+ *
+ * An added line is located by the generated line it follows, which is why the
+ * analysis pass uses a full-context diff. The intervals themselves come from
+ * the `.dfy.gen`, so no addition can move the boundary it is being judged
+ * against.
+ */
+function findSignatureViolations(genPath: string, candidatePath: string): SignatureViolation[] {
+  const intervals = signatureIntervals(readFileSync(genPath, "utf-8"));
+  if (intervals.length === 0) return [];
+
+  const found: SignatureViolation[] = [];
+  const state: LexState = { block: false, str: false };
+  let genLine = 0;
+  // An added line that opens a declaration of its own ends the generated
+  // signature it was inserted into: everything after it belongs to the
+  // candidate's declaration, not to the generated one.
+  let leftSignature = false;
+
+  for (const raw of gitDiff(genPath, candidatePath, true).split("\n")) {
+    if (raw.startsWith("@@") || raw.startsWith("+++") || raw.startsWith("---")) continue;
+    if (raw.startsWith("diff ") || raw.startsWith("index ") || raw.startsWith("\\")) continue;
+    if (raw.startsWith(" ")) {
+      genLine++;
+      leftSignature = false;
+      continue;
+    }
+    if (!raw.startsWith("+")) continue;
+
+    const text = raw.slice(1);
+    const interval = intervals.find(iv => genLine >= iv.start && genLine <= iv.end);
+    if (!interval || leftSignature) continue;
+    if (isInert(text)) continue;
+
+    const code = scrub(text, state).trim();
+    if (beginsDeclaration(code)) {
+      leftSignature = true;
+      continue;
+    }
+    const verdict = judgeSignatureLine(code, interval.trusted);
+    if (!verdict.ok) {
+      found.push({
+        declarationLine: interval.start,
+        declaration: interval.text.slice(0, 72),
+        why: verdict.why,
+        text,
+      });
+    }
+  }
+  return found;
 }
 
 /**
@@ -260,8 +355,11 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
   for (const f of opts.extraFlags ?? []) args.push(f);
 
   // A directory containing only the candidate: nothing else for Dafny to pick up.
+  // The staged name must end in `.dfy`: Dafny rejects any other extension
+  // outright, and the admission gate verifies `.dfy.gen` files directly.
   const dir = mkdtempSync(path.join(tmpdir(), "lsdb-verify-"));
-  const base = path.basename(candidatePath);
+  const raw = path.basename(candidatePath);
+  const base = raw.endsWith(".dfy") ? raw : `${raw.replace(/\.gen$/, "")}${raw.endsWith(".dfy.gen") ? "" : ".dfy"}`;
   const command = [...args, base];
   const started = Date.now();
   try {
@@ -279,6 +377,7 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
       return { status: "not-run", notRunReason: `could not run dafny: ${run.spawnError.message}`, command, ...empty, seconds };
     }
 
+    const candidateLines = content.split("\n");
     const errorSamples: string[] = [];
     const disqualifyingWarnings: DisqualifyingWarning[] = [];
     let errors = 0;
@@ -308,9 +407,12 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
         if (/timed out after/.test(message)) timeouts++;
         if (errorSamples.length < 5) errorSamples.push(`${v.location?.range?.start?.line ?? "?"}: ${message}`);
       } else if (v.severity === 2) {
+        const line = v.location?.range?.start?.line ?? -1;
         const hit = warningCategories.find(w => w.match.test(message));
         if (hit) {
-          disqualifyingWarnings.push({ category: hit.category, message, line: v.location?.range?.start?.line ?? -1 });
+          disqualifyingWarnings.push({ category: hit.category, message, line });
+        } else if (vacuousTheorem.test(message) && !isContrapositive(candidateLines, line)) {
+          disqualifyingWarnings.push({ category: "vacuous-theorem", message, line });
         } else if (contradictionWarning.test(message)) {
           contradictions++;
         } else {
@@ -348,6 +450,14 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+}
+
+/** Whether the warned-about clause is literally `ensures false` — the
+ *  contrapositive idiom rather than a vacuous proof. Dafny reports 1-based
+ *  line numbers. */
+function isContrapositive(lines: string[], line: number): boolean {
+  const text = lines[line - 1];
+  return text !== undefined && literalEnsuresFalse.test(text);
 }
 
 interface DafnyRun {

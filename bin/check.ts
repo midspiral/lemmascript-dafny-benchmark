@@ -70,6 +70,10 @@ if (boolFlag("json")) {
   if (a.deletedLines) console.log(`    ${a.deletedLines} deleted line(s): ${a.deletedSamples[0]?.trim()}`);
   for (const m of a.bannedMatches) console.log(`    banned ${m.pattern}: ${m.text.trim()}`);
   for (const w of a.weakenedContracts) console.log(`    ${w.clause} added to a generated declaration: ${w.text.trim()}`);
+  for (const v of a.signatureViolations) {
+    console.log(`    in the signature of \`${v.declaration}\` (line ${v.declarationLine}): ${v.why}`);
+    console.log(`      ${v.text.trim()}`);
+  }
   if (a.status === "not-run") console.log(`    ${a.notRunReason}`);
   if (a.status === "passed") console.log(`    +${a.addedLines} lines (${a.addedCodeLines} code)`);
 

@@ -104,8 +104,6 @@ Licence: **MIT** · branch `lemmascript`
 | task | source path |
 |---|---|
 | `0041.dfy` | `packages/opencode/src/agent/subagent-permissions.ts` |
-| `0043.dfy` | `packages/opencode/src/permission/arity.ts` |
-| `0045.dfy` | `packages/opencode/src/permission/index.ts` |
 | `0046.dfy` | `packages/opencode/src/util/wildcard.ts` |
 
 ## midspiral/quorum-lemmascript

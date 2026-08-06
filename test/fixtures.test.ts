@@ -13,6 +13,7 @@
  * fails on the lines it adds and nothing else.
  */
 
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { validate } from "../src/validator.js";
@@ -20,12 +21,18 @@ import { bannedPatterns } from "../src/banned.js";
 import type { WarningCategory } from "../src/validator.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const genPath = path.join(repoRoot, "fixtures", "base.dfy.gen");
 const fixture = (n: string) => path.join(repoRoot, "fixtures", `${n}.dfy`);
+// Most fixtures are judged against the shared base. A few need their own
+// generated file — one whose .gen already contains a trusted declaration, say.
+const genFor = (n: string) => {
+  const own = path.join(repoRoot, "fixtures", `${n}.dfy.gen`);
+  return existsSync(own) ? own : path.join(repoRoot, "fixtures", "base.dfy.gen");
+};
 
 type Expectation =
   | { kind: "banned"; patterns: string[] }
   | { kind: "weakened"; clause: string }
+  | { kind: "signature"; why: RegExp }
   | { kind: "warning"; category: WarningCategory }
   | { kind: "deletion" }
   | { kind: "accepted" };
@@ -71,6 +78,14 @@ const cases: Record<string, Expectation> = {
   "cheat-bodyless-forall": { kind: "warning", category: "bodyless-forall" },
   "cheat-bodyless-loop": { kind: "warning", category: "bodyless-loop" },
 
+  // Additions inside a generated declaration's signature. Each rejection
+  // reason is asserted, so a fixture cannot pass for the wrong cause.
+  "cheat-clause-continuation": { kind: "signature", why: /does not begin an/ },
+  "cheat-clause-smuggle": { kind: "signature", why: /contributes a `requires`/ },
+  "cheat-frame-smuggle": { kind: "signature", why: /contributes a `modifies`/ },
+  "cheat-decreases-wildcard": { kind: "signature", why: /wildcard/ },
+  "cheat-ensures-on-trusted": { kind: "signature", why: /trusted declaration/ },
+
   "cheat-deletion": { kind: "deletion" },
 
   // Must pass: proof prose that happens to contain banned English. This is the
@@ -92,6 +107,12 @@ const cases: Record<string, Expectation> = {
   // discharge the precondition from context the candidate cannot weaken, so a
   // helper with an unsatisfiable one is unusable rather than a cheat.
   "ok-new-helper-precondition": { kind: "accepted" },
+
+  // Must pass: the two clause kinds a candidate may add to a generated
+  // signature, and proof commentary beside them.
+  "ok-added-ensures": { kind: "accepted" },
+  "ok-added-decreases": { kind: "accepted" },
+  "ok-signature-comment": { kind: "accepted" },
 };
 
 let failures = 0;
@@ -113,13 +134,14 @@ for (const clause of ["requires", "reads", "modifies"]) {
 }
 
 for (const [name, want] of Object.entries(cases)) {
-  const r = await validate(genPath, fixture(name));
+  const r = await validate(genFor(name), fixture(name));
   const patterns = r.additions.bannedMatches.map(m => m.pattern);
   const weakened = r.additions.weakenedContracts.map(w => w.clause);
+  const sigWhy = r.additions.signatureViolations.map(v => v.why);
   const categories = r.verify.disqualifyingWarnings.map(w => w.category);
   const summary =
     `additions=${r.additions.status} verify=${r.verify.status} banned=[${patterns}] ` +
-    `weakened=[${weakened}] warnings=[${categories}] errors=${r.verify.errors}`;
+    `weakened=[${weakened}] signature=[${sigWhy}] warnings=[${categories}] errors=${r.verify.errors}`;
 
   switch (want.kind) {
     case "banned":
@@ -140,6 +162,13 @@ for (const [name, want] of Object.entries(cases)) {
       break;
     case "weakened":
       check(name, !r.passed && weakened.includes(want.clause), `expected weakened:${want.clause}; got ${summary}`);
+      break;
+    case "signature":
+      check(
+        name,
+        !r.passed && sigWhy.some(w => want.why.test(w)),
+        `expected a signature violation matching ${want.why}; got ${summary}`,
+      );
       break;
     case "deletion":
       check(name, !r.passed && r.additions.deletedLines > 0, `expected deleted lines; got ${summary}`);

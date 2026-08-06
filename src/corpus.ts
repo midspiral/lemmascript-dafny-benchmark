@@ -8,7 +8,7 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { validate, type ValidationResult } from "./validator.js";
+import { checkVerifies, validate, type ValidationResult } from "./validator.js";
 import {
   dedupeRepos,
   fileFacts,
@@ -42,6 +42,9 @@ export interface PairReport {
   solution?: FileFacts;
   additions?: ValidationResult["additions"];
   verify?: ValidationResult["verify"];
+  /** Whether the `.dfy.gen` verifies with no additions at all. Only measured
+   *  for pairs that would otherwise be admitted. */
+  skeletonVerifies?: boolean;
 }
 
 export interface CorpusOptions {
@@ -211,6 +214,26 @@ export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
     report.additions = result.additions;
     report.verify = result.verify;
     classify(report, result);
+
+    // A skeleton that already verifies is not a task: the empty submission
+    // solves it, however many lines the reference author wrote. Only worth the
+    // extra Dafny run for pairs that would otherwise be admitted.
+    if (report.admitted) {
+      const skeleton = await checkVerifies(pair.genPath, {
+        timeLimit: pair.timeout,
+        extraFlags: pair.flags,
+      });
+      report.skeletonVerifies = skeleton.status === "passed";
+      if (report.skeletonVerifies) {
+        report.causes.push("already-verifies");
+        report.admitted = false;
+      } else if (skeleton.status === "not-run") {
+        // Not knowing whether the skeleton is trivial is not the same as knowing
+        // it isn't, so say so rather than admit on a check that never ran.
+        report.causes.push("skeleton-not-checked");
+        report.admitted = false;
+      }
+    }
 
     done++;
     const mark = report.admitted ? "ok  " : "EXCL";

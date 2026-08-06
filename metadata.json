@@ -9,7 +9,7 @@
   ],
   "dafnyVersion": "4.11.0",
   "configSource": "midspiral/LemmaScript@main .github/workflows/ci.yml#case-studies-dafny",
-  "taskCount": 35,
+  "taskCount": 33,
   "tasks": [
     {
       "id": 5,
@@ -46,7 +46,7 @@
       "branch": "main",
       "relpath": "src/domain.ts",
       "license": "MIT",
-      "head": "1839dfd3deb7907deaadade6467928907174779b",
+      "head": "b3133160a80c5ddbea68051dc37410798e41e432",
       "verify": {
         "timeLimit": 50,
         "flags": []
@@ -64,7 +64,7 @@
       "sizeDiffBytes": 3997,
       "addedLines": 54,
       "addedCodeLines": 54,
-      "referenceVerifySeconds": 51
+      "referenceVerifySeconds": 49
     },
     {
       "id": 8,
@@ -94,7 +94,7 @@
       "sizeDiffBytes": 23402,
       "addedLines": 666,
       "addedCodeLines": 575,
-      "referenceVerifySeconds": 19
+      "referenceVerifySeconds": 18
     },
     {
       "id": 9,
@@ -131,7 +131,7 @@
       "branch": "main",
       "relpath": "src/domain.ts",
       "license": "MIT",
-      "head": "2e6c792c479ff5bf95941bfc4700cf3b3cbecd44",
+      "head": "1ac991690bcbb3bfeee4d65adf610df448d7bc57",
       "verify": {
         "flags": []
       },
@@ -148,7 +148,7 @@
       "sizeDiffBytes": 2961,
       "addedLines": 80,
       "addedCodeLines": 66,
-      "referenceVerifySeconds": 12
+      "referenceVerifySeconds": 11
     },
     {
       "id": 18,
@@ -158,7 +158,7 @@
       "branch": "main",
       "relpath": "src/automaton_core.ts",
       "license": "MIT",
-      "head": "13f428054b418209993a93600be4aa043e54f29c",
+      "head": "c1831635512a000d0734cd98c3a8722e11723012",
       "verify": {
         "flags": []
       },
@@ -185,7 +185,7 @@
       "branch": "main",
       "relpath": "src/loop_core.ts",
       "license": "MIT",
-      "head": "13f428054b418209993a93600be4aa043e54f29c",
+      "head": "c1831635512a000d0734cd98c3a8722e11723012",
       "verify": {
         "flags": []
       },
@@ -212,7 +212,7 @@
       "branch": "main",
       "relpath": "src/prov_core.ts",
       "license": "MIT",
-      "head": "13f428054b418209993a93600be4aa043e54f29c",
+      "head": "c1831635512a000d0734cd98c3a8722e11723012",
       "verify": {
         "flags": []
       },
@@ -239,7 +239,7 @@
       "branch": "main",
       "relpath": "src/taint_core.ts",
       "license": "MIT",
-      "head": "13f428054b418209993a93600be4aa043e54f29c",
+      "head": "c1831635512a000d0734cd98c3a8722e11723012",
       "verify": {
         "flags": []
       },
@@ -266,7 +266,7 @@
       "branch": "main",
       "relpath": "src/wf_core.ts",
       "license": "MIT",
-      "head": "13f428054b418209993a93600be4aa043e54f29c",
+      "head": "c1831635512a000d0734cd98c3a8722e11723012",
       "verify": {
         "flags": []
       },
@@ -580,61 +580,7 @@
       "sizeDiffBytes": 1391,
       "addedLines": 31,
       "addedCodeLines": 24,
-      "referenceVerifySeconds": 6
-    },
-    {
-      "id": 43,
-      "file": "tasks/0043.dfy",
-      "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/arity.ts",
-      "repo": "midspiral/opencode-lemmascript",
-      "branch": "lemmascript",
-      "relpath": "packages/opencode/src/permission/arity.ts",
-      "license": "MIT",
-      "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
-      "verify": {
-        "flags": []
-      },
-      "gen": {
-        "bytes": 3315,
-        "lines": 50,
-        "sha256": "4c9e93670fcd89ac745ed2b75a7ea20ac3e804903cbb2e0d38fe4615df53df32"
-      },
-      "solution": {
-        "bytes": 6074,
-        "lines": 107,
-        "sha256": "ae3a2610c86e3a25125ec0747cb9e5051af54c60f65737903c67da01839504ff"
-      },
-      "sizeDiffBytes": 2759,
-      "addedLines": 57,
-      "addedCodeLines": 35,
-      "referenceVerifySeconds": 1
-    },
-    {
-      "id": 45,
-      "file": "tasks/0045.dfy",
-      "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/index.ts",
-      "repo": "midspiral/opencode-lemmascript",
-      "branch": "lemmascript",
-      "relpath": "packages/opencode/src/permission/index.ts",
-      "license": "MIT",
-      "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
-      "verify": {
-        "flags": []
-      },
-      "gen": {
-        "bytes": 3528,
-        "lines": 61,
-        "sha256": "255182b32f86f6e86ecdc8c5f5e3319991e705051e462133c9f88e5f2fdd3e33"
-      },
-      "solution": {
-        "bytes": 4294,
-        "lines": 71,
-        "sha256": "508abe470efc39d0675ba0bc1588a288f8df0bb70b5d762bf7d5c56d31aed052"
-      },
-      "sizeDiffBytes": 766,
-      "addedLines": 10,
-      "addedCodeLines": 6,
-      "referenceVerifySeconds": 1
+      "referenceVerifySeconds": 5
     },
     {
       "id": 46,
@@ -671,7 +617,7 @@
       "branch": "main",
       "relpath": "src/domain.ts",
       "license": "MIT",
-      "head": "16db5b618210e8adfcbf001e7b5f8388d2b10c1c",
+      "head": "d0ab24ac85ba8e674a111fae37b218c8e5fd4696",
       "verify": {
         "flags": []
       },
@@ -698,7 +644,7 @@
       "branch": "main",
       "relpath": "src/grid.ts",
       "license": "MIT",
-      "head": "16db5b618210e8adfcbf001e7b5f8388d2b10c1c",
+      "head": "d0ab24ac85ba8e674a111fae37b218c8e5fd4696",
       "verify": {
         "flags": []
       },
@@ -725,7 +671,7 @@
       "branch": "main",
       "relpath": "src/domain.ts",
       "license": "MIT",
-      "head": "b98527836c53983740f306a804f42549812e3701",
+      "head": "5f20b05fb5ebe138a2878c870971e99e69b78845",
       "verify": {
         "flags": []
       },
@@ -752,7 +698,7 @@
       "branch": "main",
       "relpath": "src/grid.ts",
       "license": "MIT",
-      "head": "b98527836c53983740f306a804f42549812e3701",
+      "head": "5f20b05fb5ebe138a2878c870971e99e69b78845",
       "verify": {
         "flags": []
       },
@@ -779,7 +725,7 @@
       "branch": "main",
       "relpath": "src/domain.ts",
       "license": "MIT",
-      "head": "b946073e638a7fddbc199afa50703943c8813016",
+      "head": "f1318ecc8c2a4d53df12c9f129d5a98010796a61",
       "verify": {
         "flags": []
       },
@@ -806,7 +752,7 @@
       "branch": "main",
       "relpath": "src/domain.ts",
       "license": "MIT",
-      "head": "b83df2914e36c89a88d041fb2df91d393cf1b3cf",
+      "head": "2b50d690c64c644698f7ab46f071d8c5d7cd17b2",
       "verify": {
         "flags": []
       },
@@ -833,7 +779,7 @@
       "branch": "main",
       "relpath": "src/games/g2048/engine.ts",
       "license": "MIT",
-      "head": "14e3e4cb2459539f9a76d3aa88ecd36386cb134d",
+      "head": "8c908fa28b58dd45f11191fcc47c240c4fd6f99b",
       "verify": {
         "flags": []
       },
@@ -860,7 +806,7 @@
       "branch": "main",
       "relpath": "src/platform/replay_core.ts",
       "license": "MIT",
-      "head": "14e3e4cb2459539f9a76d3aa88ecd36386cb134d",
+      "head": "8c908fa28b58dd45f11191fcc47c240c4fd6f99b",
       "verify": {
         "flags": []
       },
@@ -904,7 +850,7 @@
       "sizeDiffBytes": 609,
       "addedLines": 15,
       "addedCodeLines": 14,
-      "referenceVerifySeconds": 5
+      "referenceVerifySeconds": 6
     },
     {
       "id": 64,
