@@ -2,8 +2,9 @@
 
 Guidance for AI coding agents working on this repository. The reasoning lives in
 [DESIGN.md](DESIGN.md), the usage in [README.md](README.md), and the case-study
-to-do list in [UPSTREAM.md](UPSTREAM.md). This file collects what is easy to get
-wrong if you only read those — mostly things that were got wrong once already.
+to-do list in [UPSTREAM.md](UPSTREAM.md), and what CI checks in [CI.md](CI.md).
+This file collects what is easy to get wrong if you only read those — mostly
+things that were got wrong once already.
 
 ## Orientation
 

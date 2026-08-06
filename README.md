@@ -312,6 +312,7 @@ and `index.json` are three consistent views of one thing, and that every task
 file still hashes to what metadata records — a stray edit there would silently
 change every verdict for that task. It needs no Dafny and no case studies, so
 CI runs it on every push, while a full regeneration runs weekly and on demand.
+[CI.md](CI.md) explains what each job checks and why the split exists.
 
 See [DESIGN.md](DESIGN.md) for the reasoning, the exact token list, and
 the loopholes each check closes. [AGENTS.md](AGENTS.md) is for anyone — human or
