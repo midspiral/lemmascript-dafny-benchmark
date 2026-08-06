@@ -124,6 +124,10 @@ the report serves both as a record of what the benchmark contains and as
 a to-do list for the case studies. A reference solution that trips the
 axiom check usually means an intentional axiom nobody marked as one.
 
+[UPSTREAM.md](UPSTREAM.md) is that to-do list, written out: which case studies
+state a contract in Dafny that belongs in their TypeScript, which verification
+budgets are too tight, and what each one costs the benchmark.
+
 ## Validation
 
 Two checks, run against the `.dfy.gen` and against Dafny — nothing else:
