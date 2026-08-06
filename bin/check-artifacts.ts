@@ -65,6 +65,8 @@ if (metadata && index && report) {
     ids.add(t.id);
     if (t.file !== `tasks/${taskFileName(t.id)}`) fail(`task ${t.id} claims file ${t.file}`);
     if (t.key !== `${t.repo}:${t.relpath}`) fail(`task ${t.id} key ${t.key} disagrees with repo/relpath`);
+    const declared = config.repos.find(r => r.repo === t.repo)?.license;
+    if (t.license !== declared) fail(`task ${t.id} records licence ${t.license}, config says ${declared}`);
   }
 
   // --- index ------------------------------------------------------------

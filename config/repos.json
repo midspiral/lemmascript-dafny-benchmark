@@ -7,9 +7,9 @@
     "",
     "`license` is the upstream repository's licence, transcribed by hand and used",
     "to build tasks/ATTRIBUTION.md. A task is a derived work of its upstream, so",
-    "this has to be right; `unlicensed` means the repo carries no LICENSE file.",
     "`exclude` keeps a repo in the list but bars its pairs from becoming tasks,",
-    "with the reason recorded in the reference report."
+    "with the reason recorded in the reference report.",
+    "this has to be right."
   ],
   "source": "midspiral/LemmaScript@main .github/workflows/ci.yml#case-studies-dafny",
   "seededAt": "2026-08-06",
@@ -19,12 +19,12 @@
     {
       "repo": "midspiral/collab-todo-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/colorwheel-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/node-casbin-lemmascript",
@@ -64,7 +64,7 @@
     {
       "repo": "midspiral/github-star-checker-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/rallly-lemmascript",
@@ -76,7 +76,7 @@
     {
       "repo": "midspiral/talktimer-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/opencode-lemmascript",
@@ -91,7 +91,7 @@
     {
       "repo": "midspiral/trace-solo-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/pi-lemmascript",
@@ -111,27 +111,27 @@
     {
       "repo": "midspiral/guardians-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/guardians-lemmascript",
       "branch": "generate-verify-execute",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/quorum-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/quorum-tutorial-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/quota-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/henri-lemmascript",
@@ -151,7 +151,7 @@
     {
       "repo": "midspiral/eventab-lemmascript",
       "branch": "main",
-      "license": "unlicensed"
+      "license": "MIT"
     },
     {
       "repo": "midspiral/eslint-plugin-with-lemmascript",

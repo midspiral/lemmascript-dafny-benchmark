@@ -17,11 +17,7 @@ Licence: **MIT** · branch `main`
 
 ## midspiral/collab-todo-lemmascript
 
-Licence: **unlicensed** · branch `main`
-
-> This repository carries no LICENSE file. The tasks below are included
-> on the understanding that the upstream is owned by the same party as
-> this benchmark; anyone redistributing them should confirm that.
+Licence: **MIT** · branch `main`
 
 | task | source path |
 |---|---|
@@ -45,11 +41,7 @@ Licence: **MIT** · branch `main`
 
 ## midspiral/github-star-checker-lemmascript
 
-Licence: **unlicensed** · branch `main`
-
-> This repository carries no LICENSE file. The tasks below are included
-> on the understanding that the upstream is owned by the same party as
-> this benchmark; anyone redistributing them should confirm that.
+Licence: **MIT** · branch `main`
 
 | task | source path |
 |---|---|
@@ -57,11 +49,7 @@ Licence: **unlicensed** · branch `main`
 
 ## midspiral/guardians-lemmascript
 
-Licence: **unlicensed** · branch `main`
-
-> This repository carries no LICENSE file. The tasks below are included
-> on the understanding that the upstream is owned by the same party as
-> this benchmark; anyone redistributing them should confirm that.
+Licence: **MIT** · branch `main`
 
 | task | source path |
 |---|---|
@@ -122,11 +110,7 @@ Licence: **MIT** · branch `lemmascript`
 
 ## midspiral/quorum-lemmascript
 
-Licence: **unlicensed** · branch `main`
-
-> This repository carries no LICENSE file. The tasks below are included
-> on the understanding that the upstream is owned by the same party as
-> this benchmark; anyone redistributing them should confirm that.
+Licence: **MIT** · branch `main`
 
 | task | source path |
 |---|---|
@@ -135,11 +119,7 @@ Licence: **unlicensed** · branch `main`
 
 ## midspiral/quorum-tutorial-lemmascript
 
-Licence: **unlicensed** · branch `main`
-
-> This repository carries no LICENSE file. The tasks below are included
-> on the understanding that the upstream is owned by the same party as
-> this benchmark; anyone redistributing them should confirm that.
+Licence: **MIT** · branch `main`
 
 | task | source path |
 |---|---|
@@ -148,11 +128,7 @@ Licence: **unlicensed** · branch `main`
 
 ## midspiral/quota-lemmascript
 
-Licence: **unlicensed** · branch `main`
-
-> This repository carries no LICENSE file. The tasks below are included
-> on the understanding that the upstream is owned by the same party as
-> this benchmark; anyone redistributing them should confirm that.
+Licence: **MIT** · branch `main`
 
 | task | source path |
 |---|---|
@@ -160,11 +136,7 @@ Licence: **unlicensed** · branch `main`
 
 ## midspiral/talktimer-lemmascript
 
-Licence: **unlicensed** · branch `main`
-
-> This repository carries no LICENSE file. The tasks below are included
-> on the understanding that the upstream is owned by the same party as
-> this benchmark; anyone redistributing them should confirm that.
+Licence: **MIT** · branch `main`
 
 | task | source path |
 |---|---|
@@ -172,11 +144,7 @@ Licence: **unlicensed** · branch `main`
 
 ## midspiral/trace-solo-lemmascript
 
-Licence: **unlicensed** · branch `main`
-
-> This repository carries no LICENSE file. The tasks below are included
-> on the understanding that the upstream is owned by the same party as
-> this benchmark; anyone redistributing them should confirm that.
+Licence: **MIT** · branch `main`
 
 | task | source path |
 |---|---|

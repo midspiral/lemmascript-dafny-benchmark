@@ -18,6 +18,7 @@
       "repo": "midspiral/clear-split-lemmascript",
       "branch": "main",
       "relpath": "src/logic/logic.ts",
+      "license": "MIT",
       "head": "f77276c8f2b10d47450e145ad8a81e39d2b11680",
       "verify": {
         "flags": []
@@ -44,6 +45,7 @@
       "repo": "midspiral/collab-todo-lemmascript",
       "branch": "main",
       "relpath": "src/domain.ts",
+      "license": "MIT",
       "head": "1839dfd3deb7907deaadade6467928907174779b",
       "verify": {
         "timeLimit": 50,
@@ -71,6 +73,7 @@
       "repo": "midspiral/equality-game-lemmascript",
       "branch": "main",
       "relpath": "src/equality.ts",
+      "license": "MIT",
       "head": "7622515e2750b4cc6662dbca40688e3cea8d3351",
       "verify": {
         "timeLimit": 60,
@@ -100,6 +103,7 @@
       "repo": "midspiral/eslint-plugin-with-lemmascript",
       "branch": "main",
       "relpath": "src/core.verified.ts",
+      "license": "MIT",
       "head": "501cee686f781b74ddc09efee65a34f8965dcf15",
       "verify": {
         "flags": []
@@ -126,6 +130,7 @@
       "repo": "midspiral/github-star-checker-lemmascript",
       "branch": "main",
       "relpath": "src/domain.ts",
+      "license": "MIT",
       "head": "2e6c792c479ff5bf95941bfc4700cf3b3cbecd44",
       "verify": {
         "flags": []
@@ -152,6 +157,7 @@
       "repo": "midspiral/guardians-lemmascript",
       "branch": "main",
       "relpath": "src/automaton_core.ts",
+      "license": "MIT",
       "head": "13f428054b418209993a93600be4aa043e54f29c",
       "verify": {
         "flags": []
@@ -178,6 +184,7 @@
       "repo": "midspiral/guardians-lemmascript",
       "branch": "main",
       "relpath": "src/loop_core.ts",
+      "license": "MIT",
       "head": "13f428054b418209993a93600be4aa043e54f29c",
       "verify": {
         "flags": []
@@ -204,6 +211,7 @@
       "repo": "midspiral/guardians-lemmascript",
       "branch": "main",
       "relpath": "src/prov_core.ts",
+      "license": "MIT",
       "head": "13f428054b418209993a93600be4aa043e54f29c",
       "verify": {
         "flags": []
@@ -230,6 +238,7 @@
       "repo": "midspiral/guardians-lemmascript",
       "branch": "main",
       "relpath": "src/taint_core.ts",
+      "license": "MIT",
       "head": "13f428054b418209993a93600be4aa043e54f29c",
       "verify": {
         "flags": []
@@ -256,6 +265,7 @@
       "repo": "midspiral/guardians-lemmascript",
       "branch": "main",
       "relpath": "src/wf_core.ts",
+      "license": "MIT",
       "head": "13f428054b418209993a93600be4aa043e54f29c",
       "verify": {
         "flags": []
@@ -282,6 +292,7 @@
       "repo": "midspiral/henri-lemmascript",
       "branch": "main",
       "relpath": "src/edit.ts",
+      "license": "MIT",
       "head": "a901c5a30df520a6b0eb881a828e486fb1ed6030",
       "verify": {
         "flags": []
@@ -308,6 +319,7 @@
       "repo": "midspiral/henri-lemmascript",
       "branch": "main",
       "relpath": "src/hooks.ts",
+      "license": "MIT",
       "head": "a901c5a30df520a6b0eb881a828e486fb1ed6030",
       "verify": {
         "flags": []
@@ -334,6 +346,7 @@
       "repo": "midspiral/henri-lemmascript",
       "branch": "main",
       "relpath": "src/permissions.ts",
+      "license": "MIT",
       "head": "a901c5a30df520a6b0eb881a828e486fb1ed6030",
       "verify": {
         "flags": []
@@ -360,6 +373,7 @@
       "repo": "midspiral/henri-lemmascript",
       "branch": "main",
       "relpath": "src/transcript.ts",
+      "license": "MIT",
       "head": "a901c5a30df520a6b0eb881a828e486fb1ed6030",
       "verify": {
         "flags": []
@@ -386,6 +400,7 @@
       "repo": "midspiral/hono-lemmascript",
       "branch": "lemmascript",
       "relpath": "src/middleware/ip-restriction/matcher.verified.ts",
+      "license": "MIT",
       "head": "72750fa7783352d4c9765ab427175840d513147c",
       "verify": {
         "flags": []
@@ -412,6 +427,7 @@
       "repo": "midspiral/hono-lemmascript",
       "branch": "lemmascript",
       "relpath": "src/middleware/serve-static/index.ts",
+      "license": "MIT",
       "head": "72750fa7783352d4c9765ab427175840d513147c",
       "verify": {
         "flags": []
@@ -438,6 +454,7 @@
       "repo": "midspiral/hono-lemmascript",
       "branch": "lemmascript",
       "relpath": "src/utils/filepath.ts",
+      "license": "MIT",
       "head": "72750fa7783352d4c9765ab427175840d513147c",
       "verify": {
         "flags": []
@@ -464,6 +481,7 @@
       "repo": "midspiral/hono-lemmascript",
       "branch": "lemmascript",
       "relpath": "src/utils/ipaddr.verified.ts",
+      "license": "MIT",
       "head": "72750fa7783352d4c9765ab427175840d513147c",
       "verify": {
         "flags": []
@@ -490,6 +508,7 @@
       "repo": "midspiral/hono-rate-limiter-with-lemmascript",
       "branch": "main",
       "relpath": "src/core.verified.ts",
+      "license": "MIT",
       "head": "e1d747093f5238d55201161cc1e9241f452c4613",
       "verify": {
         "flags": []
@@ -516,6 +535,7 @@
       "repo": "midspiral/infisical-lemmascript",
       "branch": "lemmascript",
       "relpath": "backend/src/lib/casl/glob-subset.ts",
+      "license": "MIT",
       "head": "f441627041489c259d752b1bc1a98d422f07a190",
       "verify": {
         "flags": []
@@ -542,6 +562,7 @@
       "repo": "midspiral/opencode-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/opencode/src/agent/subagent-permissions.ts",
+      "license": "MIT",
       "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
       "verify": {
         "flags": []
@@ -568,6 +589,7 @@
       "repo": "midspiral/opencode-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/opencode/src/permission/arity.ts",
+      "license": "MIT",
       "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
       "verify": {
         "flags": []
@@ -594,6 +616,7 @@
       "repo": "midspiral/opencode-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/opencode/src/permission/index.ts",
+      "license": "MIT",
       "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
       "verify": {
         "flags": []
@@ -620,6 +643,7 @@
       "repo": "midspiral/opencode-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/opencode/src/util/wildcard.ts",
+      "license": "MIT",
       "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
       "verify": {
         "flags": []
@@ -646,6 +670,7 @@
       "repo": "midspiral/quorum-lemmascript",
       "branch": "main",
       "relpath": "src/domain.ts",
+      "license": "MIT",
       "head": "16db5b618210e8adfcbf001e7b5f8388d2b10c1c",
       "verify": {
         "flags": []
@@ -672,6 +697,7 @@
       "repo": "midspiral/quorum-lemmascript",
       "branch": "main",
       "relpath": "src/grid.ts",
+      "license": "MIT",
       "head": "16db5b618210e8adfcbf001e7b5f8388d2b10c1c",
       "verify": {
         "flags": []
@@ -698,6 +724,7 @@
       "repo": "midspiral/quorum-tutorial-lemmascript",
       "branch": "main",
       "relpath": "src/domain.ts",
+      "license": "MIT",
       "head": "b98527836c53983740f306a804f42549812e3701",
       "verify": {
         "flags": []
@@ -724,6 +751,7 @@
       "repo": "midspiral/quorum-tutorial-lemmascript",
       "branch": "main",
       "relpath": "src/grid.ts",
+      "license": "MIT",
       "head": "b98527836c53983740f306a804f42549812e3701",
       "verify": {
         "flags": []
@@ -750,6 +778,7 @@
       "repo": "midspiral/quota-lemmascript",
       "branch": "main",
       "relpath": "src/domain.ts",
+      "license": "MIT",
       "head": "b946073e638a7fddbc199afa50703943c8813016",
       "verify": {
         "flags": []
@@ -776,6 +805,7 @@
       "repo": "midspiral/talktimer-lemmascript",
       "branch": "main",
       "relpath": "src/domain.ts",
+      "license": "MIT",
       "head": "b83df2914e36c89a88d041fb2df91d393cf1b3cf",
       "verify": {
         "flags": []
@@ -802,6 +832,7 @@
       "repo": "midspiral/trace-solo-lemmascript",
       "branch": "main",
       "relpath": "src/games/g2048/engine.ts",
+      "license": "MIT",
       "head": "14e3e4cb2459539f9a76d3aa88ecd36386cb134d",
       "verify": {
         "flags": []
@@ -828,6 +859,7 @@
       "repo": "midspiral/trace-solo-lemmascript",
       "branch": "main",
       "relpath": "src/platform/replay_core.ts",
+      "license": "MIT",
       "head": "14e3e4cb2459539f9a76d3aa88ecd36386cb134d",
       "verify": {
         "flags": []
@@ -854,6 +886,7 @@
       "repo": "midspiral/xyflow-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/system/src/utils/edges/general.ts",
+      "license": "MIT",
       "head": "471b24b2994eb469f668cd45b218b4bdd178761d",
       "verify": {
         "flags": []
@@ -880,6 +913,7 @@
       "repo": "midspiral/xyflow-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/system/src/utils/general.ts",
+      "license": "MIT",
       "head": "471b24b2994eb469f668cd45b218b4bdd178761d",
       "verify": {
         "flags": []
@@ -906,6 +940,7 @@
       "repo": "midspiral/xyflow-lemmascript",
       "branch": "lemmascript",
       "relpath": "packages/system/src/utils/graph.ts",
+      "license": "MIT",
       "head": "471b24b2994eb469f668cd45b218b4bdd178761d",
       "verify": {
         "flags": []

@@ -208,16 +208,10 @@ TypeScript in another repository and is a derived work of it, governed by that
 repository's licence. [`tasks/ATTRIBUTION.md`](tasks/ATTRIBUTION.md) is generated
 alongside the tasks and maps every one of them to its upstream and licence.
 
-Two consequences worth stating plainly:
-
-* A case study whose licence cannot ship under MIT is excluded in
-  `config/repos.json` rather than quietly dropped. One is today: rallly is
-  AGPL-3.0, so its pair is validated and reported like any other but never
-  becomes a task.
-* Ten upstream repositories carry no LICENSE file at all. Their tasks are
-  included because those repositories share this one's owner, and
-  `ATTRIBUTION.md` says so at each of them. Adding a licence upstream is the
-  real fix.
+Every repository that contributes a task is MIT. A case study whose licence
+cannot ship under MIT is excluded in `config/repos.json` rather than quietly
+dropped — one is today: rallly is AGPL-3.0, so its pair is validated and
+reported like any other but never becomes a task.
 
 ## Repositories
 

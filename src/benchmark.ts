@@ -94,6 +94,9 @@ export interface TaskMetadata {
   repo: string;
   branch: string;
   relpath: string;
+  /** The upstream's licence, from config/repos.json. A task is a derived work,
+   *  so a consumer reading only this file still learns what governs it. */
+  license: string;
   /** Recorded opportunistically; the working tree is used as-is, dirty or not. */
   head?: string;
   /** Applied identically to the reference solution and to a candidate. */
@@ -111,6 +114,7 @@ export interface TaskMetadata {
 
 export function buildMetadata(corpus: Corpus, ids: Map<string, number>): { tasks: TaskMetadata[]; doc: object } {
   const headFor = new Map(corpus.checkouts.map(c => [c.entry.repo, c.head]));
+  const licenseOf = new Map(corpus.config.repos.map(r => [r.repo, r.license]));
 
   const tasks: TaskMetadata[] = corpus.reports
     .filter(r => r.admitted)
@@ -123,6 +127,7 @@ export function buildMetadata(corpus: Corpus, ids: Map<string, number>): { tasks
         repo: r.repo,
         branch: r.branch,
         relpath: r.relpath,
+        license: licenseOf.get(r.repo) ?? "unknown",
         head: headFor.get(r.repo),
         verify: { timeLimit: r.verifyOptions.timeLimit, flags: r.verifyOptions.flags },
         gen: r.gen!,

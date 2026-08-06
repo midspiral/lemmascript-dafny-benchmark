@@ -9,7 +9,7 @@
       {
         "repo": "midspiral/guardians-lemmascript",
         "branch": "generate-verify-execute",
-        "license": "unlicensed"
+        "license": "MIT"
       },
       {
         "repo": "midspiral/henri-lemmascript",
