@@ -52,6 +52,13 @@ export function writeIndex(indexPath: string, index: Index) {
 /**
  * Give every pair in this run an ID, minting new ones in key order so a first
  * run is reproducible, and tombstone anything indexed that the run did not see.
+ *
+ * **Entries are only ever appended.** That, plus a monotonic `nextId`, is the
+ * whole reason a task's number is stable: a key that vanishes upstream keeps its
+ * entry, so if it comes back it is found and its old ID reused. Tombstoning is
+ * annotation on top of that, not the mechanism. Removing tombstoned entries to
+ * tidy the file would reissue their numbers to different tasks and silently
+ * change what published results refer to — don't.
  */
 export function reconcileIndex(index: Index, reports: PairReport[], today: string): Map<string, number> {
   const byKey = new Map(index.entries.map(e => [e.key, e]));
