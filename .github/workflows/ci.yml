@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  # Everything that needs neither Dafny nor the case-study checkouts, so it runs
+  # in seconds on every push. Regenerating the benchmark is the real check, but
+  # it needs eighteen clones and ten minutes of solver time — see `full` below.
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Artifacts are internally consistent
+        run: npm run check-artifacts
+
+      - name: Task listing renders
+        run: npm run list-tasks
+
+  # The fixture suite runs `dafny verify`, so it needs the toolchain — pinned to
+  # the same version the benchmark records. A Dafny bump that reworded a warning
+  # fails here rather than silently widening what the benchmark accepts.
+  fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - run: npm ci
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - uses: dafny-lang/setup-dafny-action@v1
+        with:
+          dafny-version: '4.11.0'
+
+      - name: Fixture suite
+        run: npm test
+
+      # The attempt directory is the first thing a user touches, and it carries
+      # *copies* of the validator's sources. Adding a module to that import
+      # graph without adding it to the copy list breaks every attempt directory
+      # and nothing else would notice, so build one and run its checker.
+      - name: Attempt directory works standalone
+        run: |
+          npm run make-attempt -- 5 --out="$RUNNER_TEMP/attempt"
+          cd "$RUNNER_TEMP/attempt"
+          out=$(npx tsx .bench/check.ts || true)
+          echo "$out"
+          echo "$out" | grep -q "additions-only  passed" \
+            || { echo "::error::the attempt checker did not run"; exit 1; }
+          echo "$out" | grep -q "^FAIL" \
+            || { echo "::error::the untouched task should not pass"; exit 1; }
+
+      # The same contract a runner codes against.
+      - name: check CLI scores a candidate
+        run: |
+          out=$(npm run --silent check -- 5 tasks/0005.dfy || true)
+          echo "$out"
+          echo "$out" | grep -q "verifies        failed" \
+            || { echo "::error::check did not evaluate the task"; exit 1; }
+
+  # A full regeneration: clones every case study and re-verifies every reference
+  # solution. Too slow for a push, and its result depends on runner load — the
+  # per-task limits are wall-clock — so a failure here is a prompt to look, not
+  # proof that anything broke. Manual and weekly.
+  full:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: lemmascript-dafny-benchmark
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - run: npm ci
+        working-directory: lemmascript-dafny-benchmark
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - uses: dafny-lang/setup-dafny-action@v1
+        with:
+          dafny-version: '4.11.0'
+
+      - name: Regenerate
+        working-directory: lemmascript-dafny-benchmark
+        run: npm run generate -- --jobs=2
+
+      - name: Report the diff rather than failing on it
+        working-directory: lemmascript-dafny-benchmark
+        run: git --no-pager diff --stat -- tasks metadata.json index.json reference-report.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reference-report
+          path: lemmascript-dafny-benchmark/reference-report.json

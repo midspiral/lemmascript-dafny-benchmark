@@ -518,7 +518,7 @@
           "--isolate-assertions",
           "index.dfy"
         ],
-        "seconds": 525,
+        "seconds": 528,
         "timedOut": false,
         "exitCode": 4
       }
@@ -840,7 +840,7 @@
           "--standard-libraries",
           "allocate.dfy"
         ],
-        "seconds": 36,
+        "seconds": 37,
         "timedOut": false,
         "exitCode": 4
       }
@@ -2021,7 +2021,7 @@
           "--json-output",
           "core.verified.dfy"
         ],
-        "seconds": 9,
+        "seconds": 10,
         "timedOut": false,
         "exitCode": 0
       },
