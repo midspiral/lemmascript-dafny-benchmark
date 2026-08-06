@@ -1,0 +1,338 @@
+{
+  "_comment": [
+    "Benchmark IDs. The key is `repo:relpath` of the TypeScript source, and an ID",
+    "once issued is never reused or renumbered — a task's number is its identity.",
+    "IDs are issued to every pair the generator sees, admitted or not, so that a",
+    "pair excluded on one machine (a wall-clock timeout, say) keeps its number if",
+    "a later run admits it. tasks/ therefore has gaps, by design.",
+    "A pair that disappears upstream is tombstoned rather than dropped."
+  ],
+  "nextId": 66,
+  "entries": [
+    {
+      "id": 1,
+      "key": "CHARM-BDF/charmchat:backend/src/services/provenance.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 2,
+      "key": "CHARM-BDF/charmchat:backend/src/services/workflow.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 3,
+      "key": "midspiral/anthropic-sdk-lemmascript:src/tools/memory/node.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 4,
+      "key": "midspiral/balanced-match-lemmascript:src/index.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 5,
+      "key": "midspiral/clear-split-lemmascript:src/logic/logic.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 6,
+      "key": "midspiral/collab-todo-lemmascript:src/domain.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 7,
+      "key": "midspiral/colorwheel-lemmascript:src/colorwheel.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 8,
+      "key": "midspiral/equality-game-lemmascript:src/equality.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 9,
+      "key": "midspiral/eslint-plugin-with-lemmascript:src/core.verified.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 10,
+      "key": "midspiral/eventab-lemmascript:src/allocate.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 11,
+      "key": "midspiral/eventab-lemmascript:src/floorShare.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 12,
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/compaction.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 13,
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/conversation-reducer.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 14,
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/session-identity.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 15,
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/submission-state.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 16,
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/usage.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 17,
+      "key": "midspiral/github-star-checker-lemmascript:src/domain.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 18,
+      "key": "midspiral/guardians-lemmascript:src/automaton_core.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 19,
+      "key": "midspiral/guardians-lemmascript:src/loop_core.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 20,
+      "key": "midspiral/guardians-lemmascript:src/prov_core.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 21,
+      "key": "midspiral/guardians-lemmascript:src/taint_core.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 22,
+      "key": "midspiral/guardians-lemmascript:src/wf_core.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 23,
+      "key": "midspiral/henri-lemmascript:src/edit.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 24,
+      "key": "midspiral/henri-lemmascript:src/hooks.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 25,
+      "key": "midspiral/henri-lemmascript:src/permissions.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 26,
+      "key": "midspiral/henri-lemmascript:src/transcript.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 27,
+      "key": "midspiral/hono-lemmascript:src/middleware/ip-restriction/matcher.verified.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 28,
+      "key": "midspiral/hono-lemmascript:src/middleware/ip-restriction/verified.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 29,
+      "key": "midspiral/hono-lemmascript:src/middleware/serve-static/index.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 30,
+      "key": "midspiral/hono-lemmascript:src/utils/cookie.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 31,
+      "key": "midspiral/hono-lemmascript:src/utils/filepath.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 32,
+      "key": "midspiral/hono-lemmascript:src/utils/ipaddr.verified.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 33,
+      "key": "midspiral/hono-rate-limiter-with-lemmascript:src/core.verified.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 34,
+      "key": "midspiral/infisical-lemmascript:backend/src/lib/casl/glob-subset.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 35,
+      "key": "midspiral/mcp-sdk-lemmascript:packages/client/src/client/probeClassifier.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 36,
+      "key": "midspiral/node-casbin-lemmascript:src/effect/effectorPure.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 37,
+      "key": "midspiral/node-casbin-lemmascript:src/model/getFilteredPolicy.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 38,
+      "key": "midspiral/node-casbin-lemmascript:src/util/arrayEquals.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 39,
+      "key": "midspiral/node-casbin-lemmascript:src/util/keyGet.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 40,
+      "key": "midspiral/node-casbin-lemmascript:src/util/keyMatch.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 41,
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/agent/subagent-permissions.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 42,
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/patch/index.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 43,
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/arity.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 44,
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/evaluate.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 45,
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/index.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 46,
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/util/wildcard.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 47,
+      "key": "midspiral/pi-lemmascript:packages/agent/src/harness/compaction/compaction.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 48,
+      "key": "midspiral/pi-lemmascript:packages/ai/src/models.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 49,
+      "key": "midspiral/pi-lemmascript:packages/coding-agent/src/core/compaction/compaction.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 50,
+      "key": "midspiral/pi-lemmascript:packages/coding-agent/src/core/tools/edit-diff.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 51,
+      "key": "midspiral/pi-lemmascript:packages/coding-agent/src/core/tools/truncate.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 52,
+      "key": "midspiral/pi-lemmascript:packages/coding-agent/src/utils/changelog.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 53,
+      "key": "midspiral/quorum-lemmascript:src/domain.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 54,
+      "key": "midspiral/quorum-lemmascript:src/grid.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 55,
+      "key": "midspiral/quorum-tutorial-lemmascript:src/domain.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 56,
+      "key": "midspiral/quorum-tutorial-lemmascript:src/grid.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 57,
+      "key": "midspiral/quota-lemmascript:src/domain.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 58,
+      "key": "midspiral/rallly-lemmascript:apps/web/src/features/poll/scoring.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 59,
+      "key": "midspiral/rallly-lemmascript:apps/web/src/utils/redirect.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 60,
+      "key": "midspiral/talktimer-lemmascript:src/domain.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 61,
+      "key": "midspiral/trace-solo-lemmascript:src/games/g2048/engine.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 62,
+      "key": "midspiral/trace-solo-lemmascript:src/platform/replay_core.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 63,
+      "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/edges/general.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 64,
+      "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/general.ts",
+      "firstSeen": "2026-08-06"
+    },
+    {
+      "id": 65,
+      "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/graph.ts",
+      "firstSeen": "2026-08-06"
+    }
+  ]
+}

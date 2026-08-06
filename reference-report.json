@@ -692,7 +692,7 @@
           "--isolate-assertions",
           "equality.dfy"
         ],
-        "seconds": 18,
+        "seconds": 19,
         "timedOut": false,
         "exitCode": 0
       }
@@ -3146,7 +3146,7 @@
           "--json-output",
           "domain.dfy"
         ],
-        "seconds": 3,
+        "seconds": 2,
         "timedOut": false,
         "exitCode": 0
       }
@@ -3444,7 +3444,7 @@
           "--standard-libraries",
           "general.dfy"
         ],
-        "seconds": 6,
+        "seconds": 5,
         "timedOut": false,
         "exitCode": 0
       }
@@ -3543,7 +3543,7 @@
           "--standard-libraries",
           "graph.dfy"
         ],
-        "seconds": 6,
+        "seconds": 7,
         "timedOut": false,
         "exitCode": 0
       }
