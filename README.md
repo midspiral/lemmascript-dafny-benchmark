@@ -139,6 +139,11 @@ delete one that stopped being admitted, unless you ask — `--update` and
 `reference-report` takes `--only=<substring>`; a partial walk cannot produce a
 coherent benchmark.
 
+`--from-report` rebuilds `tasks/`, `metadata.json`, and `index.json` from the
+report already on disk, in about a fifth of a second instead of ten minutes.
+It re-hashes every `.dfy.gen` against the report first and refuses if any has
+moved, so it can't emit tasks from a stale run.
+
 See [DESIGN.md](DESIGN.md) for the reasoning, the exact token list, and
 the loopholes each check closes.
 

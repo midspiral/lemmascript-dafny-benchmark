@@ -6,7 +6,7 @@
  * emitted that the report did not vouch for.
  */
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { validate, type ValidationResult } from "./validator.js";
 import {
@@ -15,6 +15,7 @@ import {
   loadConfig,
   pairsFor,
   readFileList,
+  repoName,
   resolveCheckout,
   type Checkout,
   type Config,
@@ -259,4 +260,70 @@ export function printSummary(corpus: Corpus, log: (line: string) => void) {
     log(`\nslowest admitted:`);
     for (const r of slow.slice(0, 8)) log(`  ${String(r.verify!.seconds).padStart(4)}s  ${r.key}`);
   }
+}
+
+/**
+ * Rebuild a `Corpus` from a previously written `reference-report.json`, without
+ * running Dafny.
+ *
+ * Emitting the benchmark needs nothing the report does not already hold — file
+ * facts, added-line counts, verify options, reference timings, repo heads — plus
+ * each `.dfy.gen`'s path, which is derivable from the repo and relpath. So the
+ * emission step has no business re-verifying 65 proofs to change the shape of a
+ * JSON file.
+ *
+ * The `sha256` recorded per pair is what keeps this honest: if a checkout has
+ * moved since the report was written, the report describes a corpus that no
+ * longer exists, and emitting from it would produce tasks nothing vouched for.
+ */
+export function corpusFromReport(repoRoot: string, reportPath: string): Corpus {
+  const doc = JSON.parse(readFileSync(reportPath, "utf-8"));
+  const config = loadConfig(path.join(repoRoot, "config", "repos.json"));
+  const { kept, dropped } = dedupeRepos(config.repos);
+  const parentDir = path.resolve(repoRoot, config.parentDir);
+
+  const checkouts: Checkout[] = doc.repos.map((r: any) => ({
+    entry: { repo: r.repo, branch: r.branch },
+    dir: path.join(parentDir, repoName(r.repo)),
+    present: r.present,
+    head: r.head,
+    currentBranch: r.currentBranch,
+    dirty: r.dirty,
+    error: r.error,
+  }));
+
+  const reports: PairReport[] = doc.pairs;
+  const pairs = new Map<string, Pair>();
+  const stale: string[] = [];
+
+  for (const r of reports) {
+    if (!r.gen || r.relpath === "-") continue;
+    const base = path.join(parentDir, repoName(r.repo), r.relpath.replace(/\.ts$/, ""));
+    const genPath = `${base}.dfy.gen`;
+    const solutionPath = `${base}.dfy`;
+    if (!existsSync(genPath) || fileFacts(genPath).sha256 !== r.gen.sha256) {
+      stale.push(r.key);
+      continue;
+    }
+    pairs.set(r.key, {
+      key: r.key,
+      repo: r.repo,
+      branch: r.branch,
+      relpath: r.relpath,
+      genPath,
+      solutionPath,
+      timeout: r.verifyOptions.timeLimit,
+      flags: r.verifyOptions.flags,
+    });
+  }
+
+  if (stale.length) {
+    throw new Error(
+      `${stale.length} pair(s) have moved since ${path.basename(reportPath)} was written, ` +
+        `so it no longer describes the corpus. Re-run the full pass.\n  ` +
+        stale.slice(0, 5).join("\n  "),
+    );
+  }
+
+  return { config, reposUsed: kept, branchesDeferred: dropped, checkouts, reports, pairs, elapsedSeconds: 0 };
 }

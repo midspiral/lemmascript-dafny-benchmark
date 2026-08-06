@@ -14,24 +14,32 @@
  * emitted that the report did not vouch for.
  *
  * Usage:
- *   generate [--no-clone] [--jobs=N] [--update] [--prune] [--dry-run]
+ *   generate [--no-clone] [--jobs=N] [--update] [--prune] [--dry-run] [--from-report]
  *
- *   --update   refresh tasks whose upstream `.dfy.gen` has changed
- *   --prune    delete task files that are no longer admitted
- *   --dry-run  report what would be written, write nothing
+ *   --update       refresh tasks whose upstream `.dfy.gen` has changed
+ *   --prune        delete task files that are no longer admitted
+ *   --dry-run      report what would be written, write nothing
+ *   --from-report  emit from the existing reference-report.json instead of
+ *                  re-validating. Emission derives everything it needs from the
+ *                  report, so changing the shape of metadata.json has no business
+ *                  costing 65 re-verifications. The recorded sha256 of every
+ *                  `.dfy.gen` is re-checked first: if a checkout has moved, the
+ *                  report no longer describes the corpus and this refuses to run.
  */
 
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { boolFlag, flag } from "../src/cli.js";
-import { buildReport, printSummary, walkCorpus } from "../src/corpus.js";
+import { buildReport, corpusFromReport, printSummary, walkCorpus } from "../src/corpus.js";
 import { buildMetadata, emitTasks, loadIndex, reconcileIndex, writeIndex } from "../src/benchmark.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const update = boolFlag("update");
 const prune = boolFlag("prune");
 const dryRun = boolFlag("dry-run");
+const fromReport = boolFlag("from-report");
+const reportPath = path.join(repoRoot, "reference-report.json");
 
 // A partial walk cannot produce a coherent benchmark: every unseen pair would
 // look deleted, and metadata.json would silently lose tasks.
@@ -40,13 +48,16 @@ if (flag("only") !== undefined) {
   process.exit(1);
 }
 
-const corpus = await walkCorpus({
-  repoRoot,
-  clone: !boolFlag("no-clone"),
-  jobs: Math.max(1, parseInt(flag("jobs", "4")!)),
-  log: console.log,
-});
+const corpus = fromReport
+  ? corpusFromReport(repoRoot, reportPath)
+  : await walkCorpus({
+      repoRoot,
+      clone: !boolFlag("no-clone"),
+      jobs: Math.max(1, parseInt(flag("jobs", "4")!)),
+      log: console.log,
+    });
 
+if (fromReport) console.log(`reusing ${path.basename(reportPath)} — ${corpus.reports.length} pairs, no re-verification`);
 printSummary(corpus, console.log);
 
 const indexPath = path.join(repoRoot, "index.json");
@@ -63,7 +74,9 @@ const emit = dryRun
 if (!dryRun) {
   writeIndex(indexPath, index);
   writeFileSync(path.join(repoRoot, "metadata.json"), JSON.stringify(doc, null, 2) + "\n");
-  writeFileSync(path.join(repoRoot, "reference-report.json"), JSON.stringify(buildReport(corpus), null, 2) + "\n");
+  // Rewriting the report from a corpus that was loaded *from* the report would
+  // be a no-op at best and a lossy round-trip at worst.
+  if (!fromReport) writeFileSync(reportPath, JSON.stringify(buildReport(corpus), null, 2) + "\n");
 }
 
 const tombstoned = index.entries.filter(e => e.tombstoned).length;
@@ -81,4 +94,5 @@ if (emit.stale.length) {
   console.log(`\n${emit.stale.length} task file(s) ${what}:`);
   for (const s of emit.stale) console.log(`  ${s}`);
 }
-console.log(dryRun ? "\ndry run — nothing written" : `\nwrote tasks/, metadata.json, index.json, reference-report.json`);
+const wrote = fromReport ? "tasks/, metadata.json, index.json" : "tasks/, metadata.json, index.json, reference-report.json";
+console.log(dryRun ? "\ndry run — nothing written" : `\nwrote ${wrote}`);

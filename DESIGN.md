@@ -557,6 +557,20 @@ drop a task from the benchmark. `--dry-run` reports and writes nothing.
 `--only` is rejected outright: a partial walk would make every unvisited pair
 look deleted. Use `bin/reference-report.ts` for that.
 
+**Emission does not re-verify.** `--from-report` builds `tasks/`,
+`metadata.json`, and `index.json` from an existing `reference-report.json`:
+0.2 seconds against 10 minutes, and byte-identical output. This is not a
+shortcut but the correct decomposition — everything emission needs is already
+in the report (file facts, added-line counts, verify options, reference
+timings, repo heads), plus each `.dfy.gen`'s path, which is `parentDir` +
+repo + relpath. Nothing about changing the shape of a JSON file requires
+asking Dafny 65 questions again.
+
+What keeps it honest is the `sha256` the report records per file. Before
+emitting, every `.dfy.gen` is re-hashed against it; a single mismatch means
+the report describes a corpus that no longer exists, and the run aborts
+rather than emit tasks nothing vouched for.
+
 **Admission gate.** Each `(gen, solution)` pair is run through the
 validator at generation time. Pairs that fail are excluded rather than
 emitted, so every task is known-solvable under exactly the constraints
