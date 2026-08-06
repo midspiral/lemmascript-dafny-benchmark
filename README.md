@@ -293,7 +293,9 @@ change every verdict for that task. It needs no Dafny and no case studies, so
 CI runs it on every push, while a full regeneration runs weekly and on demand.
 
 See [DESIGN.md](DESIGN.md) for the reasoning, the exact token list, and
-the loopholes each check closes.
+the loopholes each check closes. [AGENTS.md](AGENTS.md) is for anyone — human or
+otherwise — modifying the validator: the operational traps, and the measure-then-
+adopt procedure each rule went through.
 
 ## Licensing
 
@@ -330,19 +332,25 @@ commit pinning is more machinery than this needs right now.
 
 ## Status
 
-The validator, the reference report, and the emitted benchmark are all in
-place: **35 tasks** from 65 pairs across 27 case studies.
+The validator, the reference report, and the emitted benchmark are all in place:
+**33 tasks**, drawn from 65 candidate pairs across 27 configured case studies.
+Seventeen of those repositories contribute a task; the rest contribute pairs
+that were all excluded, overwhelmingly because the generated skeleton already
+verified and there was no proof to complete.
 
-Two caveats a reader should have up front. Three pairs are excluded only
-because their proofs exceed the wall-clock limit their case study sets for CI,
-which is an upstream fix — and the reason IDs are issued to excluded pairs too,
-so those tasks keep their numbers when it lands. And because those limits are
-wall-clock, **which pairs are admitted depends on the machine**: a loaded box
-turns a passing proof into a reported timeout. One task today verifies with a
-one-second margin. Read a `verification-timeout` cause as "re-run it", not as
-"the solution is broken".
+Two things a reader should know up front.
 
-The open questions are recorded at the end of DESIGN.md. The substantive one
-— whether adding preconditions to a generated declaration completes the proof
-or changes the theorem — is now settled: weakening is banned, strengthening
-is fine.
+**Admission depends on the machine.** The per-task time limits are wall-clock,
+so a loaded box turns a passing proof into a reported timeout. Three pairs are
+excluded for that reason today, and one admitted task passes with a one-second
+margin. Read a `verification-timeout` cause as "re-run it", not as "the solution
+is broken". Because IDs are issued to excluded pairs too, a task recovered by an
+upstream limit change comes back at the same number.
+
+**The validator is not proof against a determined adversary**, and does not try
+to be — see [What the validator does not catch](#what-the-validator-does-not-catch)
+for the three known escapes and why they are documented rather than closed.
+
+Remaining questions are recorded at the end of [DESIGN.md](DESIGN.md), and the
+fixes that belong in the case studies rather than here are in
+[UPSTREAM.md](UPSTREAM.md).

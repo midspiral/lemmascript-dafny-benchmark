@@ -143,7 +143,7 @@ A line-prefix rule is not enough either, because
 begins with an allowed keyword and still smuggles a precondition onto the
 generated declaration. Both are rejected above, for their own stated reasons.
 
-**Corpus cost: zero.** Across all 35 reference solutions, 76 added lines land
+**Corpus cost: zero.** Across all 33 reference solutions, 76 added lines land
 inside a generated signature — 55 `decreases`, 12 `ensures`, 9 inert — and every
 one is accepted. No added clause lands on a trusted declaration, though six task
 files contain generated `{:axiom}` declarations, so that restriction is free
@@ -595,8 +595,8 @@ passes both checks *and the `.dfy.gen` fails them*. Two sub-cases:
 - **`no-additions`** — the solution is byte-identical to its `.gen`, so there
   was never anything to prove. A large share of the corpus: 26 of 65 pairs.
 - **`already-verifies`** — the reference author wrote proof the solver did not
-  need. Measured at 2 of the 35 pairs that otherwise qualified, with 35 and 6
-  added code lines respectively.
+  need. Measured at 2 of the 35 pairs that otherwise qualified — leaving 33 —
+  with 35 and 6 added code lines respectively.
 
 Both are excluded under their own cause rather than shipped as freebies. The
 second is the one that would otherwise corrupt the numbers: without it the
