@@ -5,7 +5,9 @@
   "type": "module",
   "description": "Dafny proof-completion benchmark derived from the LemmaScript case studies",
   "scripts": {
+    "generate": "tsx bin/generate.ts",
     "reference-report": "tsx bin/reference-report.ts",
+    "check": "tsx bin/check.ts",
     "test": "tsx test/fixtures.test.ts",
     "typecheck": "tsc --noEmit"
   },

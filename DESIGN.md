@@ -477,12 +477,23 @@ plain `git diff` — stays internal to the validator.
 rather than derived state: the validator still stores nothing per task, and
 the same options apply to a reference solution and to a candidate.
 
-Implemented as `src/validator.ts`:
+Implemented as `src/validator.ts`, and exposed to a runner as
+`bin/check.ts`:
 
 ```ts
 validate(genPath, candidatePath, { timeLimit, extraFlags })
   → { additions, verify, passed, diff }
 ```
+
+```sh
+check <task-id> <candidate.dfy> [--json] [--diff]
+```
+
+`check` resolves the task ID to `tasks/NNNN.dfy` and to the verify options
+`metadata.json` records for it, so a candidate is held to exactly the budget
+its reference solution was. Exit status is 0 only when both constraints
+passed — a constraint that could not be run exits 1, since "we don't know" is
+not a pass.
 
 `additions` carries deleted-line count and samples, the banned matches
 (pattern name, index into the added lines, the line), the weakened contracts
@@ -504,11 +515,19 @@ the flat layout works:
 tasks/0001.dfy        # the .dfy.gen, renamed for viewing
 metadata.json
 index.json
+reference-report.json
 ```
 
 The generator **enforces** this rather than assuming it: any `.gen`
 containing `include` is skipped with a logged reason. Otherwise the first
 case study to gain one silently emits an unsolvable task.
+
+A task file is a **byte-for-byte** copy of its `.dfy.gen`. A candidate diffs
+against it, so a header comment identifying the task would show up as a line
+the candidate failed to add.
+
+`tasks/` has **gaps**, by design. IDs are issued to every pair the generator
+sees, not only the admitted ones — see *Reentrancy*.
 
 ## Generator
 
@@ -517,7 +536,26 @@ Node.js. Walks the repo list from metadata, reads each case study's
 
 **Reentrancy.** `index.json` maps a stable key `repo + relpath` to a
 monotonic ID. IDs are never reused or renumbered. Upstream deletions are
-tombstoned, not removed. `--update` refreshes existing entries.
+tombstoned, not removed.
+
+IDs go to **every pair seen**, admitted or not. The alternative — numbering
+only the admitted ones — makes a task's identity depend on where the
+generator ran, which matters here because admission is not machine-independent:
+wall-clock time limits mean a pair can time out on a loaded box and pass on an
+idle one. Numbering everything costs only gaps in `tasks/`, and buys a number
+that means the same thing everywhere.
+
+New IDs are minted in key order, so a first run on a clean index is
+reproducible.
+
+Three flags guard the destructive parts. `--update` refreshes a task whose
+upstream `.dfy.gen` has moved — that changes what the task *is*, so it does
+not happen quietly. `--prune` deletes task files that are no longer admitted;
+without it they are listed and left alone, so one flaky timeout cannot silently
+drop a task from the benchmark. `--dry-run` reports and writes nothing.
+
+`--only` is rejected outright: a partial walk would make every unvisited pair
+look deleted. Use `bin/reference-report.ts` for that.
 
 **Admission gate.** Each `(gen, solution)` pair is run through the
 validator at generation time. Pairs that fail are excluded rather than
