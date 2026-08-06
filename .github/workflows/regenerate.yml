@@ -1,0 +1,51 @@
+name: Regenerate
+
+# A full regeneration: clones every case study and re-verifies every reference
+# solution. Ten minutes of solver time and 27 clones, so it cannot gate a push —
+# and its result depends on runner load, since the per-task verification limits
+# are wall-clock. A difference here is a prompt to look, not proof that anything
+# broke, which is why it reports its diff instead of failing on it.
+#
+# Separate from ci.yml so that triggering CI by hand stays cheap.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: lemmascript-dafny-benchmark
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - run: npm ci
+        working-directory: lemmascript-dafny-benchmark
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - uses: dafny-lang/setup-dafny-action@v1
+        with:
+          dafny-version: '4.11.0'
+
+      - name: Regenerate
+        working-directory: lemmascript-dafny-benchmark
+        run: npm run generate -- --jobs=2
+
+      - name: Report the diff rather than failing on it
+        working-directory: lemmascript-dafny-benchmark
+        run: git --no-pager diff --stat -- tasks metadata.json index.json reference-report.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reference-report
+          path: lemmascript-dafny-benchmark/reference-report.json

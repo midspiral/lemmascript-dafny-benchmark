@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: '0 6 * * 1'
 
 jobs:
   # Everything that needs neither Dafny nor the case-study checkouts, so it runs
@@ -80,44 +78,3 @@ jobs:
           echo "$out"
           echo "$out" | grep -q "verifies        failed" \
             || { echo "::error::check did not evaluate the task"; exit 1; }
-
-  # A full regeneration: clones every case study and re-verifies every reference
-  # solution. Too slow for a push, and its result depends on runner load — the
-  # per-task limits are wall-clock — so a failure here is a prompt to look, not
-  # proof that anything broke. Manual and weekly.
-  full:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          path: lemmascript-dafny-benchmark
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-
-      - run: npm ci
-        working-directory: lemmascript-dafny-benchmark
-
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '8.0.x'
-
-      - uses: dafny-lang/setup-dafny-action@v1
-        with:
-          dafny-version: '4.11.0'
-
-      - name: Regenerate
-        working-directory: lemmascript-dafny-benchmark
-        run: npm run generate -- --jobs=2
-
-      - name: Report the diff rather than failing on it
-        working-directory: lemmascript-dafny-benchmark
-        run: git --no-pager diff --stat -- tasks metadata.json index.json reference-report.json
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: reference-report
-          path: lemmascript-dafny-benchmark/reference-report.json

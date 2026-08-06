@@ -1,7 +1,8 @@
 # CI
 
-What the workflow in [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
-checks, and why it is split the way it is.
+What the two workflows check, and why they are split the way they are:
+[`ci.yml`](.github/workflows/ci.yml) and
+[`regenerate.yml`](.github/workflows/regenerate.yml).
 
 The short version: **the cheap checks run on every push; the expensive one runs
 weekly.** The split is not about tidiness. Regenerating the benchmark takes ten
@@ -62,7 +63,9 @@ Two smoke tests ride along:
 - **the `check` CLI scores a candidate.** That is the contract a runner codes
   against, and nothing else exercises it.
 
-## `full` — weekly, and on manual dispatch
+## `regenerate` — weekly, and on manual dispatch
+
+A separate workflow, [`regenerate.yml`](.github/workflows/regenerate.yml).
 
 Clones every case study, re-verifies every reference solution, regenerates all
 four artifacts, and uploads the report as an artifact.
@@ -76,11 +79,12 @@ everyone learns to ignore.
 This is also the only job that would notice a case study changing upstream, and
 it runs once a week. A case-study edit can sit unseen for six days.
 
-> **Known wrinkle.** `full` is gated on `workflow_dispatch` and `schedule`, so
-> triggering the workflow manually (`gh workflow run CI`) starts the
-> ninety-minute regeneration as well as the fast jobs. There is currently no way
-> to manually run only the cheap checks. Splitting `full` into its own workflow
-> file would fix it; until then, prefer an empty commit over a manual dispatch.
+It lives in its own workflow file so that triggering CI by hand stays cheap.
+When it was a job inside `ci.yml` gated on `workflow_dispatch`, the obvious way
+to run the fast checks manually — `gh workflow run CI` — started the
+ninety-minute regeneration too, and there was no way to ask for only the cheap
+ones. Now `gh workflow run CI` runs `check` and `fixtures`; the regeneration
+needs `gh workflow run Regenerate` explicitly.
 
 ## Running the same checks locally
 
@@ -89,12 +93,32 @@ npm ci
 npm run typecheck
 npm run check-artifacts     # no Dafny needed
 npm test                    # needs Dafny 4.11.0
-npm run generate            # the `full` job, ~10 minutes
+npm run generate            # what `regenerate` does, ~10 minutes
 ```
 
 The validator refuses to run against any Dafny other than the pinned version, so
 a local run on 4.12 reports `not-run` with the version mismatch rather than
 producing a verdict that means something different.
+
+## Two things deliberately not built
+
+**A verification cache**, keyed on the file hashes, verify options, Dafny version
+and validator version, so that an unchanged pair is not re-verified. It sounds
+obviously worthwhile and mostly is not. After a documentation change you would
+not run `generate` at all; after a *validator* change the cache must be
+invalidated, so it saves nothing; on CI or a fresh clone the cache is cold. It
+pays off in one case — a single case study changed — which is the weekly job.
+Against that, the invalidation key has to include the validator's own logic, and
+forgetting to bump it yields stale verdicts that look authoritative. That is a
+fail-open bug in the one place a benchmark cannot afford one.
+
+**A `--skip-slow` flag**, omitting pairs above some time threshold. Two files are
+83% of the run, and both are excluded for timing out anyway. But that is exactly
+why skipping them is wrong: their result is the only signal that an upstream
+limit change worked. It would also make the corpus composition depend on a flag,
+producing a report that looks complete and is not.
+
+Ten minutes on a rare full regeneration is the cheaper problem than either.
 
 ## What CI does not cover
 
@@ -103,5 +127,5 @@ producing a verdict that means something different.
 - No formatter or linter is configured, so style drift is invisible.
 - Nothing verifies the reference solutions on more than one machine. Everything
   known about the corpus was measured on a single Dafny 4.11.0 install; the
-  weekly `full` run on a GitHub runner is the only independent check, and it is
-  advisory.
+  weekly `regenerate` run on a GitHub runner is the only independent check, and
+  it is advisory.
