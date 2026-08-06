@@ -38,7 +38,7 @@ if (!existsSync(metadataPath)) {
   console.error("No metadata.json — run `npm run generate` first.");
   process.exit(2);
 }
-const metadata = JSON.parse(readFileSync(metadataPath, "utf-8")) as { tasks: TaskMetadata[] };
+const metadata = JSON.parse(readFileSync(metadataPath, "utf-8")) as { dafnyVersion: string; tasks: TaskMetadata[] };
 
 // Accept 7, 0007, or tasks/0007.dfy — a runner shouldn't have to care.
 const wanted = parseInt(path.basename(taskArg).replace(/\.dfy$/, ""), 10);
@@ -58,6 +58,7 @@ if (!existsSync(candidatePath)) {
 const result = await validate(genPath, candidatePath, {
   timeLimit: task.verify.timeLimit,
   extraFlags: task.verify.flags,
+  expectedVersion: metadata.dafnyVersion,
 });
 
 if (boolFlag("json")) {

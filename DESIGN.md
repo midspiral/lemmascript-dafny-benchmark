@@ -145,9 +145,11 @@ generated declaration. Both are rejected above, for their own stated reasons.
 
 **Corpus cost: zero.** Across all 33 reference solutions, 76 added lines land
 inside a generated signature — 55 `decreases`, 12 `ensures`, 9 inert — and every
-one is accepted. No added clause lands on a trusted declaration, though six task
-files contain generated `{:axiom}` declarations, so that restriction is free
-too.
+one is accepted. No added clause lands on a trusted declaration, so that
+restriction is free too. Two task files carry a generated `{:axiom}`
+*declaration* (`0034`, `0046`); three more contain `assume {:axiom}`
+*statements* inside bodies (`0029`, `0031`, `0063`), which are a different
+construct and not a signature at all.
 
 Outside signature intervals, added `requires` / `reads` / `modifies` clauses are
 still rejected when they attach to a generated declaration; see *Notes on the

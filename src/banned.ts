@@ -36,6 +36,14 @@ export const bannedPatterns: BannedPattern[] = [
   { name: "at-verify-only", pattern: /@VerifyOnly\b/ },
   { name: "at-options", pattern: /@Options\s*\(/ },
 
+  // Contract inference: these ask Dafny to synthesise preconditions, frame
+  // clauses, or postconditions for a declaration. Written on a line of their
+  // own before a *generated* declaration, they change its contract without any
+  // `requires` line to notice. Neither does anything in 4.11.0 — `{:autoReq}`
+  // and `@AutoRequires` both parse and leave `x / x` still failing — so this is
+  // insurance against a release that implements them, not a live hole.
+  { name: "contract-inference", pattern: /\{\s*:(autoReq|autocontracts)\b|@AutoRequires\b|@AutoContracts\b/i },
+
   // `decreases *` tells Dafny not to prove termination. A method that never
   // returns establishes its postcondition vacuously, and a candidate has no
   // legitimate use for one: the wildcard is only legal on methods and loops,

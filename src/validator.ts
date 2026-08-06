@@ -146,7 +146,30 @@ export interface VerifyCheck {
   exitCode: number | null;
 }
 
+/**
+ * The Dafny version this checker was written against, checked once per process.
+ *
+ * Warning categories are matched on message text, so a different release can
+ * silently change what the validator accepts — a `PASS` under an unpinned
+ * toolchain means something other than what the benchmark claims. Cheap enough
+ * to enforce rather than document.
+ */
+let cachedVersion: string | null | undefined;
+export function dafnyVersion(): string | null {
+  if (cachedVersion !== undefined) return cachedVersion;
+  try {
+    cachedVersion = execFileSync("dafny", ["--version"], { encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"] })
+      .trim()
+      .split(/\s+/)[0];
+  } catch {
+    cachedVersion = null;
+  }
+  return cachedVersion;
+}
+
 export interface VerifyOptions {
+  /** Refuse to run against any other Dafny. */
+  expectedVersion?: string;
   /** `--verification-time-limit`, from the LemmaScript-files.txt entry. */
   timeLimit?: number;
   /** Extra Dafny flags from the LemmaScript-files.txt entry, e.g. `--isolate-assertions`. */
@@ -251,31 +274,29 @@ function findSignatureViolations(genPath: string, candidatePath: string): Signat
   const found: SignatureViolation[] = [];
   const state: LexState = { block: false, str: false };
   let genLine = 0;
-  // An added line that opens a declaration of its own ends the generated
-  // signature it was inserted into: everything after it belongs to the
-  // candidate's declaration, not to the generated one.
-  let leftSignature = false;
 
   for (const raw of gitDiff(genPath, candidatePath, true).split("\n")) {
     if (raw.startsWith("@@") || raw.startsWith("+++") || raw.startsWith("---")) continue;
     if (raw.startsWith("diff ") || raw.startsWith("index ") || raw.startsWith("\\")) continue;
     if (raw.startsWith(" ")) {
       genLine++;
-      leftSignature = false;
       continue;
     }
     if (!raw.startsWith("+")) continue;
 
     const text = raw.slice(1);
     const interval = intervals.find(iv => genLine >= iv.start && genLine <= iv.end);
-    if (!interval || leftSignature) continue;
+    if (!interval) continue;
     if (isInert(text)) continue;
 
+    // A declaration may not *begin* inside a generated signature. Allowing it
+    // let an added `lemma Injected(…)` capture the generated declaration's
+    // clauses and body, leaving the generated one bodyless with no
+    // specification at all — it would then claim nothing, and say so silently,
+    // because a bodyless declaration without an `ensures` produces no warning.
+    // Helpers remain legal at real declaration boundaries, which is where every
+    // reference solution puts them.
     const code = scrub(text, state).trim();
-    if (beginsDeclaration(code)) {
-      leftSignature = true;
-      continue;
-    }
     const verdict = judgeSignatureLine(code, interval.trusted);
     if (!verdict.ok) {
       found.push({
@@ -344,6 +365,21 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
     content = readFileSync(candidatePath, "utf-8");
   } catch (e: any) {
     return { status: "not-run", notRunReason: `could not read candidate: ${e?.message ?? e}`, command: [], ...empty };
+  }
+
+  if (opts.expectedVersion) {
+    const found = dafnyVersion();
+    if (found === null) {
+      return { status: "not-run", notRunReason: "`dafny` not found on PATH", command: [], ...empty };
+    }
+    if (found !== opts.expectedVersion) {
+      return {
+        status: "not-run",
+        notRunReason: `expected Dafny ${opts.expectedVersion}, found ${found}`,
+        command: [],
+        ...empty,
+      };
+    }
   }
 
   const args = ["verify", "--allow-warnings", "--warn-contradictory-assumptions", "--json-output"];

@@ -58,6 +58,7 @@ const cases: Record<string, Expectation> = {
   "cheat-at-verify-only": { kind: "banned", patterns: ["at-verify-only"] },
   "cheat-at-options": { kind: "banned", patterns: ["at-options"] },
   "cheat-decreases-star": { kind: "banned", patterns: ["decreases-wildcard"] },
+  "cheat-contract-inference": { kind: "banned", patterns: ["contract-inference"] },
 
   // The line DESIGN.md cites against stripping `//` tails: the `//` is inside a
   // string, so the code continues after it. The quote guard must decline to
@@ -86,6 +87,9 @@ const cases: Record<string, Expectation> = {
   "cheat-frame-smuggle": { kind: "signature", why: /contributes a `modifies`/ },
   "cheat-decreases-wildcard": { kind: "signature", why: /wildcard/ },
   "cheat-ensures-on-trusted": { kind: "signature", why: /trusted declaration/ },
+  // An added declaration inside a generated signature captures that
+  // declaration's clauses and body, leaving the generated one claiming nothing.
+  "cheat-declaration-inside-signature": { kind: "signature", why: /does not begin an/ },
 
   "cheat-deletion": { kind: "deletion" },
 

@@ -75,6 +75,13 @@ without adding it there breaks every attempt directory, and the fixture suite
 will not notice — it runs against the repo's own sources. CI has a smoke test
 for this; keep it.
 
+**Anything that lets the candidate influence its own classification is a bug.**
+The regions come from the `.dfy.gen` for exactly this reason, and an exception
+to that rule was shipped once: added declarations were allowed to "end" a
+generated signature, which let `+lemma Injected(…)` capture the generated
+declaration's clauses and body and leave the generated one claiming nothing. If
+you find yourself special-casing what the candidate wrote, stop.
+
 **A new check that cannot run must fail closed.** Prefer a recorded cause over
 silently admitting. `skeleton-not-checked` exists because the first version of
 that rule admitted on a check that never executed.

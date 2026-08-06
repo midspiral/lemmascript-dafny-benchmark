@@ -21,9 +21,15 @@ Each benchmark task is one such completion. Given a `.dfy.gen`, produce a
 * **leaves the generated contracts alone**. New helper lemmas may carry
   whatever `requires` they need, but a precondition may not be bolted onto a
   generated declaration. Adding `ensures` to one is fine — that is more to
-  prove, not less.
+  prove, not less;
+* is **proof only**. Additions may introduce ghost declarations, proof
+  statements, proof annotations, and the specifications allowed above. They may
+  not add executable behaviour — returns, assignments, executable calls,
+  control flow — and may not change the meaning of syntax already present,
+  whether by attaching an attribute or modifier to a generated declaration or by
+  adding tokens that continue an existing expression.
 
-The last two are what make the benchmark meaningful. A bodyless lemma
+The last three are what make the benchmark meaningful. A bodyless lemma
 verifies vacuously, and `requires false` under every generated declaration
 discharges every postcondition at once; without those constraints, a
 one-line transformation solves every task.
@@ -45,6 +51,7 @@ attempts/0005/
     task.dfy.gen    pristine copy, what the diff is taken against
     check.ts        the validator, with this task's Dafny budget inlined
     validator.ts
+    signature.ts
     banned.ts
 ```
 
@@ -244,10 +251,24 @@ lemma {:
 ```
 
 spells `{:axiom}` without any line containing it. Comparing the attributes in
-the candidate against those in the `.dfy.gen` would close it, except that six
-task files already contain a generated `{:axiom}`, so a name-based comparison is
-blind exactly where it matters. A counting version would work and has not been
-judged worth the machinery.
+the candidate against those in the `.dfy.gen` would close it, except that the
+`.gen` files already contain `{:axiom}` — two as declarations, three more as
+`assume {:axiom}` statements — so a name-based comparison is blind exactly where
+it matters. A counting version would work and has not been judged worth the
+machinery.
+
+The last two constraints in [The task](#the-task) are the answer to this in
+principle: **proof-only** is part of the task definition even where it is not
+mechanically enforced. A `PASS` establishes the automated conditions; a reported
+benchmark result should also satisfy the proof-only rule, which is why the diff
+should travel with it. The definition is stronger than its automatic
+approximation, deliberately.
+
+One related thing the validator does *not* police: a candidate may raise its own
+verification budget with a per-declaration `{:timeLimit}` or `{:rlimit}`
+attribute. Taking longer is not cheating — the recorded limit comes from the
+case study's CI, not from the task's meaning — but two candidates that spent very
+different amounts of solver time are not directly comparable.
 
 Closing the first two properly means a parser-backed structural comparison:
 every node originating in the `.dfy.gen` preserved unchanged, and the executable
@@ -263,7 +284,7 @@ comparisons want a private task set.
 ## Regenerating the benchmark
 
 ```sh
-npm install
+npm ci
 npm run generate             # the whole benchmark: tasks/, metadata.json, index.json, report
 npm run reference-report     # just the report, leaving the benchmark alone
 npm test                     # the fixture suite (needs Dafny)

@@ -21,6 +21,11 @@ const DECLARATION =
 const TRUSTED_ATTRIBUTE =
   /\{\s*:(axiom|extern|verify\s+false)\b|@Axiom\b|@Extern\b|@Verify\s*\(\s*false\s*\)/;
 
+/** Attribute groups, which are balanced and must not be mistaken for a body.
+ *  `function {:axiom} f(x): bool` is bodyless; the braces belong to the
+ *  attribute. */
+const ATTRIBUTE_GROUP = /\{\s*:[^{}]*\}/g;
+
 /** Every specification keyword, so a line's full contribution can be judged. */
 const SPEC_KEYWORD = /\b(requires|ensures|reads|modifies|decreases|invariant|yields)\b/g;
 
@@ -107,56 +112,47 @@ export function signatureIntervals(genText: string): SignatureInterval[] {
   let depth = 0;
   let open: SignatureInterval | null = null;
 
-  const close = (end: number) => {
-    if (open && end >= open.start) {
-      open.end = end;
-      intervals.push(open);
-    }
+  const close = (end: number, bodied: boolean) => {
+    if (!open) return;
+    open.end = end;
+    // A declaration whose body never opened is trusted for the same reason an
+    // {:axiom} one is: its postconditions are exposed to callers with no
+    // implementation proof behind them.
+    if (!bodied) open.trusted = true;
+    if (open.end >= open.start) intervals.push(open);
     open = null;
   };
 
   lines.forEach((raw, i) => {
     const n = i + 1;
     const code = scrub(raw, state);
+    // Attributes are stripped before any brace counting: their braces are not
+    // body braces, and a one-line body must still be recognised as a body.
+    const body = code.replace(ATTRIBUTE_GROUP, "");
 
     if (depth === 0 && DECLARATION.test(code)) {
-      close(n - 1);
-      // A bodyless declaration is trusted for the same reason an {:axiom} one
-      // is: its postconditions are exposed to callers without an implementation
-      // proof. Whether it has a body is decided below, when the body opens.
+      close(n - 1, true);
       open = { start: n, end: n, trusted: TRUSTED_ATTRIBUTE.test(code), text: code.trim() };
+      // The body opened on the declaration line itself, so there is no line on
+      // which a clause could be inserted, and the declaration is not bodyless.
+      if (body.includes("{")) {
+        open.end = n - 1;
+        open = null;
+      }
     }
 
     let d = 0;
-    for (const ch of code) {
+    for (const ch of body) {
       if (ch === "{") d++;
       else if (ch === "}") d--;
     }
     const before = depth;
     depth += d;
 
-    if (open && before === 0 && depth > 0) close(n - 1);
-    else if (open && depth === 0 && code.trim() === "") close(n - 1);
+    if (open && before === 0 && depth > 0) close(n - 1, true);
+    else if (open && depth === 0 && code.trim() === "") close(n - 1, false);
   });
-  close(lines.length);
-
-  // A declaration whose body never opened is bodyless, hence trusted.
-  const bodied = new Set<number>();
-  let depth2 = 0;
-  const state2: LexState = { block: false, str: false };
-  lines.forEach((raw, i) => {
-    const code = scrub(raw, state2);
-    const before = depth2;
-    for (const ch of code) {
-      if (ch === "{") depth2++;
-      else if (ch === "}") depth2--;
-    }
-    if (before === 0 && depth2 > 0) {
-      const owner = intervals.find(iv => i + 1 === iv.end + 1);
-      if (owner) bodied.add(owner.start);
-    }
-  });
-  for (const iv of intervals) if (!bodied.has(iv.start)) iv.trusted = true;
+  close(lines.length, false);
 
   return intervals;
 }

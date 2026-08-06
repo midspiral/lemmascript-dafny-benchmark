@@ -11,7 +11,9 @@
  * and nothing else — not `metadata.json`, not the rest of `tasks/`.
  *
  * The validator is copied rather than imported for the same reason, and it is
- * cheap to copy: two files, no npm dependencies, only Node builtins.
+ * cheap to copy: three files, no npm dependencies, only Node builtins. Keep the
+ * copy list below in step with the validator's imports — CI has a smoke test
+ * because nothing else would notice.
  *
  * Usage:
  *   make-attempt <task-id> [--out=<dir>]
@@ -30,7 +32,7 @@ if (!taskArg) {
   process.exit(2);
 }
 
-const metadata = JSON.parse(readFileSync(path.join(repoRoot, "metadata.json"), "utf-8")) as { tasks: TaskMetadata[] };
+const metadata = JSON.parse(readFileSync(path.join(repoRoot, "metadata.json"), "utf-8")) as { dafnyVersion: string; tasks: TaskMetadata[] };
 const id = parseInt(path.basename(taskArg).replace(/\.dfy$/, ""), 10);
 const task = metadata.tasks.find(t => t.id === id);
 if (!task) {
@@ -81,6 +83,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const result = await validate(path.join(here, "task.dfy.gen"), path.join(here, "..", "solution.dfy"), {
   timeLimit: ${JSON.stringify(task.verify.timeLimit)},
   extraFlags: ${JSON.stringify(task.verify.flags)},
+  expectedVersion: ${JSON.stringify(metadata.dafnyVersion)},
 });
 
 const a = result.additions;

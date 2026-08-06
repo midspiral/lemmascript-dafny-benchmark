@@ -90,9 +90,11 @@ function git(dir: string, args: string[]): string | undefined {
 export function resolveCheckout(entry: RepoEntry, parentDir: string, opts: { clone: boolean }): Checkout {
   const dir = path.join(parentDir, repoName(entry.repo));
   if (!existsSync(dir)) {
-    if (!opts.clone) return { entry, dir, present: false, error: "not checked out (pass --clone)" };
+    // https, not ssh: every case study is public, and requiring GitHub
+    // credentials would break regeneration for outside users and CI runners.
+    if (!opts.clone) return { entry, dir, present: false, error: "not checked out (cloning disabled by --no-clone)" };
     try {
-      execFileSync("git", ["clone", "--branch", entry.branch, `git@github.com:${entry.repo}.git`, dir], {
+      execFileSync("git", ["clone", "--branch", entry.branch, `https://github.com/${entry.repo}.git`, dir], {
         stdio: ["ignore", "pipe", "pipe"],
       });
     } catch (e: any) {

@@ -210,6 +210,7 @@ export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
     const result = await validate(pair.genPath, pair.solutionPath, {
       timeLimit: pair.timeout,
       extraFlags: pair.flags,
+      expectedVersion: config.dafnyVersion,
     });
     report.additions = result.additions;
     report.verify = result.verify;
@@ -222,6 +223,7 @@ export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
       const skeleton = await checkVerifies(pair.genPath, {
         timeLimit: pair.timeout,
         extraFlags: pair.flags,
+        expectedVersion: config.dafnyVersion,
       });
       report.skeletonVerifies = skeleton.status === "passed";
       if (report.skeletonVerifies) {

@@ -42,7 +42,16 @@ Your job is to make it verify, by **adding lines only**.
    preconditions they need. Adding `ensures` to an existing declaration is fine
    — that is more to prove, not less.
 
-Everything else is fair game: helper lemmas, ghost functions and predicates,
+4. **Proof only.** What you add must be proof: ghost declarations, proof
+   statements, proof annotations, and the specifications rule 3 allows. It must
+   not add executable behaviour, and it must not change the meaning of syntax
+   that is already there. Concretely, do not add returns, assignments,
+   executable calls, or control flow; do not attach attributes or modifiers to a
+   declaration already in the file; and do not add tokens that continue or wrap
+   an expression already present — a lone `|| true` on its own line attaches to
+   the clause above it, and that is a change to the task, not a proof of it.
+
+Otherwise the toolbox is open: helper lemmas, ghost functions and predicates,
 loop invariants, `decreases` clauses, `assert`s, `calc` blocks, and proofs by
 induction or contradiction.
 
@@ -52,15 +61,20 @@ induction or contradiction.
 npx tsx .bench/check.ts
 ```
 
-It reports both rules and exits 0 only when both pass. You can also run Dafny
-directly while iterating:
+It exits 0 only when every automated check passes. For faster iteration you can
+call Dafny directly, though this is *not* the authoritative command — it omits
+the warning checks the benchmark applies:
 
 ```sh
-dafny verify --allow-warnings {{DAFNY_FLAGS}}solution.dfy
+dafny verify --allow-warnings --warn-contradictory-assumptions {{DAFNY_FLAGS}}solution.dfy
 ```
 
 Verification budget for this task: {{BUDGET}}. Extra flags: {{FLAGS}}.
-A proof that only verifies with a longer budget does not count.
+
+A `PASS` from the checker establishes the automated conditions. Rules 1–3 are
+checked mechanically; **rule 4 is not fully enforceable** and is checked by
+reading the diff. A submission that passes the checker while breaking rule 4 is
+not a solution.
 
 Do not edit anything under `.bench/` — that is the checker and the pristine
 copy of the task it diffs against.
