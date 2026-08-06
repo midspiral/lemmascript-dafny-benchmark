@@ -1,0 +1,394 @@
+/**
+ * The validator: two checks against a candidate `.dfy`, and nothing else.
+ *
+ *   1. additions-only  — diff against the `.dfy.gen`, no deletions, no banned
+ *                        pattern on an added line
+ *   2. verifies        — `dafny verify` with zero errors and no disqualifying
+ *                        warning
+ *
+ * Each check is `passed` / `failed` / `not-run`. No per-task derived state: a
+ * candidate is checked against the `.gen` and against Dafny. The generator's
+ * admission gate calls exactly this, with the reference solution as the
+ * candidate.
+ */
+
+import { execFileSync, spawn } from "node:child_process";
+import { copyFileSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import {
+  declarationKeyword,
+  scanAddedLines,
+  scannedText,
+  weakeningClause,
+  type BannedMatch,
+  type WeakenedContract,
+} from "./banned.js";
+
+export type CheckStatus = "passed" | "failed" | "not-run";
+
+export interface AdditionsCheck {
+  status: CheckStatus;
+  /** Why the check could not run, when status is "not-run". */
+  notRunReason?: string;
+  deletedLines: number;
+  /** Up to five deleted lines, for the report. */
+  deletedSamples: string[];
+  bannedMatches: BannedMatch[];
+  /** Added `requires` / `reads` / `modifies` clauses attached to a generated
+   *  declaration. See `checkAdditionsOnly` for how attachment is decided. */
+  weakenedContracts: WeakenedContract[];
+  addedLines: number;
+  /** Added lines that are neither blank nor a whole-line `//` comment. */
+  addedCodeLines: number;
+}
+
+export type WarningCategory =
+  | "bodyless-declaration"
+  | "bodyless-forall"
+  | "bodyless-loop";
+
+/**
+ * Disqualifying warnings, matched on Dafny's message text.
+ *
+ * Text matching is fragile across Dafny releases — `errorId` is null for all
+ * three — so `fixtures/` holds one cheating `.dfy` per category and the test
+ * suite asserts each is still caught. A release that rewords a message fails
+ * the suite rather than silently widening the benchmark.
+ */
+const warningCategories: { category: WarningCategory; match: RegExp }[] = [
+  { category: "bodyless-declaration", match: /part of a bodyless/ },
+  { category: "bodyless-forall", match: /forall statement has no body/ },
+  { category: "bodyless-loop", match: /loop has no body/ },
+];
+
+/**
+ * Contradictory-assumption warnings: reported, never disqualifying.
+ *
+ * These used to exclude a candidate. They no longer do, because the syntactic
+ * rule that replaced them — frozen preconditions on generated declarations, see
+ * `findWeakenedContracts` — blocks the cheat they existed for, deterministically
+ * and without the solver. What the warning adds on top is false positives:
+ *
+ *   proved using contradictory assumptions: assertion always holds
+ *
+ * is what proof by contradiction looks like from the verifier's side, and nine
+ * files in this corpus contain one. Even the narrow shape,
+ *
+ *   ensures clause proved using contradictory assumptions
+ *
+ * fires on a deliberate contrapositive lemma — hono-rate-limiter's
+ * `SlidingWindowBound` states that a set of hypotheses is unsatisfiable, so
+ * `ensures false` proved from contradictory assumptions *is* the theorem.
+ *
+ * The flag stays on because it costs nothing measurable and the count is worth
+ * watching; the count is carried into the reference report.
+ */
+const contradictionWarning = /proved using contradictory assumptions/;
+
+export interface DisqualifyingWarning {
+  category: WarningCategory;
+  message: string;
+  line: number;
+}
+
+export interface VerifyCheck {
+  status: CheckStatus;
+  notRunReason?: string;
+  errors: number;
+  /** Of those errors, the ones that are `--verification-time-limit` expiries.
+   *  Dafny reports a per-procedure timeout as an error, but it means "ran out
+   *  of clock", not "could not be proved" — and since the limit is wall-clock,
+   *  it is sensitive to machine load. Counted separately so the report can tell
+   *  a flaky run from a broken proof. */
+  timeouts: number;
+  /** Up to five error messages, for the report. */
+  errorSamples: string[];
+  disqualifyingWarnings: DisqualifyingWarning[];
+  /** Contradictory-assumption warnings of any shape. Reported, not
+   *  disqualifying — see `contradictionWarning`. */
+  contradictions: number;
+  otherWarnings: number;
+  /** The argv actually run, minus the absolute path of the candidate. */
+  command: string[];
+  seconds: number;
+  timedOut: boolean;
+  exitCode: number | null;
+}
+
+export interface VerifyOptions {
+  /** `--verification-time-limit`, from the LemmaScript-files.txt entry. */
+  timeLimit?: number;
+  /** Extra Dafny flags from the LemmaScript-files.txt entry, e.g. `--isolate-assertions`. */
+  extraFlags?: string[];
+  /** Wall-clock kill, in seconds. Defence against a hang, not a verification budget. */
+  wallClockSeconds?: number;
+}
+
+export interface ValidationResult {
+  additions: AdditionsCheck;
+  verify: VerifyCheck;
+  /** Both checks passed. */
+  passed: boolean;
+  /** The unified diff, gen → candidate. */
+  diff: string;
+}
+
+/** `git diff --no-index`, whose exit status is 1 when the files differ. */
+function gitDiff(genPath: string, candidatePath: string): string {
+  try {
+    return execFileSync("git", ["diff", "--no-index", "--no-color", "--", genPath, candidatePath], {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"],
+      maxBuffer: 64 * 1024 * 1024,
+    });
+  } catch (e: any) {
+    if (e?.stdout != null) return typeof e.stdout === "string" ? e.stdout : e.stdout.toString("utf-8");
+    throw e;
+  }
+}
+
+export function checkAdditionsOnly(genPath: string, candidatePath: string): { check: AdditionsCheck; diff: string } {
+  let diff: string;
+  try {
+    diff = gitDiff(genPath, candidatePath);
+  } catch (e: any) {
+    return {
+      diff: "",
+      check: {
+        status: "not-run",
+        notRunReason: `could not run git diff: ${e?.message ?? e}`,
+        deletedLines: 0,
+        deletedSamples: [],
+        bannedMatches: [],
+        weakenedContracts: [],
+        addedLines: 0,
+        addedCodeLines: 0,
+      },
+    };
+  }
+
+  const lines = diff.split("\n");
+  const deleted = lines.filter(l => l.startsWith("-") && !l.startsWith("---"));
+  const added = lines.filter(l => l.startsWith("+") && !l.startsWith("+++")).map(l => l.slice(1));
+
+  const bannedMatches = scanAddedLines(added);
+  const weakenedContracts = findWeakenedContracts(lines);
+  const addedCodeLines = added.filter(l => {
+    const t = l.trim();
+    return t !== "" && !t.startsWith("//");
+  }).length;
+
+  const clean = deleted.length === 0 && bannedMatches.length === 0 && weakenedContracts.length === 0;
+  return {
+    diff,
+    check: {
+      status: clean ? "passed" : "failed",
+      deletedLines: deleted.length,
+      deletedSamples: deleted.slice(0, 5),
+      bannedMatches,
+      weakenedContracts,
+      addedLines: added.length,
+      addedCodeLines,
+    },
+  };
+}
+
+/**
+ * Added `requires` / `reads` / `modifies` clauses that belong to a *generated*
+ * declaration.
+ *
+ * A clause is attributed to the nearest declaration keyword *preceding* it in
+ * the candidate, and is allowed only when that keyword is itself on an added
+ * line — i.e. the clause is part of a helper the candidate wrote. Order
+ * matters: "somewhere in the same run of added lines" would let a clause
+ * borrow the keyword of a helper declared after it.
+ *
+ * Why this and not the vacuous-proof warning it replaces: adding `requires
+ * false` to a generated lemma discharges its postcondition outright, and a
+ * generated lemma nothing calls has no caller to break. On a *new* helper the
+ * same clause is inert — Dafny makes every call site discharge it from
+ * generated context the candidate cannot weaken, so an uncallable helper
+ * proves nothing. The syntactic rule therefore covers the case the semantic
+ * one existed for, and covers ordinary weakening too, which the warning never
+ * saw.
+ */
+function findWeakenedContracts(diffLines: string[]): WeakenedContract[] {
+  const found: WeakenedContract[] = [];
+  let addedIndex = 0;
+  // Whether the nearest preceding declaration keyword sat on an added line.
+  // `null` until one is seen at all; a clause before any declaration is not
+  // something a candidate can have written legitimately.
+  let lastDeclarationAdded: boolean | null = null;
+
+  for (const line of diffLines) {
+    const isAdded = line.startsWith("+") && !line.startsWith("+++");
+    const isContext = line.startsWith(" ");
+    if (!isAdded && !isContext) continue; // headers, deletions, "\ No newline"
+
+    const text = line.slice(1);
+    if (isAdded) addedIndex++;
+
+    // Comments must not supply a keyword — `// this lemma is hard` is prose.
+    const code = scannedText(text);
+    if (declarationKeyword.test(code)) lastDeclarationAdded = isAdded;
+
+    if (isAdded && lastDeclarationAdded !== true) {
+      const m = weakeningClause.exec(code);
+      if (m) found.push({ clause: m[1], addedLineIndex: addedIndex, text });
+    }
+  }
+  return found;
+}
+
+export async function checkVerifies(candidatePath: string, opts: VerifyOptions = {}): Promise<VerifyCheck> {
+  const empty = { errors: 0, timeouts: 0, errorSamples: [], disqualifyingWarnings: [], contradictions: 0, otherWarnings: 0, seconds: 0, timedOut: false, exitCode: null };
+
+  let content: string;
+  try {
+    content = readFileSync(candidatePath, "utf-8");
+  } catch (e: any) {
+    return { status: "not-run", notRunReason: `could not read candidate: ${e?.message ?? e}`, command: [], ...empty };
+  }
+
+  const args = ["verify", "--allow-warnings", "--warn-contradictory-assumptions", "--json-output"];
+  // Mirrors LemmaScript's own sniff (tools/src/dafny-commands.ts): the standard
+  // library is opt-in, and a candidate may reach for it even when the .gen does
+  // not, so this is read off the candidate rather than stored per task.
+  if (content.includes("Std.")) args.push("--standard-libraries");
+  if (opts.timeLimit) args.push("--verification-time-limit", String(opts.timeLimit));
+  for (const f of opts.extraFlags ?? []) args.push(f);
+
+  // A directory containing only the candidate: nothing else for Dafny to pick up.
+  const dir = mkdtempSync(path.join(tmpdir(), "lsdb-verify-"));
+  const base = path.basename(candidatePath);
+  const command = [...args, base];
+  const started = Date.now();
+  try {
+    copyFileSync(candidatePath, path.join(dir, base));
+    const run = await runDafny([...args, base], dir, (opts.wallClockSeconds ?? 2400) * 1000);
+    const seconds = Math.round((Date.now() - started) / 1000);
+
+    if (run.spawnError?.code === "ENOENT") {
+      return { status: "not-run", notRunReason: "`dafny` not found on PATH", command, ...empty, seconds };
+    }
+    if (run.timedOut) {
+      return { status: "failed", command, ...empty, seconds, timedOut: true, exitCode: null };
+    }
+    if (run.spawnError) {
+      return { status: "not-run", notRunReason: `could not run dafny: ${run.spawnError.message}`, command, ...empty, seconds };
+    }
+
+    const errorSamples: string[] = [];
+    const disqualifyingWarnings: DisqualifyingWarning[] = [];
+    let errors = 0;
+    let timeouts = 0;
+    let contradictions = 0;
+    let otherWarnings = 0;
+    let sawStatus = false;
+
+    for (const raw of run.stdout.split("\n")) {
+      const line = raw.trim();
+      if (!line.startsWith("{")) continue;
+      let parsed: any;
+      try {
+        parsed = JSON.parse(line);
+      } catch {
+        continue;
+      }
+      if (parsed.type === "status") {
+        sawStatus = true;
+        continue;
+      }
+      if (parsed.type !== "diagnostic") continue;
+      const v = parsed.value;
+      const message: string = v.defaultFormatMessage ?? "";
+      if (v.severity === 1) {
+        errors++;
+        if (/timed out after/.test(message)) timeouts++;
+        if (errorSamples.length < 5) errorSamples.push(`${v.location?.range?.start?.line ?? "?"}: ${message}`);
+      } else if (v.severity === 2) {
+        const hit = warningCategories.find(w => w.match.test(message));
+        if (hit) {
+          disqualifyingWarnings.push({ category: hit.category, message, line: v.location?.range?.start?.line ?? -1 });
+        } else if (contradictionWarning.test(message)) {
+          contradictions++;
+        } else {
+          otherWarnings++;
+        }
+      }
+    }
+
+    // No diagnostics and no status line means Dafny never got far enough to say
+    // anything — a crashed run must not read as a clean one.
+    if (!sawStatus && errors === 0) {
+      return {
+        status: "not-run",
+        notRunReason: `dafny produced no verification status (exit ${run.code}): ${run.stderr.trim().slice(0, 300)}`,
+        command,
+        ...empty,
+        seconds,
+        exitCode: run.code,
+      };
+    }
+
+    return {
+      status: errors === 0 && disqualifyingWarnings.length === 0 ? "passed" : "failed",
+      errors,
+      timeouts,
+      errorSamples,
+      disqualifyingWarnings,
+      contradictions,
+      otherWarnings,
+      command,
+      seconds,
+      timedOut: false,
+      exitCode: run.code,
+    };
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+interface DafnyRun {
+  stdout: string;
+  stderr: string;
+  code: number | null;
+  timedOut: boolean;
+  spawnError?: NodeJS.ErrnoException;
+}
+
+/** One `dafny` invocation, killed at the wall clock. Async so the reference
+ *  report can run several case studies at once. */
+function runDafny(args: string[], cwd: string, wallClockMs: number): Promise<DafnyRun> {
+  return new Promise(resolve => {
+    const child = spawn("dafny", args, { cwd });
+    let stdout = "";
+    let stderr = "";
+    let timedOut = false;
+    child.stdout.on("data", d => (stdout += d));
+    child.stderr.on("data", d => (stderr += d));
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGKILL");
+    }, wallClockMs);
+    child.on("error", (err: NodeJS.ErrnoException) => {
+      clearTimeout(timer);
+      resolve({ stdout, stderr, code: null, timedOut, spawnError: err });
+    });
+    child.on("close", code => {
+      clearTimeout(timer);
+      resolve({ stdout, stderr, code, timedOut });
+    });
+  });
+}
+
+/**
+ * Both checks. Corpus mode runs both regardless of the first result — the
+ * reference report wants every cause, not the first one.
+ */
+export async function validate(genPath: string, candidatePath: string, opts: VerifyOptions = {}): Promise<ValidationResult> {
+  const { check: additions, diff } = checkAdditionsOnly(genPath, candidatePath);
+  const verify = await checkVerifies(candidatePath, opts);
+  return { additions, verify, passed: additions.status === "passed" && verify.status === "passed", diff };
+}

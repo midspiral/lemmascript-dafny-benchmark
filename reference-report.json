@@ -1,0 +1,3552 @@
+{
+  "dafnyVersion": "4.11.0",
+  "configSource": "midspiral/LemmaScript@main .github/workflows/ci.yml#case-studies-dafny",
+  "configSeededAt": "2026-08-06",
+  "aggregate": {
+    "reposConfigured": 30,
+    "reposUsed": 27,
+    "branchesDeferred": [
+      {
+        "repo": "midspiral/guardians-lemmascript",
+        "branch": "generate-verify-execute"
+      },
+      {
+        "repo": "midspiral/henri-lemmascript",
+        "branch": "generate-verify-execute"
+      },
+      {
+        "repo": "midspiral/henri-lemmascript",
+        "branch": "session"
+      }
+    ],
+    "pairsSeen": 65,
+    "admitted": 36,
+    "excluded": 29,
+    "excludedByCause": {
+      "no-additions": 26,
+      "verification-timeout": 3,
+      "weakened:requires": 1
+    }
+  },
+  "repos": [
+    {
+      "repo": "midspiral/collab-todo-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "1839dfd3deb7907deaadade6467928907174779b",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/colorwheel-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "26d2ac4019619aaecbc0a27c83010f7f95f6f2e3",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/node-casbin-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "2589b90572bf10e2e8067b349a3abe6956db52bb",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/clear-split-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "f77276c8f2b10d47450e145ad8a81e39d2b11680",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/hono-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "72750fa7783352d4c9765ab427175840d513147c",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/hono-rate-limiter-with-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "e1d747093f5238d55201161cc1e9241f452c4613",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "CHARM-BDF/charmchat",
+      "branch": "lemma",
+      "present": true,
+      "head": "13d58e87d8e5ee2741e0e9e04cbdac639e4a3e58",
+      "currentBranch": "lemma",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/xyflow-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "471b24b2994eb469f668cd45b218b4bdd178761d",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/equality-game-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "7622515e2750b4cc6662dbca40688e3cea8d3351",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/github-star-checker-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "2e6c792c479ff5bf95941bfc4700cf3b3cbecd44",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/rallly-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "db9d4d8a68e8c10ea44c5d7f7aab4c004c275dc4",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/talktimer-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "b83df2914e36c89a88d041fb2df91d393cf1b3cf",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/opencode-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/anthropic-sdk-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "e63567786a03a45d06d41cf272da6031934b9237",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/trace-solo-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "14e3e4cb2459539f9a76d3aa88ecd36386cb134d",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/pi-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "a2c7a6a8b5216f31438245ca52eb8fba63191704",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/flue-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "d2d89359f257c5b81679f53332829fb8a15595d5",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/balanced-match-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "50747512cbe087cb60b5a28569231c9a007f8fce",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/guardians-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "13f428054b418209993a93600be4aa043e54f29c",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/quorum-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "16db5b618210e8adfcbf001e7b5f8388d2b10c1c",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/quorum-tutorial-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "b98527836c53983740f306a804f42549812e3701",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/quota-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "b946073e638a7fddbc199afa50703943c8813016",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/henri-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "a901c5a30df520a6b0eb881a828e486fb1ed6030",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/eventab-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "342cd2efb792f7a80a0c47e15e4c5f613ecbf5c7",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/eslint-plugin-with-lemmascript",
+      "branch": "main",
+      "present": true,
+      "head": "501cee686f781b74ddc09efee65a34f8965dcf15",
+      "currentBranch": "main",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/infisical-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "f441627041489c259d752b1bc1a98d422f07a190",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    },
+    {
+      "repo": "midspiral/mcp-sdk-lemmascript",
+      "branch": "lemmascript",
+      "present": true,
+      "head": "d1ea7269ecac093720e0e824ed88a2698c4c2807",
+      "currentBranch": "lemmascript",
+      "dirty": false
+    }
+  ],
+  "pairs": [
+    {
+      "key": "CHARM-BDF/charmchat:backend/src/services/provenance.ts",
+      "repo": "CHARM-BDF/charmchat",
+      "branch": "lemma",
+      "relpath": "backend/src/services/provenance.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 2078,
+        "lines": 53,
+        "sha256": "bcc8e9d62a7bbe053ba9e32859fc1eeaa9e3de48c764d1a634e325931f7835de"
+      },
+      "solution": {
+        "bytes": 2078,
+        "lines": 53,
+        "sha256": "bcc8e9d62a7bbe053ba9e32859fc1eeaa9e3de48c764d1a634e325931f7835de"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "provenance.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "CHARM-BDF/charmchat:backend/src/services/workflow.ts",
+      "repo": "CHARM-BDF/charmchat",
+      "branch": "lemma",
+      "relpath": "backend/src/services/workflow.ts",
+      "admitted": false,
+      "causes": [
+        "weakened:requires",
+        "verification-timeout"
+      ],
+      "verifyOptions": {
+        "timeLimit": 600,
+        "flags": [
+          "--isolate-assertions"
+        ]
+      },
+      "gen": {
+        "bytes": 3738,
+        "lines": 115,
+        "sha256": "33ec8a8313e40a73090b71ffca00ee4d9f3ea67e9810a5af7d4ff2f89fda48d0"
+      },
+      "solution": {
+        "bytes": 33335,
+        "lines": 814,
+        "sha256": "6f4a94d45365d99fcf250dbac18b1af68082144172ebb42f14d55fb2326c53f3"
+      },
+      "additions": {
+        "status": "failed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [
+          {
+            "clause": "requires",
+            "addedLineIndex": 463,
+            "text": "  requires forall i, j :: 0 <= i < j < |nodes| ==> nodes[i].id != nodes[j].id"
+          },
+          {
+            "clause": "requires",
+            "addedLineIndex": 464,
+            "text": "  requires forall k :: k in deps ==> k in NodeIds(nodes)"
+          },
+          {
+            "clause": "requires",
+            "addedLineIndex": 465,
+            "text": "  requires forall k, v :: k in deps && v in deps[k] ==> v in NodeIds(nodes)"
+          },
+          {
+            "clause": "requires",
+            "addedLineIndex": 466,
+            "text": "  requires exists rank: map<string, nat> :: IsRanking(NodeIds(nodes), deps, rank)"
+          }
+        ],
+        "addedLines": 699,
+        "addedCodeLines": 647
+      },
+      "verify": {
+        "status": "failed",
+        "errors": 1,
+        "timeouts": 1,
+        "errorSamples": [
+          "560: Verification of 'topologicalSort' timed out after 600 seconds. (the limit can be increased using --verification-time-limit)"
+        ],
+        "disqualifyingWarnings": [],
+        "contradictions": 12,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--verification-time-limit",
+          "600",
+          "--isolate-assertions",
+          "workflow.dfy"
+        ],
+        "seconds": 604,
+        "timedOut": false,
+        "exitCode": 4
+      }
+    },
+    {
+      "key": "midspiral/anthropic-sdk-lemmascript:src/tools/memory/node.ts",
+      "repo": "midspiral/anthropic-sdk-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/tools/memory/node.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 669,
+        "lines": 14,
+        "sha256": "624224b1f4e6a223bf5e7316e49225e28baed49a882cb5562239efe486632d2a"
+      },
+      "solution": {
+        "bytes": 669,
+        "lines": 14,
+        "sha256": "624224b1f4e6a223bf5e7316e49225e28baed49a882cb5562239efe486632d2a"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "node.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/balanced-match-lemmascript:src/index.ts",
+      "repo": "midspiral/balanced-match-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/index.ts",
+      "admitted": false,
+      "causes": [
+        "verification-timeout"
+      ],
+      "verifyOptions": {
+        "timeLimit": 500,
+        "flags": [
+          "--isolate-assertions"
+        ]
+      },
+      "gen": {
+        "bytes": 4090,
+        "lines": 103,
+        "sha256": "2462f2b0c750a3aef4b5bd094e1b4b971c9c9839fb1e7aff41c7bbcf5d9d0290"
+      },
+      "solution": {
+        "bytes": 61042,
+        "lines": 1297,
+        "sha256": "e4ceee8e44bf319a9dcf19a67cf0f0572878382e9587449fc008cc8835b18ff6"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 1194,
+        "addedCodeLines": 872
+      },
+      "verify": {
+        "status": "failed",
+        "errors": 1,
+        "timeouts": 1,
+        "errorSamples": [
+          "1166: Verification of 'range' timed out after 500 seconds. (the limit can be increased using --verification-time-limit)"
+        ],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 9,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--verification-time-limit",
+          "500",
+          "--isolate-assertions",
+          "index.dfy"
+        ],
+        "seconds": 525,
+        "timedOut": false,
+        "exitCode": 4
+      }
+    },
+    {
+      "key": "midspiral/clear-split-lemmascript:src/logic/logic.ts",
+      "repo": "midspiral/clear-split-lemmascript",
+      "branch": "main",
+      "relpath": "src/logic/logic.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 6567,
+        "lines": 197,
+        "sha256": "255ca9288e6e1232d99ccb60cc7114d41e3fc1b299a58a95a81821d86ae183c8"
+      },
+      "solution": {
+        "bytes": 7819,
+        "lines": 229,
+        "sha256": "33dc1573fded66474eff554aee5c57f7d2e5267ea6f0df3db735f4fff9e90a32"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 32,
+        "addedCodeLines": 30
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "logic.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/collab-todo-lemmascript:src/domain.ts",
+      "repo": "midspiral/collab-todo-lemmascript",
+      "branch": "main",
+      "relpath": "src/domain.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "timeLimit": 50,
+        "flags": []
+      },
+      "gen": {
+        "bytes": 51472,
+        "lines": 1647,
+        "sha256": "138abbb048d48b621b421d06f5de36b467f3610442324df45635924d1f559cdd"
+      },
+      "solution": {
+        "bytes": 55469,
+        "lines": 1701,
+        "sha256": "5227e03454f0eb3325987522d9b1a293b8cab6f66d9021b8eeaa3c7bde48bf9f"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 54,
+        "addedCodeLines": 54
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--verification-time-limit",
+          "50",
+          "domain.dfy"
+        ],
+        "seconds": 51,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/colorwheel-lemmascript:src/colorwheel.ts",
+      "repo": "midspiral/colorwheel-lemmascript",
+      "branch": "main",
+      "relpath": "src/colorwheel.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 17137,
+        "lines": 421,
+        "sha256": "f8c475babd644981058601dee90871485cde158f625b381171701e7a6b1b9b55"
+      },
+      "solution": {
+        "bytes": 17137,
+        "lines": 421,
+        "sha256": "f8c475babd644981058601dee90871485cde158f625b381171701e7a6b1b9b55"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "colorwheel.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/equality-game-lemmascript:src/equality.ts",
+      "repo": "midspiral/equality-game-lemmascript",
+      "branch": "main",
+      "relpath": "src/equality.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "timeLimit": 60,
+        "flags": [
+          "--isolate-assertions"
+        ]
+      },
+      "gen": {
+        "bytes": 4495,
+        "lines": 191,
+        "sha256": "982a3846b0ed053880778d6381a85416476b488ec57190b3e3aff889f57e6607"
+      },
+      "solution": {
+        "bytes": 27897,
+        "lines": 857,
+        "sha256": "197ba952cca7f5435420f8c7341e8d710e6555dd12a7b5d630a1b41bf3cf903b"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 666,
+        "addedCodeLines": 575
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 1,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "--verification-time-limit",
+          "60",
+          "--isolate-assertions",
+          "equality.dfy"
+        ],
+        "seconds": 18,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/eslint-plugin-with-lemmascript:src/core.verified.ts",
+      "repo": "midspiral/eslint-plugin-with-lemmascript",
+      "branch": "main",
+      "relpath": "src/core.verified.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 4306,
+        "lines": 148,
+        "sha256": "4826234ed3225e5282311b4db4e9806a1a6cb38c663a2bc825d16f5627b44912"
+      },
+      "solution": {
+        "bytes": 21883,
+        "lines": 493,
+        "sha256": "f1254e1ea0b055e2c297324539194bd59872405298ef7cbd6cdf6036b6826ce0"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 345,
+        "addedCodeLines": 257
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "core.verified.dfy"
+        ],
+        "seconds": 12,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/eventab-lemmascript:src/allocate.ts",
+      "repo": "midspiral/eventab-lemmascript",
+      "branch": "main",
+      "relpath": "src/allocate.ts",
+      "admitted": false,
+      "causes": [
+        "verification-timeout"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 12179,
+        "lines": 381,
+        "sha256": "8e2b23694b440969ccba27af2ff74e9bfe1c81c530491d82b79e762b1d13a4ce"
+      },
+      "solution": {
+        "bytes": 18421,
+        "lines": 538,
+        "sha256": "bf12ada22a34c703e003fc522f58a2526826a6b5ff0d69e481276fd92900bdf3"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 157,
+        "addedCodeLines": 120
+      },
+      "verify": {
+        "status": "failed",
+        "errors": 1,
+        "timeouts": 1,
+        "errorSamples": [
+          "266: Verification of 'itemShare' timed out after 30 seconds. (the limit can be increased using --verification-time-limit)"
+        ],
+        "disqualifyingWarnings": [],
+        "contradictions": 3,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "allocate.dfy"
+        ],
+        "seconds": 37,
+        "timedOut": false,
+        "exitCode": 4
+      }
+    },
+    {
+      "key": "midspiral/eventab-lemmascript:src/floorShare.ts",
+      "repo": "midspiral/eventab-lemmascript",
+      "branch": "main",
+      "relpath": "src/floorShare.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 820,
+        "lines": 33,
+        "sha256": "3a676d400bb680ca7a8f819216744b59dc94cafb1676b2f391472ac488e86190"
+      },
+      "solution": {
+        "bytes": 820,
+        "lines": 33,
+        "sha256": "3a676d400bb680ca7a8f819216744b59dc94cafb1676b2f391472ac488e86190"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "floorShare.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/compaction.ts",
+      "repo": "midspiral/flue-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/runtime/src/compaction.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 4046,
+        "lines": 100,
+        "sha256": "9e25330a4e0bd1ef29a6654b4eab1e37e6a2524cc6a8c7c7113ba8b38381358c"
+      },
+      "solution": {
+        "bytes": 4046,
+        "lines": 100,
+        "sha256": "9e25330a4e0bd1ef29a6654b4eab1e37e6a2524cc6a8c7c7113ba8b38381358c"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "compaction.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/conversation-reducer.ts",
+      "repo": "midspiral/flue-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/runtime/src/conversation-reducer.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1515,
+        "lines": 38,
+        "sha256": "98e979abaada15f28127d561f88b703a5dbcfba5afafb489ec7baa1bf4903251"
+      },
+      "solution": {
+        "bytes": 1515,
+        "lines": 38,
+        "sha256": "98e979abaada15f28127d561f88b703a5dbcfba5afafb489ec7baa1bf4903251"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "conversation-reducer.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/session-identity.ts",
+      "repo": "midspiral/flue-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/runtime/src/session-identity.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1740,
+        "lines": 56,
+        "sha256": "b4bccb1cbe445f9d59c40b84a6d77b0f4d905b32dbde7fd85f5c82c7d9365512"
+      },
+      "solution": {
+        "bytes": 1740,
+        "lines": 56,
+        "sha256": "b4bccb1cbe445f9d59c40b84a6d77b0f4d905b32dbde7fd85f5c82c7d9365512"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "session-identity.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/submission-state.ts",
+      "repo": "midspiral/flue-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/runtime/src/submission-state.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 2435,
+        "lines": 81,
+        "sha256": "09f42d828929c5c9b9c493f5b35675c83edd0de0d600d39c7363697d129462f5"
+      },
+      "solution": {
+        "bytes": 2435,
+        "lines": 81,
+        "sha256": "09f42d828929c5c9b9c493f5b35675c83edd0de0d600d39c7363697d129462f5"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "submission-state.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/flue-lemmascript:packages/runtime/src/usage.ts",
+      "repo": "midspiral/flue-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/runtime/src/usage.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1182,
+        "lines": 35,
+        "sha256": "81fc0bff01e8b4032492b61aec7e06fe68019bca34a1539eb73104aa085bae87"
+      },
+      "solution": {
+        "bytes": 1182,
+        "lines": 35,
+        "sha256": "81fc0bff01e8b4032492b61aec7e06fe68019bca34a1539eb73104aa085bae87"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "usage.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/github-star-checker-lemmascript:src/domain.ts",
+      "repo": "midspiral/github-star-checker-lemmascript",
+      "branch": "main",
+      "relpath": "src/domain.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 9437,
+        "lines": 231,
+        "sha256": "542e9c7d33b442b7c5fab054c67ee46f6f03acd5d7c50d14cdc8627b28d9e793"
+      },
+      "solution": {
+        "bytes": 12398,
+        "lines": 311,
+        "sha256": "403a53ef3262e688b75fdc1015a6f0197dcb310eeae34cf082cc89aef7eeaecb"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 80,
+        "addedCodeLines": 66
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "domain.dfy"
+        ],
+        "seconds": 12,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/guardians-lemmascript:src/automaton_core.ts",
+      "repo": "midspiral/guardians-lemmascript",
+      "branch": "main",
+      "relpath": "src/automaton_core.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1746,
+        "lines": 36,
+        "sha256": "d98b0640ede1c2d059d59cf8e1b1655a6360bcc5ec08c252edaa094473cb9c46"
+      },
+      "solution": {
+        "bytes": 2131,
+        "lines": 46,
+        "sha256": "151f336632c3b3748b4800f623e5cbd668eededdec1831b41f871ad5924c0948"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 10,
+        "addedCodeLines": 10
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "automaton_core.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/guardians-lemmascript:src/loop_core.ts",
+      "repo": "midspiral/guardians-lemmascript",
+      "branch": "main",
+      "relpath": "src/loop_core.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 3456,
+        "lines": 95,
+        "sha256": "7ede3f2f13167ac8679469874f1b0d82d04ea41a970a319f7cb4b9c673dfeb49"
+      },
+      "solution": {
+        "bytes": 5119,
+        "lines": 136,
+        "sha256": "720ae46d0a683681f2b414997e023b35d1057f2d363d5958562fbfa6a9bba277"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 41,
+        "addedCodeLines": 40
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "loop_core.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/guardians-lemmascript:src/prov_core.ts",
+      "repo": "midspiral/guardians-lemmascript",
+      "branch": "main",
+      "relpath": "src/prov_core.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 3334,
+        "lines": 70,
+        "sha256": "e0ff11da82f01ee72240b3946856a6ea07519e25a2ff603171b8612210dd424d"
+      },
+      "solution": {
+        "bytes": 4143,
+        "lines": 90,
+        "sha256": "f8e7c0ff7229d7724752cb64ca54102c7af2cfd4aab388642618c9e14e790cde"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 20,
+        "addedCodeLines": 20
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 1,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "prov_core.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/guardians-lemmascript:src/taint_core.ts",
+      "repo": "midspiral/guardians-lemmascript",
+      "branch": "main",
+      "relpath": "src/taint_core.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 5772,
+        "lines": 149,
+        "sha256": "5d5943af297b5f097a3a250f0902e21398254d95035a21ede5519c6cdd9207d8"
+      },
+      "solution": {
+        "bytes": 7414,
+        "lines": 191,
+        "sha256": "1fc4b137aab5121550af6773a131b9356a82b50b55204efb9395e6d73979fb89"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 42,
+        "addedCodeLines": 42
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 1,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "taint_core.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/guardians-lemmascript:src/wf_core.ts",
+      "repo": "midspiral/guardians-lemmascript",
+      "branch": "main",
+      "relpath": "src/wf_core.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 9967,
+        "lines": 243,
+        "sha256": "7dc8122f81df1916d10cc6a5c4dd1f2d139c6ee294d2de4c8c90ccf2c572c769"
+      },
+      "solution": {
+        "bytes": 15488,
+        "lines": 353,
+        "sha256": "cdca2c34dd26304a7e682ea755b89ea35da0233e0fd167c5db36b37baf794cf0"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 110,
+        "addedCodeLines": 110
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "wf_core.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/henri-lemmascript:src/edit.ts",
+      "repo": "midspiral/henri-lemmascript",
+      "branch": "main",
+      "relpath": "src/edit.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 4294,
+        "lines": 190,
+        "sha256": "4ea1b98589c30cf83d0a5e0fc1f10d7bba98b2da7ff918d0288677e60297e0c0"
+      },
+      "solution": {
+        "bytes": 8169,
+        "lines": 320,
+        "sha256": "7458b37b7d8ae1a2c8447ba52fbd953e25a91c25d69422a69d64654c56d94f58"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 130,
+        "addedCodeLines": 119
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "edit.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/henri-lemmascript:src/hooks.ts",
+      "repo": "midspiral/henri-lemmascript",
+      "branch": "main",
+      "relpath": "src/hooks.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 4878,
+        "lines": 191,
+        "sha256": "917fb69b39613d5ca7fefe3eaac31ceb76eeb14803311452eac3d35fbf6b2bb4"
+      },
+      "solution": {
+        "bytes": 11582,
+        "lines": 367,
+        "sha256": "58afcfc17423a98db9b4284d4d9d36eb2e9e9251aba0d4547394dc1e7a4a6508"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 176,
+        "addedCodeLines": 154
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "hooks.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/henri-lemmascript:src/permissions.ts",
+      "repo": "midspiral/henri-lemmascript",
+      "branch": "main",
+      "relpath": "src/permissions.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 4343,
+        "lines": 127,
+        "sha256": "7deed7bf769b62d6ccb2d5c01d2bbb5b9d437069d902e03423e894e708a4918a"
+      },
+      "solution": {
+        "bytes": 9542,
+        "lines": 251,
+        "sha256": "972a23406120368e6cc6c857399a605ae729f1d1657997b0412e6c155e4b6b77"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 124,
+        "addedCodeLines": 90
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "permissions.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/henri-lemmascript:src/transcript.ts",
+      "repo": "midspiral/henri-lemmascript",
+      "branch": "main",
+      "relpath": "src/transcript.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 4679,
+        "lines": 210,
+        "sha256": "0149339c0ee5c51d605bab875b5a0223106070056c7beae2307b9a60852678a6"
+      },
+      "solution": {
+        "bytes": 8674,
+        "lines": 339,
+        "sha256": "defb209dff791aff036a54cab5c983d74579c00f4a89980345e94d8f1aec17cd"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 129,
+        "addedCodeLines": 117
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "transcript.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/hono-lemmascript:src/middleware/ip-restriction/matcher.verified.ts",
+      "repo": "midspiral/hono-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/middleware/ip-restriction/matcher.verified.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 4343,
+        "lines": 150,
+        "sha256": "5dbc5532cd7821bbdcc02bf1d79031b162ac067b969e2f4ae0e9ee7cdc3d81e1"
+      },
+      "solution": {
+        "bytes": 6364,
+        "lines": 212,
+        "sha256": "dce12e2980bacd67713491a436349a409dc7673ebcf01de67f9de0a7481fc46b"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 62,
+        "addedCodeLines": 48
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "matcher.verified.dfy"
+        ],
+        "seconds": 6,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/hono-lemmascript:src/middleware/ip-restriction/verified.ts",
+      "repo": "midspiral/hono-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/middleware/ip-restriction/verified.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 2680,
+        "lines": 57,
+        "sha256": "f93fd4da3ca4de8e4883a0069ffc5f0261ce9a1b7d679de2acf6ebcbf738b43f"
+      },
+      "solution": {
+        "bytes": 2680,
+        "lines": 57,
+        "sha256": "f93fd4da3ca4de8e4883a0069ffc5f0261ce9a1b7d679de2acf6ebcbf738b43f"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "verified.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/hono-lemmascript:src/middleware/serve-static/index.ts",
+      "repo": "midspiral/hono-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/middleware/serve-static/index.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 526,
+        "lines": 17,
+        "sha256": "c1cecde198114753c3605f3d65f4bdc75cf47b29117bc94780df32b928d4be89"
+      },
+      "solution": {
+        "bytes": 613,
+        "lines": 20,
+        "sha256": "ba4893fee9fc83d46c18399d2dfe87a37639bf74910c781e4d15f81f79cc77ac"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 3,
+        "addedCodeLines": 2
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "index.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/hono-lemmascript:src/utils/cookie.ts",
+      "repo": "midspiral/hono-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/utils/cookie.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1689,
+        "lines": 39,
+        "sha256": "c8c28516b1d1613d6ca6ba33e401dae73244cabc914bed4033a07e43fc45c776"
+      },
+      "solution": {
+        "bytes": 1689,
+        "lines": 39,
+        "sha256": "c8c28516b1d1613d6ca6ba33e401dae73244cabc914bed4033a07e43fc45c776"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "cookie.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/hono-lemmascript:src/utils/filepath.ts",
+      "repo": "midspiral/hono-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/utils/filepath.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 953,
+        "lines": 28,
+        "sha256": "ed99d7c53f33de9ce1dc420c173da051c14e217ae7359d3217dd80f16cda16b0"
+      },
+      "solution": {
+        "bytes": 999,
+        "lines": 30,
+        "sha256": "e5609529e02b85dd7c99d514de74239496b0ae6eaeaf9ceaba1c0b218c72cf4c"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 2,
+        "addedCodeLines": 1
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "filepath.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/hono-lemmascript:src/utils/ipaddr.verified.ts",
+      "repo": "midspiral/hono-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/utils/ipaddr.verified.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 4367,
+        "lines": 165,
+        "sha256": "61ea8510d5ff593f995b2fdaacd57c33261fcc4977eaf330d4c02af5e80c5cf7"
+      },
+      "solution": {
+        "bytes": 4545,
+        "lines": 175,
+        "sha256": "199aa4e6effa585b1f7baebd008180945ca8e817f11ce095d5074a820ca994b7"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 10,
+        "addedCodeLines": 9
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "ipaddr.verified.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/hono-rate-limiter-with-lemmascript:src/core.verified.ts",
+      "repo": "midspiral/hono-rate-limiter-with-lemmascript",
+      "branch": "main",
+      "relpath": "src/core.verified.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 2154,
+        "lines": 63,
+        "sha256": "3afee231fcb095de650e6871856775833c2a3919679d8769818391784dca8d28"
+      },
+      "solution": {
+        "bytes": 13671,
+        "lines": 321,
+        "sha256": "2371c1604d1b63ae720dbee2152537e9119d5aacfd202c877602d34a7f121494"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 258,
+        "addedCodeLines": 185
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 8,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "core.verified.dfy"
+        ],
+        "seconds": 9,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/infisical-lemmascript:backend/src/lib/casl/glob-subset.ts",
+      "repo": "midspiral/infisical-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "backend/src/lib/casl/glob-subset.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1909,
+        "lines": 75,
+        "sha256": "fe560c8e25f7fea887bdf93bb69012e3fdf3871a44e7fae669de13ffe83954c8"
+      },
+      "solution": {
+        "bytes": 9566,
+        "lines": 238,
+        "sha256": "4f1cfd6a50a1222de393a2905642a5a67e554ee40fa698cfa148012a8e6cb4ce"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 163,
+        "addedCodeLines": 122
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 10,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "glob-subset.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/mcp-sdk-lemmascript:packages/client/src/client/probeClassifier.ts",
+      "repo": "midspiral/mcp-sdk-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/client/src/client/probeClassifier.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 7680,
+        "lines": 187,
+        "sha256": "e0b116738f0513405bfca14e942dbe2005f3ad64c643a333d4199ce027cbf254"
+      },
+      "solution": {
+        "bytes": 7680,
+        "lines": 187,
+        "sha256": "e0b116738f0513405bfca14e942dbe2005f3ad64c643a333d4199ce027cbf254"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "probeClassifier.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/node-casbin-lemmascript:src/effect/effectorPure.ts",
+      "repo": "midspiral/node-casbin-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/effect/effectorPure.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 2669,
+        "lines": 68,
+        "sha256": "6b02863c630f47c3e2249e61d3f5b12d4a9f59ff687a2b3f4d8db9a3f07315dd"
+      },
+      "solution": {
+        "bytes": 2669,
+        "lines": 68,
+        "sha256": "6b02863c630f47c3e2249e61d3f5b12d4a9f59ff687a2b3f4d8db9a3f07315dd"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "effectorPure.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/node-casbin-lemmascript:src/model/getFilteredPolicy.ts",
+      "repo": "midspiral/node-casbin-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/model/getFilteredPolicy.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1796,
+        "lines": 47,
+        "sha256": "020a72d15bac510d9e69ecd9dca5edb3ed76e919fdfa2f89f9b9d14afd57586e"
+      },
+      "solution": {
+        "bytes": 1796,
+        "lines": 47,
+        "sha256": "020a72d15bac510d9e69ecd9dca5edb3ed76e919fdfa2f89f9b9d14afd57586e"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 3,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "getFilteredPolicy.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/node-casbin-lemmascript:src/util/arrayEquals.ts",
+      "repo": "midspiral/node-casbin-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/util/arrayEquals.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 798,
+        "lines": 29,
+        "sha256": "58df9da047109e495e644d28c472753b2389d07b5397dae8df372cd255dab6e8"
+      },
+      "solution": {
+        "bytes": 798,
+        "lines": 29,
+        "sha256": "58df9da047109e495e644d28c472753b2389d07b5397dae8df372cd255dab6e8"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 2,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "arrayEquals.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/node-casbin-lemmascript:src/util/keyGet.ts",
+      "repo": "midspiral/node-casbin-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/util/keyGet.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1833,
+        "lines": 51,
+        "sha256": "cda49071bf3603eb1a89407aad393d7addcb3381a3779328fbb22265b4a181c0"
+      },
+      "solution": {
+        "bytes": 1833,
+        "lines": 51,
+        "sha256": "cda49071bf3603eb1a89407aad393d7addcb3381a3779328fbb22265b4a181c0"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "keyGet.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/node-casbin-lemmascript:src/util/keyMatch.ts",
+      "repo": "midspiral/node-casbin-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "src/util/keyMatch.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1485,
+        "lines": 46,
+        "sha256": "22973ed554a54619bdf7f8248cbc01caba4c9104902d6a86c5c70a02d3315f19"
+      },
+      "solution": {
+        "bytes": 1485,
+        "lines": 46,
+        "sha256": "22973ed554a54619bdf7f8248cbc01caba4c9104902d6a86c5c70a02d3315f19"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "keyMatch.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/agent/subagent-permissions.ts",
+      "repo": "midspiral/opencode-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/opencode/src/agent/subagent-permissions.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1948,
+        "lines": 26,
+        "sha256": "88ddd3a6d66fd096a3357db8eada7566bbd1e4e77882dda43e654b866b5f11c8"
+      },
+      "solution": {
+        "bytes": 3339,
+        "lines": 57,
+        "sha256": "8be1e1480648ed5ee21d35169a2692f96498cfa6cdd5eddee030a6f28e4925e2"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 31,
+        "addedCodeLines": 24
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "subagent-permissions.dfy"
+        ],
+        "seconds": 6,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/patch/index.ts",
+      "repo": "midspiral/opencode-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/opencode/src/patch/index.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 13266,
+        "lines": 345,
+        "sha256": "25e2819f1c5f31b669673b060945161d248767d918e508309357ec05df942213"
+      },
+      "solution": {
+        "bytes": 13266,
+        "lines": 345,
+        "sha256": "25e2819f1c5f31b669673b060945161d248767d918e508309357ec05df942213"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "index.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/arity.ts",
+      "repo": "midspiral/opencode-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/opencode/src/permission/arity.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 3315,
+        "lines": 50,
+        "sha256": "4c9e93670fcd89ac745ed2b75a7ea20ac3e804903cbb2e0d38fe4615df53df32"
+      },
+      "solution": {
+        "bytes": 6074,
+        "lines": 107,
+        "sha256": "ae3a2610c86e3a25125ec0747cb9e5051af54c60f65737903c67da01839504ff"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 57,
+        "addedCodeLines": 35
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "arity.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/evaluate.ts",
+      "repo": "midspiral/opencode-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/opencode/src/permission/evaluate.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 2459,
+        "lines": 47,
+        "sha256": "91b36f40e5e99f14ada2b675f8fe6f0c49179447df5d928bc70db6838dd3bcba"
+      },
+      "solution": {
+        "bytes": 2459,
+        "lines": 47,
+        "sha256": "91b36f40e5e99f14ada2b675f8fe6f0c49179447df5d928bc70db6838dd3bcba"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "evaluate.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/permission/index.ts",
+      "repo": "midspiral/opencode-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/opencode/src/permission/index.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 3528,
+        "lines": 61,
+        "sha256": "255182b32f86f6e86ecdc8c5f5e3319991e705051e462133c9f88e5f2fdd3e33"
+      },
+      "solution": {
+        "bytes": 4294,
+        "lines": 71,
+        "sha256": "508abe470efc39d0675ba0bc1588a288f8df0bb70b5d762bf7d5c56d31aed052"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 10,
+        "addedCodeLines": 6
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "index.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/util/wildcard.ts",
+      "repo": "midspiral/opencode-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/opencode/src/util/wildcard.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 866,
+        "lines": 33,
+        "sha256": "14b8f96a6c92cebfb6b65509edfdf95b332f3acd20e4a93f03e0c944bd46297e"
+      },
+      "solution": {
+        "bytes": 1422,
+        "lines": 45,
+        "sha256": "5af2671e359f0f694f68d0247c6e83c85ac36564c77722751afd27242a274cf0"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 12,
+        "addedCodeLines": 7
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "wildcard.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/pi-lemmascript:packages/agent/src/harness/compaction/compaction.ts",
+      "repo": "midspiral/pi-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/agent/src/harness/compaction/compaction.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 11704,
+        "lines": 223,
+        "sha256": "666e27fb357c149c15cc6156ee667662ccebe40b2a0d33b041c1b4da04b16212"
+      },
+      "solution": {
+        "bytes": 11704,
+        "lines": 223,
+        "sha256": "666e27fb357c149c15cc6156ee667662ccebe40b2a0d33b041c1b4da04b16212"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "compaction.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/pi-lemmascript:packages/ai/src/models.ts",
+      "repo": "midspiral/pi-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/ai/src/models.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 3847,
+        "lines": 73,
+        "sha256": "ebbc5c0290952d9af6b07b52ff9e251c89a33e605a70e90ee40ec3a3e0400b91"
+      },
+      "solution": {
+        "bytes": 3847,
+        "lines": 73,
+        "sha256": "ebbc5c0290952d9af6b07b52ff9e251c89a33e605a70e90ee40ec3a3e0400b91"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "models.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/pi-lemmascript:packages/coding-agent/src/core/compaction/compaction.ts",
+      "repo": "midspiral/pi-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/coding-agent/src/core/compaction/compaction.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 11355,
+        "lines": 239,
+        "sha256": "8430cffbdd91cf91169693c59b8f8749aafe70e5759f659653880cbe4ddf3bf1"
+      },
+      "solution": {
+        "bytes": 11355,
+        "lines": 239,
+        "sha256": "8430cffbdd91cf91169693c59b8f8749aafe70e5759f659653880cbe4ddf3bf1"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "compaction.dfy"
+        ],
+        "seconds": 6,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/pi-lemmascript:packages/coding-agent/src/core/tools/edit-diff.ts",
+      "repo": "midspiral/pi-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/coding-agent/src/core/tools/edit-diff.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1458,
+        "lines": 26,
+        "sha256": "ba599c0cb3b2e2ec33206f5312504a4ab486735ec84dc606f4629563c855e0d0"
+      },
+      "solution": {
+        "bytes": 1458,
+        "lines": 26,
+        "sha256": "ba599c0cb3b2e2ec33206f5312504a4ab486735ec84dc606f4629563c855e0d0"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "edit-diff.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/pi-lemmascript:packages/coding-agent/src/core/tools/truncate.ts",
+      "repo": "midspiral/pi-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/coding-agent/src/core/tools/truncate.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 6152,
+        "lines": 129,
+        "sha256": "6a5c8fae37ae1c8f0260aea3d9d0aa043908040bdfb868e08ab001e3bff646d6"
+      },
+      "solution": {
+        "bytes": 6152,
+        "lines": 129,
+        "sha256": "6a5c8fae37ae1c8f0260aea3d9d0aa043908040bdfb868e08ab001e3bff646d6"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "truncate.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/pi-lemmascript:packages/coding-agent/src/utils/changelog.ts",
+      "repo": "midspiral/pi-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/coding-agent/src/utils/changelog.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 990,
+        "lines": 22,
+        "sha256": "5a3375a56b3760741716a2881f11d2c8b17d2bd0cc50ad43cee4d1e1a27e9724"
+      },
+      "solution": {
+        "bytes": 990,
+        "lines": 22,
+        "sha256": "5a3375a56b3760741716a2881f11d2c8b17d2bd0cc50ad43cee4d1e1a27e9724"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "changelog.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/quorum-lemmascript:src/domain.ts",
+      "repo": "midspiral/quorum-lemmascript",
+      "branch": "main",
+      "relpath": "src/domain.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 17342,
+        "lines": 685,
+        "sha256": "d9902838397f9d8157d164c0bccd537bfb25b15a4af5638d71a52bef4957b25e"
+      },
+      "solution": {
+        "bytes": 25054,
+        "lines": 859,
+        "sha256": "170c74e18bb6d9bd35a1cd2b8cf8328e4a00959891eb3c8217cc3f38981ab17e"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 174,
+        "addedCodeLines": 129
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "domain.dfy"
+        ],
+        "seconds": 2,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/quorum-lemmascript:src/grid.ts",
+      "repo": "midspiral/quorum-lemmascript",
+      "branch": "main",
+      "relpath": "src/grid.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1984,
+        "lines": 72,
+        "sha256": "348d26c156bf2dde7b5fda27e5af228b2b21ae26425154905c127d87568f5c78"
+      },
+      "solution": {
+        "bytes": 3858,
+        "lines": 122,
+        "sha256": "5ca21d202ce75250d8730052ff884d3a3626ccdc7887e19ea0e07c89311fe61a"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 50,
+        "addedCodeLines": 34
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "grid.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/quorum-tutorial-lemmascript:src/domain.ts",
+      "repo": "midspiral/quorum-tutorial-lemmascript",
+      "branch": "main",
+      "relpath": "src/domain.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 28753,
+        "lines": 1086,
+        "sha256": "d40bf63ed30cc2c91798f47b56043df2a2a1ee64b28ec8e664aecf73dc44c924"
+      },
+      "solution": {
+        "bytes": 49014,
+        "lines": 1624,
+        "sha256": "319cc6b1444b66c433e9ab27f35a3589432b1683c8673c5172687f392e53c86c"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 538,
+        "addedCodeLines": 482
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "domain.dfy"
+        ],
+        "seconds": 3,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/quorum-tutorial-lemmascript:src/grid.ts",
+      "repo": "midspiral/quorum-tutorial-lemmascript",
+      "branch": "main",
+      "relpath": "src/grid.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1965,
+        "lines": 72,
+        "sha256": "d5ce634f1d52d33d13a5eeb136c45a609e5f6a6ba31f1e670eea829fe6e8fc68"
+      },
+      "solution": {
+        "bytes": 3740,
+        "lines": 121,
+        "sha256": "d4406a63bfc561db4ca7d0c1002545df65a07244b08ae2f7776049ac98f58488"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 49,
+        "addedCodeLines": 34
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "grid.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/quota-lemmascript:src/domain.ts",
+      "repo": "midspiral/quota-lemmascript",
+      "branch": "main",
+      "relpath": "src/domain.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 17750,
+        "lines": 659,
+        "sha256": "4d213dae2f1cbe54ca85c1ab367331564258d78576676b9aaf2bf5c96a5992a7"
+      },
+      "solution": {
+        "bytes": 31164,
+        "lines": 934,
+        "sha256": "0c4b109643748dbcb5c4dadf107603540d929281acab30acff2f43d2ad2efce6"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 275,
+        "addedCodeLines": 200
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "domain.dfy"
+        ],
+        "seconds": 3,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/rallly-lemmascript:apps/web/src/features/poll/scoring.ts",
+      "repo": "midspiral/rallly-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "apps/web/src/features/poll/scoring.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 3350,
+        "lines": 70,
+        "sha256": "4c859e035fe44fd6d340e60872aaa094dec5471f7a9414728822a2312231634e"
+      },
+      "solution": {
+        "bytes": 3381,
+        "lines": 71,
+        "sha256": "b0dd570ddee644e62c651a5df3260652cb33c08d087630b6a5c297439cbf19b1"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 1,
+        "addedCodeLines": 1
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "scoring.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/rallly-lemmascript:apps/web/src/utils/redirect.ts",
+      "repo": "midspiral/rallly-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "apps/web/src/utils/redirect.ts",
+      "admitted": false,
+      "causes": [
+        "no-additions"
+      ],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 2099,
+        "lines": 62,
+        "sha256": "03db56767500fa4c4754d43e1343c25ae4d00232c64c445c8c37598109bff841"
+      },
+      "solution": {
+        "bytes": 2099,
+        "lines": 62,
+        "sha256": "03db56767500fa4c4754d43e1343c25ae4d00232c64c445c8c37598109bff841"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 0,
+        "addedCodeLines": 0
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "redirect.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/talktimer-lemmascript:src/domain.ts",
+      "repo": "midspiral/talktimer-lemmascript",
+      "branch": "main",
+      "relpath": "src/domain.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 19437,
+        "lines": 812,
+        "sha256": "46994db971eb4a9d68d9af1d1367e7ef86e0d872a5cad62bdb1e10ee2234a820"
+      },
+      "solution": {
+        "bytes": 21444,
+        "lines": 868,
+        "sha256": "fb261573f1205f55cfa5e357e92b8525633155eeeb9e492a231e57049e788396"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 56,
+        "addedCodeLines": 54
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "domain.dfy"
+        ],
+        "seconds": 8,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/trace-solo-lemmascript:src/games/g2048/engine.ts",
+      "repo": "midspiral/trace-solo-lemmascript",
+      "branch": "main",
+      "relpath": "src/games/g2048/engine.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 6201,
+        "lines": 227,
+        "sha256": "dff5860c4fd5bdec6abf5797095fea74358e1569f48c7b49c3728e571fc3a878"
+      },
+      "solution": {
+        "bytes": 11042,
+        "lines": 361,
+        "sha256": "2cb673062207677e8f773d42983587c7e24ebe59f3dd4ddec5ed27f891e83756"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 134,
+        "addedCodeLines": 105
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "engine.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/trace-solo-lemmascript:src/platform/replay_core.ts",
+      "repo": "midspiral/trace-solo-lemmascript",
+      "branch": "main",
+      "relpath": "src/platform/replay_core.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 3838,
+        "lines": 84,
+        "sha256": "fdedb1f818f06c595e5204b80031be94311968b436dd74d1eebc3d728a1f1ad6"
+      },
+      "solution": {
+        "bytes": 8261,
+        "lines": 185,
+        "sha256": "291dc19c39018c02622dcbebe731e14e82ad6e3d05430c8a2cf153a7021cddea"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 101,
+        "addedCodeLines": 91
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "replay_core.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/edges/general.ts",
+      "repo": "midspiral/xyflow-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/system/src/utils/edges/general.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 5021,
+        "lines": 93,
+        "sha256": "610cd281d52c43f8695046052b2dbe19ff26ac7591814271035fd425f4fbdaae"
+      },
+      "solution": {
+        "bytes": 5630,
+        "lines": 108,
+        "sha256": "1217cd8ad2f6a71aca0369a3b82c82a3e2a78698c09bd841ae72645264d38f17"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 15,
+        "addedCodeLines": 14
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "general.dfy"
+        ],
+        "seconds": 6,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/general.ts",
+      "repo": "midspiral/xyflow-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/system/src/utils/general.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 3381,
+        "lines": 114,
+        "sha256": "b17b602fea70e5a8dd618feebf2715065e34e04752a966734c3fe0f7e7440f53"
+      },
+      "solution": {
+        "bytes": 3450,
+        "lines": 115,
+        "sha256": "313698be5e211aba50db232b0446274ab3c6b2abe3325b3e1bd1a48e2159f5ac"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 1,
+        "addedCodeLines": 1
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "general.dfy"
+        ],
+        "seconds": 1,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "key": "midspiral/xyflow-lemmascript:packages/system/src/utils/graph.ts",
+      "repo": "midspiral/xyflow-lemmascript",
+      "branch": "lemmascript",
+      "relpath": "packages/system/src/utils/graph.ts",
+      "admitted": true,
+      "causes": [],
+      "verifyOptions": {
+        "flags": []
+      },
+      "gen": {
+        "bytes": 1122,
+        "lines": 44,
+        "sha256": "06382274dee3d0b18efca9e3f85e3ed1be69818ddda130ebd03a7c74b3e23f81"
+      },
+      "solution": {
+        "bytes": 17485,
+        "lines": 431,
+        "sha256": "0f89474b399e8b72b29a106a19ac3ac862daefdbd947f4dfdd6e890545eaad00"
+      },
+      "additions": {
+        "status": "passed",
+        "deletedLines": 0,
+        "deletedSamples": [],
+        "bannedMatches": [],
+        "weakenedContracts": [],
+        "addedLines": 387,
+        "addedCodeLines": 309
+      },
+      "verify": {
+        "status": "passed",
+        "errors": 0,
+        "timeouts": 0,
+        "errorSamples": [],
+        "disqualifyingWarnings": [],
+        "contradictions": 0,
+        "otherWarnings": 0,
+        "command": [
+          "verify",
+          "--allow-warnings",
+          "--warn-contradictory-assumptions",
+          "--json-output",
+          "--standard-libraries",
+          "graph.dfy"
+        ],
+        "seconds": 6,
+        "timedOut": false,
+        "exitCode": 0
+      }
+    }
+  ]
+}

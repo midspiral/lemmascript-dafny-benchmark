@@ -17,10 +17,16 @@ Each benchmark task is one such completion. Given a `.dfy.gen`, produce a
   removed, nothing edited;
 * **adds no axioms**, whether through `{:axiom}`, `assume`, an
   unimplemented lemma, or any other route by which Dafny will accept a
-  claim it hasn't proven.
+  claim it hasn't proven;
+* **leaves the generated contracts alone**. New helper lemmas may carry
+  whatever `requires` they need, but a precondition may not be bolted onto a
+  generated declaration. Adding `ensures` to one is fine — that is more to
+  prove, not less.
 
-The third constraint is what makes the benchmark meaningful. A bodyless
-lemma verifies vacuously, so without it the empty submission passes.
+The last two are what make the benchmark meaningful. A bodyless lemma
+verifies vacuously, and `requires false` under every generated declaration
+discharges every postcondition at once; without those constraints, a
+one-line transformation solves every task.
 
 ## How tasks are made
 
@@ -62,23 +68,56 @@ axiom check usually means an intentional axiom nobody marked as one.
 
 ## Validation
 
-Two checks, run against the `.dfy.gen` and against Dafny — nothing else,
-and no per-task stored state:
+Two checks, run against the `.dfy.gen` and against Dafny — nothing else:
 
-1. The diff against the `.dfy.gen` contains no deletions, and no added
-   line reaches for one of Dafny's trust escape hatches. Added lines are
-   scanned whole, so a banned word in a comment is rejected too.
-2. `dafny verify` reports no errors, and none of the warnings that
-   indicate an unproven claim — a bodyless declaration, or a proof that
-   succeeded by contradiction rather than by argument.
+1. The diff against the `.dfy.gen` contains no deletions; no added line
+   reaches for one of Dafny's trust escape hatches; and no added
+   `requires` / `reads` / `modifies` attaches to a generated declaration. A
+   line is scanned whole apart from a trailing `//` comment, and even that is
+   only dropped when no `"` appears before it — so a banned word inside a
+   string is still caught, while proof commentary is left alone.
+2. `dafny verify` reports no errors, and none of the three warnings that
+   indicate an unproven claim: a bodyless declaration, a bodyless `forall`,
+   or a bodyless loop.
+
+Contradictory-assumption warnings are counted but do not disqualify. They
+fire on proof by contradiction, which is a technique rather than a cheat, and
+the vacuous proof they were meant to catch is blocked by check 1 instead —
+syntactically, and without the solver.
+
+Each task carries the verification options its case study uses — a time
+limit and any extra Dafny flags, taken from `LemmaScript-files.txt` — and
+the validator applies them to reference and candidate alike. They change how
+long Dafny looks, not what it will accept.
 
 The escape hatches are enumerated as patterns, and each one has a
 fixture: a small cheating `.dfy` that the test suite asserts is rejected.
 Dafny spells several of these more than one way, so the list is kept
-executable rather than documentary.
+executable rather than documentary. Four fixtures run the other way and
+assert that legitimate work passes: proof commentary containing the word
+"assume", a proof by contradiction, a lemma whose `ensures false` is the
+theorem, and a new helper carrying its own precondition.
 
 The same code path validates candidate solutions and admits reference
 solutions, so the two can't drift apart.
+
+Of the 65 pairs in the case studies, one adds preconditions to a generated
+declaration and is excluded for it — see DESIGN.md. That is the report
+working as intended: it is an upstream to-do, not a benchmark defect.
+
+## Running it
+
+```sh
+npm install
+npm run reference-report     # walks the case studies, writes reference-report.json
+npm test                     # the fixture suite
+```
+
+`reference-report` clones any missing case study as a sibling; pass
+`--no-clone` to work with what's already there, `--jobs=N` to change how many
+verifications run at once, and `--only=<substring>` to restrict it to matching
+tasks. Keep `--jobs` low: the per-task time limits are wall-clock, so a loaded
+machine can turn a passing proof into a reported timeout.
 
 See [DESIGN.md](DESIGN.md) for the reasoning, the exact token list, and
 the loopholes each check closes.
@@ -103,7 +142,10 @@ commit pinning is more machinery than this needs right now.
 
 ## Status
 
-Early. The generator, the validator, and the emitted benchmark all live
-here. The open questions are recorded at the end of DESIGN.md; the
-substantive one is whether adding preconditions to a generated
-declaration counts as completing the proof or as changing the theorem.
+Early. The validator and the reference report are implemented; `tasks/`,
+`metadata.json`, and `index.json` are not yet emitted — the report comes
+first, because it is what decides which pairs belong in them.
+
+The open questions are recorded at the end of DESIGN.md; the substantive one
+is whether adding preconditions to a generated declaration counts as
+completing the proof or as changing the theorem.
