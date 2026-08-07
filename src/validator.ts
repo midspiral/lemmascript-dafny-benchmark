@@ -155,6 +155,21 @@ export interface VerifyCheck {
  * to enforce rather than document.
  */
 let cachedVersion: string | null | undefined;
+
+/**
+ * Whether a reported Dafny version is the one we pinned.
+ *
+ * Release builds report bare `4.11.0`, but `setup-dafny-action` installs a build
+ * that reports `4.11.0+fcb2042d6d043a2634f0854338c08feeaaaf4ae2`. Semver says
+ * build metadata — everything after `+` — is ignored when comparing versions, so
+ * an exact string match rejects the very toolchain it is trying to require.
+ * Found by CI, because the check had only ever run against one local install.
+ */
+export function versionMatches(expected: string, found: string): boolean {
+  const core = (v: string) => v.trim().split("+")[0];
+  return core(expected) === core(found);
+}
+
 export function dafnyVersion(): string | null {
   if (cachedVersion !== undefined) return cachedVersion;
   try {
@@ -372,7 +387,7 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
     if (found === null) {
       return { status: "not-run", notRunReason: "`dafny` not found on PATH", command: [], ...empty };
     }
-    if (found !== opts.expectedVersion) {
+    if (!versionMatches(opts.expectedVersion, found)) {
       return {
         status: "not-run",
         notRunReason: `expected Dafny ${opts.expectedVersion}, found ${found}`,

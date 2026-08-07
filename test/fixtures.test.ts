@@ -16,7 +16,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { validate } from "../src/validator.js";
+import { validate, versionMatches } from "../src/validator.js";
 import { bannedPatterns } from "../src/banned.js";
 import type { WarningCategory } from "../src/validator.js";
 
@@ -124,6 +124,20 @@ let failures = 0;
 function check(name: string, ok: boolean, detail: string) {
   console.log(`${ok ? "  ok  " : "  FAIL"} ${name}${ok ? "" : ` — ${detail}`}`);
   if (!ok) failures++;
+}
+
+// Version comparison. Release builds report a bare `4.11.0`; the CI action
+// installs one reporting `4.11.0+<sha>`, and semver ignores build metadata. An
+// exact string match rejected the very toolchain it required — caught only when
+// the check first ran somewhere other than the development machine.
+for (const [expected, found, want] of [
+  ["4.11.0", "4.11.0", true],
+  ["4.11.0", "4.11.0+fcb2042d6d043a2634f0854338c08feeaaaf4ae2", true],
+  ["4.11.0", "4.12.0", false],
+  ["4.11.0", "4.11.1", false],
+  ["4.11.0", "4.11.0-rc1", false],
+] as [string, string, boolean][]) {
+  check(`version: ${expected} vs ${found}`, versionMatches(expected, found) === want, "wrong verdict");
 }
 
 // Every banned pattern needs a fixture, or the list has rotted past the suite.
