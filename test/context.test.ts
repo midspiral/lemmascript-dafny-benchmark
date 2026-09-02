@@ -1,5 +1,5 @@
 #!/usr/bin/env -S npx tsx
-/** Focused fixtures for semantic-context selection and minimality. */
+/** Focused fixtures for benchmark-local semantic-context selection. */
 
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -13,7 +13,7 @@ function check(name: string, ok: boolean, detail: string) {
   if (!ok) failures++;
 }
 
-function pair(gen: string, solution: string) {
+function pair(gen: string, solution: string, declarations: string[] = []) {
   const dir = mkdtempSync(path.join(tmpdir(), "lsdb-context-fixture-"));
   const genPath = path.join(dir, "fixture.dfy.gen");
   const solutionPath = path.join(dir, "fixture.dfy");
@@ -22,13 +22,22 @@ function pair(gen: string, solution: string) {
   return {
     dir,
     genPath,
-    result: buildTaskScaffold(genPath, solutionPath, { expectedVersion: "4.11.0" }),
+    result: buildTaskScaffold(genPath, solutionPath, {
+      expectedVersion: "4.11.0",
+      declarations,
+    }),
     cleanup: () => rmSync(dir, { recursive: true, force: true }),
   };
 }
 
-function run(name: string, gen: string, solution: string, inspect: (result: ReturnType<typeof buildTaskScaffold>) => string | undefined) {
-  const { result, cleanup } = pair(gen, solution);
+function run(
+  name: string,
+  gen: string,
+  solution: string,
+  declarations: string[],
+  inspect: (result: ReturnType<typeof buildTaskScaffold>) => string | undefined,
+) {
+  const { result, cleanup } = pair(gen, solution, declarations);
   try {
     const problem = inspect(result);
     check(name, problem === undefined, problem ?? "");
@@ -50,12 +59,10 @@ method Decide(x: int) returns (res: bool)
 const directSolution = `
 // Generated fixture
 
-// @benchmark-context begin Model
 predicate Model(x: int)
 {
   x >= 0
 }
-// @benchmark-context end Model
 
 method Decide(x: int) returns (res: bool)
   ensures res == Model(x)
@@ -64,20 +71,18 @@ method Decide(x: int) returns (res: bool)
 }
 `;
 
-run(
-  "direct predicate",
-  directGen,
-  directSolution,
-  result =>
-    result.context.status !== "passed"
-      ? `expected passed, got ${result.context.status}: ${result.context.diagnostics}`
-      : result.context.declarations.map(d => d.name).join(",") !== "Model"
-        ? `selected ${result.context.declarations.map(d => d.name)}`
+run("direct predicate", directGen, directSolution, ["Model"], result =>
+  result.context.status !== "passed"
+    ? `expected passed, got ${result.context.status}: ${result.context.diagnostics}`
+    : result.context.declarations.map(d => d.name).join(",") !== "Model"
+      ? `selected ${result.context.declarations.map(d => d.name)}`
+      : result.taskText.includes("@benchmark-context")
+        ? "task scaffold contains a benchmark marker"
         : undefined,
 );
 
 {
-  const fixture = pair(directGen, directSolution);
+  const fixture = pair(directGen, directSolution, ["Model"]);
   try {
     const taskPath = path.join(fixture.dir, "task.dfy.gen");
     writeFileSync(taskPath, fixture.result.taskText);
@@ -98,26 +103,20 @@ run(
   `
 // Generated fixture
 
-// @benchmark-context begin Leaf
 predicate Leaf(x: int)
 {
   x >= 0
 }
-// @benchmark-context end Leaf
 
-// @benchmark-context begin Mid
 predicate Mid(x: int)
 {
   Leaf(x)
 }
-// @benchmark-context end Mid
 
-// @benchmark-context begin Root
 predicate Root(x: int)
 {
   Mid(x)
 }
-// @benchmark-context end Root
 
 method Decide(x: int) returns (res: bool)
   ensures res == Root(x)
@@ -125,9 +124,10 @@ method Decide(x: int) returns (res: bool)
   return x >= 0;
 }
 `,
+  ["Leaf", "Mid", "Root"],
   result => {
     if (result.context.status !== "passed") return `expected passed: ${result.context.diagnostics}`;
-    const rounds = result.context.resolutionRounds.map(r => r.join(",")).join(" -> ");
+    const rounds = result.context.resolutionRounds.map(round => round.join(",")).join(" -> ");
     return rounds !== "Root -> Mid -> Leaf" ? `unexpected rounds ${rounds}` : undefined;
   },
 );
@@ -138,13 +138,9 @@ run(
   `
 // Generated fixture
 
-// @benchmark-context begin Model
 predicate Model(x: int) { x >= 0 }
-// @benchmark-context end Model
 
-// @benchmark-context begin Spare
 predicate Spare(x: int) { x == 0 }
-// @benchmark-context end Spare
 
 method Decide(x: int) returns (res: bool)
   ensures res == Model(x)
@@ -152,6 +148,7 @@ method Decide(x: int) returns (res: bool)
   return x >= 0;
 }
 `,
+  ["Model", "Spare"],
   result =>
     result.context.causes.includes("unused-context")
       ? undefined
@@ -164,11 +161,9 @@ run(
   `
 // Generated fixture
 
-// @benchmark-context begin Model
 lemma Model(x: int)
 {
 }
-// @benchmark-context end Model
 
 method Decide(x: int) returns (res: bool)
   ensures res == Model(x)
@@ -176,6 +171,7 @@ method Decide(x: int) returns (res: bool)
   return x >= 0;
 }
 `,
+  ["Model"],
   result =>
     result.context.causes.includes("invalid-context")
       ? undefined
@@ -188,13 +184,11 @@ run(
   `
 // Generated fixture
 
-// @benchmark-context begin Model
 function Model(x: int): bool
   ensures Model(x) == (x >= 0)
 {
   x >= 0
 }
-// @benchmark-context end Model
 
 method Decide(x: int) returns (res: bool)
   ensures res == Model(x)
@@ -202,6 +196,7 @@ method Decide(x: int) returns (res: bool)
   return x >= 0;
 }
 `,
+  ["Model"],
   result =>
     result.context.causes.includes("invalid-context")
       ? undefined
@@ -214,9 +209,7 @@ run(
   `
 // Generated fixture
 
-// @benchmark-context begin AbstractModel
 ghost predicate AbstractModel(x: int)
-// @benchmark-context end AbstractModel
 
 method Decide(x: int) returns (res: bool)
   ensures res == AbstractModel(x)
@@ -224,6 +217,7 @@ method Decide(x: int) returns (res: bool)
   return x >= 0;
 }
 `,
+  ["AbstractModel"],
   result => {
     const declaration = result.context.declarations[0];
     return result.context.status !== "passed" || !declaration?.abstract
@@ -233,23 +227,16 @@ method Decide(x: int) returns (res: bool)
 );
 
 run(
-  "missing marker rejected",
-  directGen,
-  directGen,
-  result =>
-    result.context.causes.includes("unresolved-context-name")
-      ? undefined
-      : `expected unresolved-context-name, got ${result.context.causes}`,
-);
-
-run(
-  "unbalanced marker rejected",
+  "blank before body stays concrete",
   directGen,
   `
 // Generated fixture
 
-// @benchmark-context begin Model
-predicate Model(x: int) { x >= 0 }
+predicate Model(x: int)
+
+{
+  x >= 0
+}
 
 method Decide(x: int) returns (res: bool)
   ensures res == Model(x)
@@ -257,37 +244,52 @@ method Decide(x: int) returns (res: bool)
   return x >= 0;
 }
 `,
+  ["Model"],
+  result => {
+    const declaration = result.context.declarations[0];
+    return result.context.status !== "passed" || declaration?.abstract
+      ? `expected concrete context, got ${result.context.status}: ${result.context.diagnostics}`
+      : result.taskText.includes("x >= 0")
+        ? undefined
+        : "concrete predicate body was omitted";
+  },
+);
+
+run("missing manifest entry rejected", directGen, directGen, [], result =>
+  result.context.causes.includes("unresolved-context-name")
+    ? undefined
+    : `expected unresolved-context-name, got ${result.context.causes}`,
+);
+
+run("unknown configured name rejected", directGen, directSolution, ["Missing"], result =>
+  result.context.causes.includes("invalid-context")
+    ? undefined
+    : `expected invalid-context, got ${result.context.causes}`,
+);
+
+run(
+  "ambiguous configured name rejected",
+  directGen,
+  `
+// Generated fixture
+
+predicate Model(x: int) { x >= 0 }
+predicate Model(x: int) { x < 0 }
+
+method Decide(x: int) returns (res: bool)
+  ensures res == Model(x)
+{
+  return x >= 0;
+}
+`,
+  ["Model"],
   result =>
     result.context.causes.includes("invalid-context")
       ? undefined
       : `expected invalid-context, got ${result.context.causes}`,
 );
 
-run(
-  "mismatched marker rejected",
-  directGen,
-  `
-// Generated fixture
-
-// @benchmark-context begin Model
-predicate Model(x: int) { x >= 0 }
-// @benchmark-context end Other
-
-method Decide(x: int) returns (res: bool)
-  ensures res == Model(x)
-{
-  return x >= 0;
-}
-`,
-  result =>
-    result.context.causes.includes("invalid-context")
-      ? undefined
-      : `expected invalid-context, got ${result.context.causes}`,
-);
-
-run(
-  "generated lines cannot be marked",
-  `
+const generatedModel = `
 // Generated fixture
 
 predicate Model(x: int) { x >= 0 }
@@ -297,24 +299,12 @@ method Decide(x: int) returns (res: bool)
 {
   return x >= 0;
 }
-`,
-  `
-// Generated fixture
+`;
 
-// @benchmark-context begin Model
-predicate Model(x: int) { x >= 0 }
-// @benchmark-context end Model
-
-method Decide(x: int) returns (res: bool)
-  ensures res == Model(x)
-{
-  return x >= 0;
-}
-`,
-  result =>
-    result.context.causes.includes("invalid-context")
-      ? undefined
-      : `expected invalid-context, got ${result.context.causes}`,
+run("generated declaration cannot be configured", generatedModel, generatedModel, ["Model"], result =>
+  result.context.causes.includes("invalid-context")
+    ? undefined
+    : `expected invalid-context, got ${result.context.causes}`,
 );
 
 run(
@@ -323,17 +313,15 @@ run(
   `
 // Generated fixture
 
-// @benchmark-context begin Model
 predicate Model(x: int)
 {
   x >= 0
 }
-// @benchmark-context end Model
 
 method Decide(x: int) returns (res: bool)
   ensures res == Model(x)
 {
-+  Helper(x);
+  Helper(x);
   return x >= 0;
 }
 
@@ -341,7 +329,8 @@ lemma Helper(x: int)
   ensures x >= 0 || x < 0
 {
 }
-`.replace("+  Helper", "  Helper"),
+`,
+  ["Model"],
   result =>
     result.context.status !== "passed"
       ? `expected passed: ${result.context.diagnostics}`

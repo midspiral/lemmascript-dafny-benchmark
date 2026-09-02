@@ -11,7 +11,8 @@ Given an emitted task scaffold, produce a `.dfy` that:
 
 The scaffold is normally the raw `.dfy.gen`. When that file names an omitted
 semantic function or predicate, it is the `.dfy.gen` plus the minimum
-resolver-demanded, explicitly marked definitions from the completed `.dfy`.
+resolver-demanded definitions explicitly configured in the benchmark-local
+context manifest and extracted from the completed `.dfy`.
 [DESIGN_CONTEXT.md](DESIGN_CONTEXT.md) specifies that construction and, in
 particular, why reference-only helper lemmas and calls never enter the task.
 
@@ -526,7 +527,7 @@ case study to gain one silently emits an unsolvable task.
 
 A task file is the **byte-for-byte composed scaffold**. With no semantic
 context it equals `.dfy.gen`; otherwise it additionally contains only the
-selected marker blocks projected from the completed `.dfy`. A candidate diffs
+selected declarations projected from the completed `.dfy`. A candidate diffs
 against that exact file, so neither generated text nor context can be changed.
 
 `tasks/` has **gaps**, by design. IDs are issued to every pair the generator
@@ -578,11 +579,12 @@ rather than emit tasks nothing vouched for.
 
 **Admission gate.** Each `(gen, solution)` pair first passes through the
 semantic-context builder. Dafny resolution starts at `gen`, selects only
-demanded marked functions and predicates (including their transitive semantic
-dependencies), and rejects unused markers. The resulting `(task, solution)`
-pair is then run through the validator. Pairs that fail are excluded rather
-than emitted, so every task is known-solvable under exactly the constraints the
-harness enforces. Generator and validator share one code path.
+demanded configured functions and predicates (including their transitive
+semantic dependencies), and rejects unused manifest entries. The declarations
+are extracted by name from ordinary, unannotated Dafny source. The resulting
+`(task, solution)` pair is then run through the validator. Pairs that fail are
+excluded rather than emitted, so every task is known-solvable under exactly the
+constraints the harness enforces. Generator and validator share one code path.
 
 Since the validator derives no per-task state, the gate is purely a
 filter — the reference solution is needed to admit a task, never to check

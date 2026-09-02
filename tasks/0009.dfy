@@ -2,36 +2,26 @@
 
 datatype Edge = Edge(source: string, target: string)
 
-// @benchmark-context begin hasEdge
 predicate hasEdge(edges: seq<Edge>, a: string, b: string)
 {
   exists i :: 0 <= i < |edges| && edges[i].source == a && edges[i].target == b
 }
-// @benchmark-context end hasEdge
-// @benchmark-context begin isPath
 ghost predicate isPath(edges: seq<Edge>, p: seq<string>)
 {
   forall i :: 0 <= i < |p| - 1 ==> hasEdge(edges, p[i], p[i + 1])
 }
-// @benchmark-context end isPath
-// @benchmark-context begin reach
 ghost predicate reach(edges: seq<Edge>, from: string, to: string)
 {
   exists p :: |p| >= 1 && p[0] == from && p[|p| - 1] == to && isPath(edges, p)
 }
-// @benchmark-context end reach
-// @benchmark-context begin directViolation
 ghost predicate directViolation(edges: seq<Edge>, sources: seq<string>, sinks: seq<string>)
 {
   exists i, j :: 0 <= i < |sources| && 0 <= j < |sinks| && hasEdge(edges, sources[i], sinks[j])
 }
-// @benchmark-context end directViolation
-// @benchmark-context begin reachViolation
 ghost predicate reachViolation(edges: seq<Edge>, sources: seq<string>, sinks: seq<string>)
 {
   exists i, j :: 0 <= i < |sources| && 0 <= j < |sinks| && reach(edges, sources[i], sinks[j])
 }
-// @benchmark-context end reachViolation
 function domination(edges: seq<Edge>, sources: seq<string>, sinks: seq<string>): bool
   requires directViolation(edges, sources, sinks)
 {

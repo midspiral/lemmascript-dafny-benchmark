@@ -11,6 +11,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import {
   buildTaskScaffold,
+  loadContextConfig,
   scaffoldFromReport,
   textFacts,
   type ContextReport,
@@ -166,6 +167,7 @@ function applyExclusions(reports: PairReport[], repos: RepoEntry[]) {
 export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
   const log = opts.log ?? (() => {});
   const config = loadConfig(path.join(opts.repoRoot, "config", "repos.json"));
+  const contextConfig = loadContextConfig(path.join(opts.repoRoot, "config", "context.json"));
   const { kept, dropped } = dedupeRepos(config.repos);
   const parentDir = path.resolve(opts.repoRoot, config.parentDir);
 
@@ -181,6 +183,7 @@ export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
   const reports: PairReport[] = [];
   const pairs = new Map<string, Pair>();
   const work: { pair: Pair; report: PairReport }[] = [];
+  const enumeratedRepos = new Set<string>();
 
   for (const c of checkouts) {
     if (!c.present) {
@@ -192,6 +195,7 @@ export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
       reports.push(repoLevelFailure(c.entry, "missing-file-list"));
       continue;
     }
+    enumeratedRepos.add(c.entry.repo);
     for (const pair of pairsFor(c, entries)) {
       if (opts.only && !pair.key.includes(opts.only)) continue;
       pairs.set(pair.key, pair);
@@ -213,12 +217,24 @@ export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
     }
   }
 
+  if (!opts.only) {
+    const configuredRepos = new Set(kept.map(entry => entry.repo));
+    const unknown = [...contextConfig.keys()].filter(key => {
+      const repo = key.slice(0, key.indexOf(":"));
+      return !configuredRepos.has(repo) || (enumeratedRepos.has(repo) && !pairs.has(key));
+    });
+    if (unknown.length > 0) throw new Error(`context config names unknown pair(s): ${unknown.join(", ")}`);
+  }
+
   log(`  ${work.length} pairs to validate, ${opts.jobs} at a time\n`);
 
   const started = Date.now();
   let done = 0;
   await pool(work, opts.jobs, async ({ pair, report }) => {
-    const built = buildTaskScaffold(pair.genPath, pair.solutionPath, { expectedVersion: config.dafnyVersion });
+    const built = buildTaskScaffold(pair.genPath, pair.solutionPath, {
+      expectedVersion: config.dafnyVersion,
+      declarations: contextConfig.get(pair.key) ?? [],
+    });
     pair.taskText = built.taskText;
     report.task = textFacts(built.taskText);
     report.context = built.context;
@@ -366,6 +382,7 @@ export function printSummary(corpus: Corpus, log: (line: string) => void) {
 export function corpusFromReport(repoRoot: string, reportPath: string): Corpus {
   const doc = JSON.parse(readFileSync(reportPath, "utf-8"));
   const config = loadConfig(path.join(repoRoot, "config", "repos.json"));
+  const contextConfig = loadContextConfig(path.join(repoRoot, "config", "context.json"));
   const { kept, dropped } = dedupeRepos(config.repos);
   const parentDir = path.resolve(repoRoot, config.parentDir);
 
@@ -382,6 +399,10 @@ export function corpusFromReport(repoRoot: string, reportPath: string): Corpus {
   const reports: PairReport[] = doc.pairs;
   const pairs = new Map<string, Pair>();
   const stale: string[] = [];
+  const reportedKeys = new Set(reports.map(report => report.key));
+  for (const key of contextConfig.keys()) {
+    if (!reportedKeys.has(key)) stale.push(key);
+  }
 
   for (const r of reports) {
     if (!r.gen || r.relpath === "-") continue;
@@ -395,6 +416,12 @@ export function corpusFromReport(repoRoot: string, reportPath: string): Corpus {
       !existsSync(solutionPath) ||
       fileFacts(solutionPath).sha256 !== r.solution.sha256
     ) {
+      stale.push(r.key);
+      continue;
+    }
+    const configured = contextConfig.get(r.key) ?? [];
+    const reportedConfigured = r.context?.configured ?? [];
+    if (JSON.stringify(configured) !== JSON.stringify(reportedConfigured)) {
       stale.push(r.key);
       continue;
     }

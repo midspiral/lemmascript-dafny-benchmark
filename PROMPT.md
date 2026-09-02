@@ -19,11 +19,11 @@ template and the script cannot drift apart.
 empty bodies, and its methods lack the invariants and assertions their
 postconditions need. As given, it does not verify.
 
-The file may include functions or predicates marked `@benchmark-context`.
-Those are part of the problem statement: semantic definitions needed to make
-the generated specifications meaningful. They are immutable like every other
-existing line. They are not helper lemmas from the reference proof; choosing or
-inventing proof helpers remains your job.
+The file may include semantic functions or predicates supplied as part of the
+problem statement because the generated specifications refer to them. They are
+ordinary Dafny and immutable like every other existing line. They are not
+helper lemmas from the reference proof; choosing or inventing proof helpers
+remains your job.
 
 Your job is to make it verify, by **adding lines only**.
 

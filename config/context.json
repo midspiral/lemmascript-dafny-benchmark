@@ -1,0 +1,58 @@
+{
+  "_comment": [
+    "Benchmark-local semantic context. Each key is repo:TypeScript-relpath.",
+    "The listed top-level Dafny functions/predicates are eligible context; Dafny",
+    "resolution must demand every one, otherwise corpus construction fails."
+  ],
+  "pairs": [
+    {
+      "key": "midspiral/equality-game-lemmascript:src/equality.ts",
+      "declarations": ["ExpressionsAgree"]
+    },
+    {
+      "key": "midspiral/eslint-plugin-with-lemmascript:src/core.verified.ts",
+      "declarations": ["hasEdge", "isPath", "reach", "directViolation", "reachViolation"]
+    },
+    {
+      "key": "midspiral/henri-lemmascript:src/permissions.ts",
+      "declarations": [
+        "seqEq",
+        "normalizeFrom",
+        "normalize",
+        "resolvePath",
+        "isPrefix",
+        "isWithin",
+        "pathGranted",
+        "isAllowed"
+      ]
+    },
+    {
+      "key": "midspiral/henri-lemmascript:src/transcript.ts",
+      "declarations": ["pairs", "headOk", "lastOk", "okAdjacent", "wfFrom", "wellFormed"]
+    },
+    {
+      "key": "midspiral/hono-lemmascript:src/middleware/serve-static/index.ts",
+      "declarations": ["Decoded", "HasPathTraversal"]
+    },
+    {
+      "key": "midspiral/hono-lemmascript:src/utils/filepath.ts",
+      "declarations": ["ContainsParentDir"]
+    },
+    {
+      "key": "midspiral/hono-rate-limiter-with-lemmascript:src/core.verified.ts",
+      "declarations": ["CountIn"]
+    },
+    {
+      "key": "midspiral/infisical-lemmascript:backend/src/lib/casl/glob-subset.ts",
+      "declarations": ["segMatchSpec"]
+    },
+    {
+      "key": "midspiral/opencode-lemmascript:packages/opencode/src/util/wildcard.ts",
+      "declarations": ["Matches"]
+    },
+    {
+      "key": "midspiral/trace-solo-lemmascript:src/games/g2048/engine.ts",
+      "declarations": ["sumTo", "nzTo", "colSumTo", "cell"]
+    }
+  ]
+}

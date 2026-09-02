@@ -20,6 +20,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { taskFileName, type Index, type TaskMetadata } from "../src/benchmark.js";
 import type { PairReport } from "../src/corpus.js";
+import { loadContextConfig } from "../src/context.js";
 import { dedupeRepos, loadConfig } from "../src/pairs.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -36,6 +37,7 @@ function readJson<T>(name: string): T | undefined {
 }
 
 const config = loadConfig(path.join(repoRoot, "config", "repos.json"));
+const contextConfig = loadContextConfig(path.join(repoRoot, "config", "context.json"));
 const metadata = readJson<{ dafnyVersion: string; taskCount: number; tasks: TaskMetadata[] }>("metadata.json");
 const index = readJson<Index>("index.json");
 const report = readJson<{ dafnyVersion: string; pairs: PairReport[] }>("reference-report.json");
@@ -88,6 +90,15 @@ if (metadata && index && report) {
   // --- report agrees on what was admitted --------------------------------
   const reported = new Map(report.pairs.map(p => [p.key, p]));
   const admitted = new Set(report.pairs.filter(p => p.admitted).map(p => p.key));
+  for (const pair of report.pairs) {
+    const configured = contextConfig.get(pair.key) ?? [];
+    if (JSON.stringify(pair.context?.configured ?? []) !== JSON.stringify(configured)) {
+      fail(`${pair.key} context config disagrees with reference-report.json`);
+    }
+  }
+  for (const key of contextConfig.keys()) {
+    if (!reported.has(key)) fail(`context config names ${key}, which is absent from reference-report.json`);
+  }
   for (const t of tasks) {
     if (!admitted.has(t.key)) fail(`task ${t.id} (${t.key}) is not admitted in reference-report.json`);
     const pair = reported.get(t.key);

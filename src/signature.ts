@@ -107,6 +107,80 @@ export function declarationHeader(code: string): DeclarationHeader | null {
   return { kind: m[2] as DeclarationHeader["kind"], name: m[3], ghost: m[1] !== undefined };
 }
 
+export interface TopLevelDeclaration extends DeclarationHeader {
+  /** 1-based inclusive source lines. */
+  start: number;
+  end: number;
+  abstract: boolean;
+}
+
+/**
+ * Locate complete top-level callable declarations in source order.
+ *
+ * This deliberately shares the lexer and attribute handling used for frozen
+ * signatures. It is used only to recover declarations explicitly named by the
+ * benchmark's context manifest; Dafny resolution remains the authority on
+ * whether any recovered declaration is actually needed.
+ */
+export function topLevelDeclarations(text: string): TopLevelDeclaration[] {
+  const lines = text.split("\n");
+  const state: LexState = { block: false, str: false };
+  const declarations: TopLevelDeclaration[] = [];
+  let depth = 0;
+  let open:
+    | (DeclarationHeader & {
+        start: number;
+        lastCode: number;
+        bodyOpened: boolean;
+      })
+    | null = null;
+
+  const close = (end: number) => {
+    if (!open) return;
+    declarations.push({
+      kind: open.kind,
+      name: open.name,
+      ghost: open.ghost,
+      start: open.start,
+      end,
+      abstract: !open.bodyOpened,
+    });
+    open = null;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const n = i + 1;
+    const code = scrub(raw, state);
+    const body = code.replace(ATTRIBUTE_GROUP, "");
+    const header = depth === 0 ? declarationHeader(code) : null;
+
+    // A second header at depth zero ends a preceding bodyless declaration.
+    if (header) {
+      if (open) close(open.lastCode);
+      open = { ...header, start: n, lastCode: n, bodyOpened: false };
+    } else if (open && code.trim() !== "") {
+      open.lastCode = n;
+    }
+
+    if (open && body.includes("{")) open.bodyOpened = true;
+
+    for (const ch of body) {
+      if (ch === "{") depth++;
+      else if (ch === "}") depth--;
+    }
+
+    // Blank lines are only whitespace in Dafny: a concrete declaration may
+    // legally put one between its signature and opening brace. A bodyless
+    // declaration therefore ends only at the next top-level callable (handled
+    // above) or at EOF, never merely at a blank line.
+    if (open?.bodyOpened && depth === 0) close(n);
+  }
+
+  if (open) close(open.lastCode);
+  return declarations;
+}
+
 export interface SignatureInterval {
   /** 1-based line of the declaration keyword in the task scaffold. */
   start: number;

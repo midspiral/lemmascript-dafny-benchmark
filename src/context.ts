@@ -1,11 +1,12 @@
 /**
- * Build the immutable task scaffold from a generated file plus explicitly
- * marked semantic declarations in its completed Dafny solution.
+ * Build the immutable task scaffold from a generated file plus semantic
+ * declarations named in the benchmark-local context manifest.
  *
  * Context is deliberately demand-driven: Dafny resolution starts at the raw
- * `.dfy.gen`, and a marked function or predicate is selected only when its name
- * is unresolved. Resolving again discovers transitive semantic dependencies.
- * Nothing reachable only from reference-proof additions enters the task.
+ * `.dfy.gen`, and a configured function or predicate is selected only when its
+ * name is unresolved. Resolving again discovers transitive semantic
+ * dependencies. Nothing reachable only from reference-proof additions enters
+ * the task, and upstream Dafny files contain no benchmark annotations.
  */
 
 import { createHash } from "node:crypto";
@@ -14,13 +15,46 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { scanAddedLines } from "./banned.js";
-import { declarationHeader, scrub, type LexState } from "./signature.js";
+import {
+  declarationHeader,
+  scrub,
+  topLevelDeclarations,
+  type DeclarationHeader,
+  type LexState,
+} from "./signature.js";
 import { dafnyVersion, gitDiff, versionMatches } from "./validator.js";
 
-const BEGIN = /^\s*\/\/\s*@benchmark-context\s+begin\s+([A-Za-z_]\w*)\s*$/;
-const END = /^\s*\/\/\s*@benchmark-context\s+end\s+([A-Za-z_]\w*)\s*$/;
 const PROOF_TOKEN = /\b(assert|calc|reveal)\b|^\s*by\s+method\b/m;
 const INELIGIBLE_TOP_LEVEL = /^\s*(datatype|type|newtype|const|class|trait|module|import|include)\b/m;
+
+export interface ContextConfigEntry {
+  key: string;
+  declarations: string[];
+}
+
+/** Read and validate the benchmark-local declaration allowlist. */
+export function loadContextConfig(configPath: string): Map<string, string[]> {
+  const raw = JSON.parse(readFileSync(configPath, "utf-8"));
+  if (!Array.isArray(raw.pairs)) throw new Error(`${configPath}: expected a pairs array`);
+  const result = new Map<string, string[]>();
+  for (const entry of raw.pairs as ContextConfigEntry[]) {
+    if (!entry || typeof entry.key !== "string" || !Array.isArray(entry.declarations)) {
+      throw new Error(`${configPath}: every context entry needs a key and declarations array`);
+    }
+    if (result.has(entry.key)) throw new Error(`${configPath}: duplicate context key ${entry.key}`);
+    if (entry.declarations.length === 0) throw new Error(`${configPath}: ${entry.key} has no declarations`);
+    const names = new Set<string>();
+    for (const name of entry.declarations) {
+      if (typeof name !== "string" || !/^[A-Za-z_]\w*$/.test(name)) {
+        throw new Error(`${configPath}: invalid declaration name ${String(name)} for ${entry.key}`);
+      }
+      if (names.has(name)) throw new Error(`${configPath}: duplicate declaration ${name} for ${entry.key}`);
+      names.add(name);
+    }
+    result.set(entry.key, [...names]);
+  }
+  return result;
+}
 
 export interface ContextDeclaration {
   name: string;
@@ -36,6 +70,8 @@ export interface ContextReport {
   status: "none" | "passed" | "failed" | "not-run";
   causes: string[];
   diagnostics: string[];
+  /** Names supplied by config/context.json, whether or not construction passed. */
+  configured: string[];
   declarations: ContextDeclaration[];
   /** Unresolved names observed on each demand-driven resolution round. */
   resolutionRounds: string[][];
@@ -53,7 +89,7 @@ interface DiffEntry {
   text: string;
 }
 
-interface MarkerBlock {
+interface ContextBlock {
   name: string;
   start: number;
   end: number;
@@ -65,7 +101,7 @@ interface Prepared {
   solutionText: string;
   entries: DiffEntry[];
   trailingNewline: boolean;
-  blocks: MarkerBlock[];
+  blocks: ContextBlock[];
   errors: string[];
 }
 
@@ -140,18 +176,22 @@ function scrubbedLines(lines: string[]): string[] {
   return lines.map(line => scrub(line, state));
 }
 
-function validateBlock(name: string, lines: string[]): { declaration?: ContextDeclaration; errors: string[] } {
+function validateBlock(
+  name: string,
+  lines: string[],
+  header: DeclarationHeader,
+  abstract: boolean,
+  trailingNewline: boolean,
+): { declaration?: ContextDeclaration; errors: string[] } {
   const errors: string[] = [];
-  const inner = lines.slice(1, -1);
-  const scrubbed = scrubbedLines(inner);
+  const scrubbed = scrubbedLines(lines);
   const headers = scrubbed.map(line => declarationHeader(line)).filter(h => h !== null);
   if (headers.length !== 1) {
     errors.push(`context ${name}: expected exactly one callable declaration, found ${headers.length}`);
     return { errors };
   }
 
-  const header = headers[0];
-  if (header.name !== name) errors.push(`context ${name}: marker wraps declaration ${header.name}`);
+  if (header.name !== name) errors.push(`context ${name}: extracted declaration is ${header.name}`);
   if (header.kind !== "function" && header.kind !== "predicate") {
     errors.push(`context ${name}: ${header.kind} declarations are not eligible context`);
   }
@@ -160,21 +200,21 @@ function validateBlock(name: string, lines: string[]): { declaration?: ContextDe
   if (/\bensures\b/.test(code)) errors.push(`context ${name}: context declarations may not contain ensures clauses`);
   if (PROOF_TOKEN.test(code)) errors.push(`context ${name}: context declarations may not contain proof statements`);
   if (INELIGIBLE_TOP_LEVEL.test(code)) errors.push(`context ${name}: block contains an ineligible top-level declaration`);
-  const banned = scanAddedLines(inner);
+  const banned = scanAddedLines(lines);
   if (banned.length > 0) {
     errors.push(`context ${name}: contains banned material (${[...new Set(banned.map(b => b.pattern))].join(", ")})`);
   }
   if (errors.length > 0 || (header.kind !== "function" && header.kind !== "predicate")) return { errors };
 
-  const whole = lines.join("\n") + "\n";
-  const addedCodeLines = inner.filter((line, i) => scrubbed[i].trim() !== "").length;
+  const whole = renderLines(lines, trailingNewline);
+  const addedCodeLines = lines.filter((line, i) => scrubbed[i].trim() !== "").length;
   return {
     errors,
     declaration: {
       name,
       kind: header.kind,
       ghost: header.ghost,
-      abstract: !code.includes("{"),
+      abstract,
       addedLines: lines.length,
       addedCodeLines,
       sha256: textHash(whole),
@@ -182,55 +222,52 @@ function validateBlock(name: string, lines: string[]): { declaration?: ContextDe
   };
 }
 
-function prepare(genPath: string, solutionPath: string): Prepared {
+function prepare(genPath: string, solutionPath: string, configured: string[]): Prepared {
   const genText = readFileSync(genPath, "utf-8");
   const solutionText = readFileSync(solutionPath, "utf-8");
   const { entries, deletions, errors: diffErrors } = diffEntries(genPath, solutionPath);
   const errors = [...diffErrors];
   if (deletions > 0) errors.push(`solution deletes ${deletions} generated line(s)`);
 
-  const blocks: MarkerBlock[] = [];
-  const names = new Set<string>();
-  let open: { name: string; start: number } | null = null;
-  for (let i = 0; i < entries.length; i++) {
-    const begin = BEGIN.exec(entries[i].text);
-    const end = END.exec(entries[i].text);
-    if (begin) {
-      if (open) {
-        errors.push(`context ${begin[1]}: marker is nested inside context ${open.name}`);
-        continue;
-      }
-      if (entries[i].origin !== "added") errors.push(`context ${begin[1]}: begin marker is not an added line`);
-      open = { name: begin[1], start: i };
+  const blocks: ContextBlock[] = [];
+  const solutionLines = physicalLines(solutionText).lines;
+  const declarations = topLevelDeclarations(solutionText);
+  for (const name of configured) {
+    const matches = declarations.filter(declaration => declaration.name === name);
+    if (matches.length === 0) {
+      errors.push(`context ${name}: configured declaration was not found at top level`);
       continue;
     }
-    if (!end) {
-      if (open && entries[i].origin !== "added") {
-        errors.push(`context ${open.name}: block contains a generated line`);
-      }
+    if (matches.length > 1) {
+      errors.push(`context ${name}: configured declaration is ambiguous (${matches.length} top-level matches)`);
       continue;
     }
-    if (!open) {
-      errors.push(`context ${end[1]}: end marker has no matching begin`);
+
+    const span = matches[0];
+    const start = span.start - 1;
+    const end = span.end - 1;
+    const lines = solutionLines.slice(start, end + 1);
+    if (entries.slice(start, end + 1).some(entry => entry?.origin !== "added")) {
+      errors.push(`context ${name}: declaration contains a generated line`);
       continue;
     }
-    if (entries[i].origin !== "added") errors.push(`context ${end[1]}: end marker is not an added line`);
-    if (end[1] !== open.name) {
-      errors.push(`context ${open.name}: end marker names ${end[1]}`);
-      open = null;
+    const previousCode = start > 0 ? scrubbedLines([solutionLines[start - 1]])[0].trim() : "";
+    if (/^\{\s*:/.test(previousCode) || /^@\w+/.test(previousCode)) {
+      errors.push(`context ${name}: leading declaration attributes must be on the declaration line`);
       continue;
     }
-    if (names.has(open.name)) errors.push(`context ${open.name}: declaration is marked more than once`);
-    names.add(open.name);
-    const lines = entries.slice(open.start, i + 1).map(e => e.text);
-    const checked = validateBlock(open.name, lines);
+    const checked = validateBlock(
+      name,
+      lines,
+      span,
+      span.abstract,
+      end < solutionLines.length - 1 || solutionText.endsWith("\n"),
+    );
     errors.push(...checked.errors);
-    if (checked.declaration) {
-      blocks.push({ name: open.name, start: open.start, end: i, declaration: checked.declaration });
-    }
-    open = null;
+    if (checked.declaration) blocks.push({ name, start, end, declaration: checked.declaration });
   }
-  if (open) errors.push(`context ${open.name}: begin marker has no matching end`);
+
+  blocks.sort((a, b) => a.start - b.start);
 
   return { genText, solutionText, entries, trailingNewline: solutionText.endsWith("\n"), blocks, errors };
 }
@@ -311,11 +348,17 @@ function resolveText(text: string, expectedVersion?: string): ResolveResult {
   }
 }
 
-function emptyReport(status: ContextReport["status"], causes: string[] = [], diagnostics: string[] = []): ContextReport {
+function emptyReport(
+  status: ContextReport["status"],
+  configured: string[],
+  causes: string[] = [],
+  diagnostics: string[] = [],
+): ContextReport {
   return {
     status,
     causes,
     diagnostics,
+    configured,
     declarations: [],
     resolutionRounds: [],
     addedLines: 0,
@@ -337,21 +380,22 @@ function outputSample(output: string): string {
 export function buildTaskScaffold(
   genPath: string,
   solutionPath: string,
-  opts: { expectedVersion?: string } = {},
+  opts: { expectedVersion?: string; declarations?: string[] } = {},
 ): ContextBuildResult {
+  const configured = opts.declarations ?? [];
   let prepared: Prepared;
   try {
-    prepared = prepare(genPath, solutionPath);
+    prepared = prepare(genPath, solutionPath, configured);
   } catch (error: any) {
     return {
       taskText: readFileSync(genPath, "utf-8"),
-      context: emptyReport("not-run", ["context-not-checked"], [String(error?.message ?? error)]),
+      context: emptyReport("not-run", configured, ["context-not-checked"], [String(error?.message ?? error)]),
     };
   }
   if (prepared.errors.length > 0) {
     return {
       taskText: prepared.genText,
-      context: emptyReport("failed", ["invalid-context"], prepared.errors),
+      context: emptyReport("failed", configured, ["invalid-context"], prepared.errors),
     };
   }
 
@@ -359,7 +403,12 @@ export function buildTaskScaffold(
   if (raw.status === "not-run") {
     return {
       taskText: prepared.genText,
-      context: emptyReport("not-run", ["context-not-checked"], [raw.notRunReason ?? "dafny resolve did not run"]),
+      context: emptyReport(
+        "not-run",
+        configured,
+        ["context-not-checked"],
+        [raw.notRunReason ?? "dafny resolve did not run"],
+      ),
     };
   }
 
@@ -369,12 +418,13 @@ export function buildTaskScaffold(
         taskText: prepared.genText,
         context: emptyReport(
           "failed",
+          configured,
           ["unresolved-context-name"],
-          [`unresolved names with no marked context: ${raw.unresolved.join(", ")}`],
+          [`unresolved names with no configured context: ${raw.unresolved.join(", ")}`],
         ),
       };
     }
-    return { taskText: prepared.genText, context: emptyReport("none") };
+    return { taskText: prepared.genText, context: emptyReport("none", configured) };
   }
 
   const byName = new Map(prepared.blocks.map(block => [block.name, block]));
@@ -387,7 +437,7 @@ export function buildTaskScaffold(
       return {
         taskText: prepared.genText,
         context: {
-          ...emptyReport("failed", ["context-not-resolved"], [outputSample(resolution.output)]),
+          ...emptyReport("failed", configured, ["context-not-resolved"], [outputSample(resolution.output)]),
           resolutionRounds: rounds,
         },
       };
@@ -400,8 +450,9 @@ export function buildTaskScaffold(
         context: {
           ...emptyReport(
             "failed",
+            configured,
             ["unresolved-context-name"],
-            [`no marked context supplies: ${resolution.unresolved.join(", ")}`],
+            [`no configured context supplies: ${resolution.unresolved.join(", ")}`],
           ),
           resolutionRounds: rounds,
         },
@@ -413,7 +464,12 @@ export function buildTaskScaffold(
       return {
         taskText: prepared.genText,
         context: {
-          ...emptyReport("not-run", ["context-not-checked"], [resolution.notRunReason ?? "dafny resolve did not run"]),
+          ...emptyReport(
+            "not-run",
+            configured,
+            ["context-not-checked"],
+            [resolution.notRunReason ?? "dafny resolve did not run"],
+          ),
           resolutionRounds: rounds,
         },
       };
@@ -425,7 +481,12 @@ export function buildTaskScaffold(
     return {
       taskText: prepared.genText,
       context: {
-        ...emptyReport("failed", ["unused-context"], [`marked context was not requested: ${unused.join(", ")}`]),
+        ...emptyReport(
+          "failed",
+          configured,
+          ["unused-context"],
+          [`configured context was not requested: ${unused.join(", ")}`],
+        ),
         resolutionRounds: rounds,
       },
     };
@@ -438,6 +499,7 @@ export function buildTaskScaffold(
       status: "passed",
       causes: [],
       diagnostics: [],
+      configured,
       declarations,
       resolutionRounds: rounds,
       addedLines: declarations.reduce((n, d) => n + d.addedLines, 0),
@@ -448,13 +510,11 @@ export function buildTaskScaffold(
 
 /** Recompose a previously reported scaffold without invoking Dafny. */
 export function scaffoldFromReport(genPath: string, solutionPath: string, declarationNames: string[]): string {
-  const prepared = prepare(genPath, solutionPath);
+  const prepared = prepare(genPath, solutionPath, declarationNames);
   if (prepared.errors.length > 0) throw new Error(prepared.errors.join("; "));
   const available = new Set(prepared.blocks.map(block => block.name));
   const missing = declarationNames.filter(name => !available.has(name));
-  if (missing.length > 0) throw new Error(`reported context declarations are no longer marked: ${missing.join(", ")}`);
-  const extra = prepared.blocks.filter(block => !declarationNames.includes(block.name)).map(block => block.name);
-  if (extra.length > 0) throw new Error(`new unreported context declarations are present: ${extra.join(", ")}`);
+  if (missing.length > 0) throw new Error(`reported context declarations are unavailable: ${missing.join(", ")}`);
   return project(prepared, new Set(declarationNames));
 }
 

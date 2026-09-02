@@ -91,20 +91,21 @@ yourself special-casing what the candidate wrote, stop.
 silently admitting. `task-not-checked` exists because the first version of that
 rule admitted on a check that never executed.
 
-**Semantic context is not proof convenience.** A context block in a completed
-`.dfy` must use paired `@benchmark-context begin/end Name` comments, wrap one
-complete top-level function or predicate, and occupy only lines added relative
-to `.dfy.gen`. Dafny resolution starting at the raw generated file must request
-its name; every marked block not reached by that transitive walk rejects the
-pair as `unused-context`. Never mark a lemma, a lemma call inserted into a
+**Semantic context is not proof convenience.** `config/context.json` may name
+one or more complete top-level functions or predicates from a completed
+`.dfy`. Each declaration must occupy only lines added relative to `.dfy.gen`,
+and Dafny resolution starting at the raw generated file must request its name.
+Every configured declaration not reached by that transitive walk rejects the
+pair as `unused-context`. Never configure a lemma, a lemma call inserted into a
 method, an invariant, or a definition used only by reference-proof additions.
-Those are exactly the choices a candidate is meant to reinvent.
+Those are exactly the choices a candidate is meant to reinvent. Keep the
+upstream `.dfy` self-contained and free of benchmark-specific annotations.
 
-The projection keeps each context block at its position in the completed file.
-That position must remain top-level after all unmarked proof additions are
-removed. If `context-not-resolved` reports a parse error, move the definition to
-a projection-safe top-level position in the completed `.dfy`; do not import the
-surrounding proof braces to make it parse.
+The projection keeps each configured declaration at its position in the
+completed file. That position must remain top-level after all other proof
+additions are removed. If `context-not-resolved` reports a parse error, move
+the definition to a projection-safe ordinary top-level position in the
+completed `.dfy`; do not import the surrounding proof braces to make it parse.
 
 ## Changing a validator rule
 

@@ -112,12 +112,16 @@ from which a task and its reference solution are constructed.
 
 Before validating the reference, the generator asks Dafny to resolve the raw
 `.dfy.gen`. An unresolved function or predicate may be supplied from an
-explicitly marked declaration in the completed `.dfy`; resolving again finds
-any transitive semantic dependencies. Every marked block must be requested,
-and only functions and predicates are eligible. Lemmas, lemma calls added to
-method bodies, invariants, assertions, and definitions reached only from the
-reference proof remain absent for the candidate to invent or avoid. See
-[DESIGN_CONTEXT.md](DESIGN_CONTEXT.md) for the exact boundary and marker format.
+eligible declaration named in the benchmark-local
+[`config/context.json`](config/context.json); resolving again finds any
+transitive semantic dependencies. Every configured declaration must be
+requested, and only functions and predicates are eligible. The completed
+`.dfy` remains ordinary, self-contained Dafny and carries no benchmark
+annotations. Lemmas, lemma calls added to method bodies, invariants,
+assertions, and definitions reached only from the reference proof remain
+absent for the candidate to invent or avoid. See
+[DESIGN_CONTEXT.md](DESIGN_CONTEXT.md) for the exact boundary and manifest
+format.
 
 A generator script walks the configured case study repositories, collects
 every such pair, and emits:
@@ -150,7 +154,7 @@ being admitted — takes an explicit `--update` or `--prune`.
 Every constraint above is a claim about the case studies as much as about
 candidate solutions: that the human-written `.dfy` files are themselves
 additions-only, verify cleanly, and take nothing on trust that isn't
-explicitly marked.
+explicitly allowed.
 
 The generator checks this and reports it, rather than assuming it. Pairs
 that fail are excluded from the benchmark and listed with their cause, so

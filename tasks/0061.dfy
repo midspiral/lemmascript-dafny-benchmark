@@ -14,21 +14,16 @@ const RIGHT: int := 1
 
 const DOWN: int := 3
 
-// @benchmark-context begin sumTo
 ghost function sumTo(s: seq<int>, n: int): int
   requires 0 <= n <= |s|
 {
   if n == 0 then 0 else sumTo(s, n - 1) + s[n - 1]
 }
-// @benchmark-context end sumTo
-// @benchmark-context begin nzTo
 ghost function nzTo(s: seq<int>, n: int): int
   requires 0 <= n <= |s|
 {
   if n == 0 then 0 else nzTo(s, n - 1) + (if s[n - 1] != 0 then 1 else 0)
 }
-// @benchmark-context end nzTo
-// @benchmark-context begin colSumTo
 ghost function colSumTo(b: seq<int>, c: int, n: int): int
   requires |b| == SIZE
   requires 0 <= c < N
@@ -36,8 +31,6 @@ ghost function colSumTo(b: seq<int>, c: int, n: int): int
 {
   if n == 0 then 0 else colSumTo(b, c, n - 1) + b[(n - 1) * N + c]
 }
-// @benchmark-context end colSumTo
-// @benchmark-context begin cell
 ghost function cell(b: seq<int>, r: int, c: int): int
   requires |b| == SIZE
   requires 0 <= r < N
@@ -45,7 +38,6 @@ ghost function cell(b: seq<int>, r: int, c: int): int
 {
   b[r * N + c]
 }
-// @benchmark-context end cell
 method slideLine(line: seq<int>) returns (res: seq<int>)
   ensures (|res| == |line|)
   ensures (sumTo(res, |res|) == sumTo(line, |line|))

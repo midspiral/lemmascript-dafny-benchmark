@@ -54,9 +54,9 @@ asserting *the reason* it is rejected rather than merely that it fails. Seven
 more assert the opposite direction — that legitimate work still passes, because
 a validator tested only against attacks drifts toward rejecting everything.
 The semantic-context fixtures separately pin direct and transitive selection,
-the unused-marker over-inclusion guard, eligible declaration kinds, bodyless
-abstractions, and the rule that a helper lemma called only by the reference
-proof stays candidate work.
+the unused-config-entry over-inclusion guard, eligible declaration kinds,
+bodyless abstractions, and the rule that a helper lemma called only by the
+reference proof stays candidate work.
 
 Two smoke tests ride along:
 
