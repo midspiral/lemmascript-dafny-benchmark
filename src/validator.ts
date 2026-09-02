@@ -1,15 +1,15 @@
 /**
  * The validator: two checks against a candidate `.dfy`, and nothing else.
  *
- *   1. additions-only  — diff against the `.dfy.gen`, no deletions, no banned
- *                        pattern on an added line
+ *   1. additions-only  — diff against the immutable task scaffold, no
+ *                        deletions, no banned pattern on an added line
  *   2. verifies        — `dafny verify` with zero errors and no disqualifying
  *                        warning
  *
  * Each check is `passed` / `failed` / `not-run`. No per-task derived state: a
- * candidate is checked against the `.gen` and against Dafny. The generator's
- * admission gate calls exactly this, with the reference solution as the
- * candidate.
+ * candidate is checked against the task and against Dafny. The generator's
+ * admission gate calls exactly this, with the composed scaffold as the task
+ * and the reference solution as the candidate.
  */
 
 import { execFileSync, spawn } from "node:child_process";
@@ -36,7 +36,7 @@ import {
 export type CheckStatus = "passed" | "failed" | "not-run";
 
 export interface SignatureViolation {
-  /** 1-based line of the generated declaration the addition lands in. */
+  /** 1-based line of the task declaration the addition lands in. */
   declarationLine: number;
   /** The declaration, for the message. */
   declaration: string;
@@ -52,11 +52,11 @@ export interface AdditionsCheck {
   /** Up to five deleted lines, for the report. */
   deletedSamples: string[];
   bannedMatches: BannedMatch[];
-  /** Added `requires` / `reads` / `modifies` clauses attached to a generated
+  /** Added `requires` / `reads` / `modifies` clauses attached to a task
    *  declaration outside its signature interval. */
   weakenedContracts: WeakenedContract[];
-  /** Added lines inside a generated declaration's signature that are not an
-   *  allowed clause. This is what stops `|| true` from continuing a generated
+  /** Added lines inside a task declaration's signature that are not an
+   *  allowed clause. This is what stops `|| true` from continuing an existing
    *  postcondition into something trivial. */
   signatureViolations: SignatureViolation[];
   addedLines: number;
@@ -107,7 +107,7 @@ const warningCategories: { category: WarningCategory; match: RegExp }[] = [
  * `ensures false`. Such a lemma asserts that its own hypotheses are
  * unsatisfiable, so proving `false` from them *is* the theorem — the
  * contrapositive idiom. The exception is safe because a candidate cannot write
- * `ensures false` onto a generated declaration; the signature rule rejects an
+ * `ensures false` onto a task declaration; the signature rule rejects an
  * added `ensures` there unless the declaration is concretely verified, and a
  * candidate's own lemma proving `false` from contradictory hypotheses is honest
  * work.
@@ -206,7 +206,7 @@ export interface ValidationResult {
  *  `context` is Infinity for the analysis pass: the classification needs every
  *  generated line present, since an added line is located by the generated line
  *  it follows. The compact diff is kept separately, for reporting. */
-function gitDiff(genPath: string, candidatePath: string, fullContext = false): string {
+export function gitDiff(genPath: string, candidatePath: string, fullContext = false): string {
   const ctx = fullContext ? ["-U1000000"] : [];
   try {
     return execFileSync("git", ["diff", "--no-index", "--no-color", ...ctx, "--", genPath, candidatePath], {
@@ -274,13 +274,13 @@ export function checkAdditionsOnly(genPath: string, candidatePath: string): { ch
 }
 
 /**
- * Added lines that land inside a generated declaration's signature and are not
+ * Added lines that land inside a task declaration's signature and are not
  * one of the two clauses a candidate may add there.
  *
- * An added line is located by the generated line it follows, which is why the
+ * An added line is located by the task line it follows, which is why the
  * analysis pass uses a full-context diff. The intervals themselves come from
- * the `.dfy.gen`, so no addition can move the boundary it is being judged
- * against.
+ * the immutable scaffold, so no addition can move the boundary it is being
+ * judged against.
  */
 function findSignatureViolations(genPath: string, candidatePath: string): SignatureViolation[] {
   const intervals = signatureIntervals(readFileSync(genPath, "utf-8"));
@@ -304,9 +304,9 @@ function findSignatureViolations(genPath: string, candidatePath: string): Signat
     if (!interval) continue;
     if (isInert(text)) continue;
 
-    // A declaration may not *begin* inside a generated signature. Allowing it
-    // let an added `lemma Injected(…)` capture the generated declaration's
-    // clauses and body, leaving the generated one bodyless with no
+    // A declaration may not *begin* inside a task signature. Allowing it let
+    // an added `lemma Injected(…)` capture the existing declaration's clauses
+    // and body, leaving the existing one bodyless with no
     // specification at all — it would then claim nothing, and say so silently,
     // because a bodyless declaration without an `ensures` produces no warning.
     // Helpers remain legal at real declaration boundaries, which is where every
@@ -399,7 +399,7 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
 
   const args = ["verify", "--allow-warnings", "--warn-contradictory-assumptions", "--json-output"];
   // Mirrors LemmaScript's own sniff (tools/src/dafny-commands.ts): the standard
-  // library is opt-in, and a candidate may reach for it even when the .gen does
+  // library is opt-in, and a candidate may reach for it even when the task does
   // not, so this is read off the candidate rather than stored per task.
   if (content.includes("Std.")) args.push("--standard-libraries");
   if (opts.timeLimit) args.push("--verification-time-limit", String(opts.timeLimit));
@@ -407,7 +407,7 @@ export async function checkVerifies(candidatePath: string, opts: VerifyOptions =
 
   // A directory containing only the candidate: nothing else for Dafny to pick up.
   // The staged name must end in `.dfy`: Dafny rejects any other extension
-  // outright, and the admission gate verifies `.dfy.gen` files directly.
+  // outright. Raw generated baselines may still have a `.dfy.gen` suffix.
   const dir = mkdtempSync(path.join(tmpdir(), "lsdb-verify-"));
   const raw = path.basename(candidatePath);
   const base = raw.endsWith(".dfy") ? raw : `${raw.replace(/\.gen$/, "")}${raw.endsWith(".dfy.gen") ? "" : ".dfy"}`;

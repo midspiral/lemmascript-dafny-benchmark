@@ -2,16 +2,21 @@
  * Signature intervals of the generated program, and what may be added inside
  * one.
  *
- * Everything here is computed from the `.dfy.gen`, which is immutable. That is
- * the point: if the regions were derived from the candidate, the candidate
- * could move them — an unbalanced brace in a comment, a string containing `{`,
- * a declaration inserted to shift the boundary. Anchoring on the generated file
- * removes the whole class rather than defending against each instance.
+ * Everything here is computed from the immutable task scaffold. That is the
+ * point: if the regions were derived from the candidate, the candidate could
+ * move them — an unbalanced brace in a comment, a string containing `{`, a
+ * declaration inserted to shift the boundary. Anchoring on the task removes
+ * the whole class rather than defending against each instance.
  */
 
 /** Anything a specification clause can hang off. */
 const DECLARATION =
   /^\s*(@\w+(\([^)]*\))?\s+)*(ghost\s+)?(twostate\s+|least\s+|greatest\s+|opaque\s+)?(lemma|function|method|predicate|constructor|iterator)\b/;
+
+/** The same declaration prefix, with the callable kind and name captured.
+ * Attributes may sit between the kind and name (`function {:axiom} f`). */
+const DECLARATION_HEADER =
+  /^\s*(?:@\w+(?:\([^)]*\))?\s+)*(ghost\s+)?(?:twostate\s+|least\s+|greatest\s+|opaque\s+)?(lemma|function|method|predicate|constructor|iterator)\s+(?:\{\s*:[^{}]*\}\s*)*([A-Za-z_]\w*)\b/;
 
 /**
  * A declaration whose postconditions Dafny *assumes* rather than proves. Adding
@@ -89,8 +94,21 @@ export function beginsDeclaration(code: string): boolean {
   return DECLARATION.test(code);
 }
 
+export interface DeclarationHeader {
+  kind: "lemma" | "function" | "method" | "predicate" | "constructor" | "iterator";
+  name: string;
+  ghost: boolean;
+}
+
+/** Parse the kind and name from a scrubbed declaration line. */
+export function declarationHeader(code: string): DeclarationHeader | null {
+  const m = DECLARATION_HEADER.exec(code);
+  if (!m) return null;
+  return { kind: m[2] as DeclarationHeader["kind"], name: m[3], ghost: m[1] !== undefined };
+}
+
 export interface SignatureInterval {
-  /** 1-based line of the declaration keyword in the `.dfy.gen`. */
+  /** 1-based line of the declaration keyword in the task scaffold. */
   start: number;
   /** 1-based line of the last specification line, before the body opens. */
   end: number;
@@ -101,7 +119,7 @@ export interface SignatureInterval {
 }
 
 /**
- * The signature interval of every declaration in the generated program: from
+ * The signature interval of every declaration in the task scaffold: from
  * its declaration keyword through the last line before its body opens, or
  * through its last specification line when it has no body.
  */

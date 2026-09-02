@@ -19,6 +19,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { taskFileName, type Index, type TaskMetadata } from "../src/benchmark.js";
+import type { PairReport } from "../src/corpus.js";
 import { dedupeRepos, loadConfig } from "../src/pairs.js";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -37,7 +38,7 @@ function readJson<T>(name: string): T | undefined {
 const config = loadConfig(path.join(repoRoot, "config", "repos.json"));
 const metadata = readJson<{ dafnyVersion: string; taskCount: number; tasks: TaskMetadata[] }>("metadata.json");
 const index = readJson<Index>("index.json");
-const report = readJson<{ dafnyVersion: string; pairs: { key: string; admitted: boolean }[] }>("reference-report.json");
+const report = readJson<{ dafnyVersion: string; pairs: PairReport[] }>("reference-report.json");
 
 if (metadata && index && report) {
   const tasks = metadata.tasks;
@@ -85,9 +86,26 @@ if (metadata && index && report) {
   }
 
   // --- report agrees on what was admitted --------------------------------
+  const reported = new Map(report.pairs.map(p => [p.key, p]));
   const admitted = new Set(report.pairs.filter(p => p.admitted).map(p => p.key));
   for (const t of tasks) {
     if (!admitted.has(t.key)) fail(`task ${t.id} (${t.key}) is not admitted in reference-report.json`);
+    const pair = reported.get(t.key);
+    if (!pair) continue;
+    if (JSON.stringify(t.task) !== JSON.stringify(pair.task)) {
+      fail(`task ${t.id} facts disagree between metadata.json and reference-report.json`);
+    }
+    const reportedContext =
+      pair.context?.status === "passed"
+        ? {
+            declarations: pair.context.declarations,
+            addedLines: pair.context.addedLines,
+            addedCodeLines: pair.context.addedCodeLines,
+          }
+        : undefined;
+    if (JSON.stringify(t.context) !== JSON.stringify(reportedContext)) {
+      fail(`task ${t.id} context disagrees between metadata.json and reference-report.json`);
+    }
   }
   for (const key of admitted) {
     if (!tasks.some(t => t.key === key)) fail(`${key} is admitted in the report but has no task`);
@@ -105,11 +123,11 @@ if (metadata && index && report) {
       fail(`${t.file} is missing`);
       continue;
     }
-    // The task file must still be the exact `.dfy.gen` its hash was taken from:
-    // a candidate's diff is measured against it, so a stray edit here silently
-    // changes every verdict for that task.
+    // The task file must still be the exact composed scaffold its hash was
+    // taken from: a candidate's diff is measured against it, so a stray edit
+    // here silently changes every verdict for that task.
     const actual = createHash("sha256").update(readFileSync(p)).digest("hex");
-    if (actual !== t.gen.sha256) fail(`${t.file} does not match the sha256 recorded in metadata.json`);
+    if (actual !== t.task.sha256) fail(`${t.file} does not match the task sha256 recorded in metadata.json`);
   }
 
   if (!existsSync(path.join(tasksDir, "ATTRIBUTION.md"))) {

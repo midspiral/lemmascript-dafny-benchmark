@@ -1,7 +1,9 @@
 # Attribution
 
-Every file in this directory is a Dafny skeleton that LemmaScript compiled
-from TypeScript in the repository named below, and is a derived work of it.
+Every file in this directory is a Dafny task scaffold: a skeleton that
+LemmaScript compiled from TypeScript, plus any minimal semantic context
+selected from the completed Dafny file in the repository named below.
+Each task is a derived work of that upstream repository.
 The upstream licence governs the task file; this repository's own licence
 covers the validator, the generator, and the metadata.
 
@@ -67,7 +69,6 @@ Licence: **MIT** · branch `main`
 |---|---|
 | `0023.dfy` | `src/edit.ts` |
 | `0024.dfy` | `src/hooks.ts` |
-| `0025.dfy` | `src/permissions.ts` |
 | `0026.dfy` | `src/transcript.ts` |
 
 ## midspiral/hono-lemmascript
@@ -77,8 +78,6 @@ Licence: **MIT** · branch `lemmascript`
 | task | source path |
 |---|---|
 | `0027.dfy` | `src/middleware/ip-restriction/matcher.verified.ts` |
-| `0029.dfy` | `src/middleware/serve-static/index.ts` |
-| `0031.dfy` | `src/utils/filepath.ts` |
 | `0032.dfy` | `src/utils/ipaddr.verified.ts` |
 
 ## midspiral/hono-rate-limiter-with-lemmascript
@@ -89,14 +88,6 @@ Licence: **MIT** · branch `main`
 |---|---|
 | `0033.dfy` | `src/core.verified.ts` |
 
-## midspiral/infisical-lemmascript
-
-Licence: **MIT** · branch `lemmascript`
-
-| task | source path |
-|---|---|
-| `0034.dfy` | `backend/src/lib/casl/glob-subset.ts` |
-
 ## midspiral/opencode-lemmascript
 
 Licence: **MIT** · branch `lemmascript`
@@ -104,7 +95,6 @@ Licence: **MIT** · branch `lemmascript`
 | task | source path |
 |---|---|
 | `0041.dfy` | `packages/opencode/src/agent/subagent-permissions.ts` |
-| `0046.dfy` | `packages/opencode/src/util/wildcard.ts` |
 
 ## midspiral/quorum-lemmascript
 

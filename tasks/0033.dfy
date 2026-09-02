@@ -2,6 +2,16 @@
 
 datatype AdmitResult = AdmitResult(log: seq<int>, ok: bool)
 
+// @benchmark-context begin CountIn
+ghost function CountIn(log: seq<int>, now: int, W: int): int
+  decreases |log|
+{
+  if |log| == 0 then
+    0
+  else
+    (if (now - W) < log[0] && log[0] <= now then 1 else 0) + CountIn(log[1..], now, W)
+}
+// @benchmark-context end CountIn
 function pruneWindow(log: seq<int>, now: int, W: int): seq<int>
   requires forall k: int :: ((0 <= k) ==> (k < |log|) ==> (log[k] <= now))
   decreases |log|

@@ -6,8 +6,15 @@
  * emitted that the report did not vouch for.
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
+import {
+  buildTaskScaffold,
+  scaffoldFromReport,
+  textFacts,
+  type ContextReport,
+} from "./context.js";
 import { checkVerifies, validate, type ValidationResult } from "./validator.js";
 import {
   dedupeRepos,
@@ -39,12 +46,15 @@ export interface PairReport {
   causes: string[];
   verifyOptions: { timeLimit?: number; flags: string[] };
   gen?: FileFacts;
+  /** The immutable task scaffold: `.dfy.gen` plus demanded semantic context. */
+  task?: FileFacts;
   solution?: FileFacts;
+  context?: ContextReport;
   additions?: ValidationResult["additions"];
   verify?: ValidationResult["verify"];
-  /** Whether the `.dfy.gen` verifies with no additions at all. Only measured
+  /** Whether the composed task verifies with no additions at all. Only measured
    *  for pairs that would otherwise be admitted. */
-  skeletonVerifies?: boolean;
+  taskVerifies?: boolean;
 }
 
 export interface CorpusOptions {
@@ -102,8 +112,9 @@ function classify(report: PairReport, result: ValidationResult) {
   if (a.deletedLines > 0) report.causes.push("deleted-lines");
   for (const m of new Set(a.bannedMatches.map(m => m.pattern))) report.causes.push(`banned:${m}`);
   for (const c of new Set(a.weakenedContracts.map(w => w.clause))) report.causes.push(`weakened:${c}`);
-  // Not a failure — the solution is byte-identical to the .gen, so there is no
-  // proof to complete and the empty submission would pass. Reported, not shipped.
+  // Not a failure — the solution is byte-identical to the composed scaffold,
+  // so there is no proof to complete and the empty submission would pass.
+  // Reported, not shipped.
   if (a.status === "passed" && a.addedLines === 0) report.causes.push("no-additions");
 
   const v = result.verify;
@@ -207,40 +218,65 @@ export async function walkCorpus(opts: CorpusOptions): Promise<Corpus> {
   const started = Date.now();
   let done = 0;
   await pool(work, opts.jobs, async ({ pair, report }) => {
-    const result = await validate(pair.genPath, pair.solutionPath, {
-      timeLimit: pair.timeout,
-      extraFlags: pair.flags,
-      expectedVersion: config.dafnyVersion,
-    });
-    report.additions = result.additions;
-    report.verify = result.verify;
-    classify(report, result);
+    const built = buildTaskScaffold(pair.genPath, pair.solutionPath, { expectedVersion: config.dafnyVersion });
+    pair.taskText = built.taskText;
+    report.task = textFacts(built.taskText);
+    report.context = built.context;
+    report.causes.push(...built.context.causes);
 
-    // A skeleton that already verifies is not a task: the empty submission
-    // solves it, however many lines the reference author wrote. Only worth the
-    // extra Dafny run for pairs that would otherwise be admitted.
-    if (report.admitted) {
-      const skeleton = await checkVerifies(pair.genPath, {
+    const genText = readFileSync(pair.genPath, "utf-8");
+    const stagedDir = built.taskText === genText ? undefined : mkdtempSync(path.join(tmpdir(), "lsdb-task-"));
+    const taskPath = stagedDir ? path.join(stagedDir, "task.dfy") : pair.genPath;
+    if (stagedDir) writeFileSync(taskPath, built.taskText);
+
+    try {
+      const result = await validate(taskPath, pair.solutionPath, {
         timeLimit: pair.timeout,
         extraFlags: pair.flags,
         expectedVersion: config.dafnyVersion,
       });
-      report.skeletonVerifies = skeleton.status === "passed";
-      if (report.skeletonVerifies) {
-        report.causes.push("already-verifies");
-        report.admitted = false;
-      } else if (skeleton.status === "not-run") {
-        // Not knowing whether the skeleton is trivial is not the same as knowing
-        // it isn't, so say so rather than admit on a check that never ran.
-        report.causes.push("skeleton-not-checked");
-        report.admitted = false;
-      }
-    }
+      report.additions = result.additions;
+      report.verify = result.verify;
+      classify(report, result);
 
-    done++;
-    const mark = report.admitted ? "ok  " : "EXCL";
-    const detail = report.admitted ? `${result.additions.addedLines} added` : report.causes.join(",");
-    log(`  [${String(done).padStart(3)}/${work.length}] ${mark} ${pair.key} (${result.verify.seconds}s) ${detail}`);
+      // A scaffold that already verifies is not a task: the empty submission
+      // solves it, however many standalone theorems the reference later adds.
+      // Context-only completions have no remaining additions, but are checked
+      // too so their exclusion records the real reason.
+      const contextOnly =
+        built.context.status === "passed" &&
+        report.causes.length === 1 &&
+        report.causes[0] === "no-additions";
+      if (report.admitted || contextOnly) {
+        const taskCheck = await checkVerifies(taskPath, {
+          timeLimit: pair.timeout,
+          extraFlags: pair.flags,
+          expectedVersion: config.dafnyVersion,
+        });
+        report.taskVerifies = taskCheck.status === "passed";
+        if (report.taskVerifies) {
+          if (built.context.status === "passed") {
+            report.causes = report.causes.filter(c => c !== "no-additions");
+            report.causes.push("already-verifies-after-context");
+          } else {
+            report.causes.push("already-verifies");
+          }
+          report.admitted = false;
+        } else if (taskCheck.status === "not-run") {
+          // Not knowing whether the scaffold is trivial is not the same as
+          // knowing it isn't, so fail closed.
+          report.causes.push("task-not-checked");
+          report.admitted = false;
+        }
+      }
+
+      done++;
+      const mark = report.admitted ? "ok  " : "EXCL";
+      const detail = report.admitted ? `${result.additions.addedLines} added` : report.causes.join(",");
+      log(`  [${String(done).padStart(3)}/${work.length}] ${mark} ${pair.key} (${result.verify.seconds}s) ${detail}`);
+    } finally {
+      if (stagedDir) rmSync(stagedDir, { recursive: true, force: true });
+    }
   });
 
   applyExclusions(reports, kept);
@@ -319,13 +355,13 @@ export function printSummary(corpus: Corpus, log: (line: string) => void) {
  *
  * Emitting the benchmark needs nothing the report does not already hold — file
  * facts, added-line counts, verify options, reference timings, repo heads — plus
- * each `.dfy.gen`'s path, which is derivable from the repo and relpath. So the
- * emission step has no business re-verifying 65 proofs to change the shape of a
- * JSON file.
+ * each pair's source paths, which are derivable from the repo and relpath. So
+ * the emission step has no business re-verifying 65 proofs to change the shape
+ * of a JSON file.
  *
- * The `sha256` recorded per pair is what keeps this honest: if a checkout has
- * moved since the report was written, the report describes a corpus that no
- * longer exists, and emitting from it would produce tasks nothing vouched for.
+ * The hashes recorded per pair are what keep this honest: a context-bearing
+ * scaffold depends on both `.dfy.gen` and `.dfy`, so both must still be the
+ * files the report vouched for.
  */
 export function corpusFromReport(repoRoot: string, reportPath: string): Corpus {
   const doc = JSON.parse(readFileSync(reportPath, "utf-8"));
@@ -352,7 +388,29 @@ export function corpusFromReport(repoRoot: string, reportPath: string): Corpus {
     const base = path.join(parentDir, repoName(r.repo), r.relpath.replace(/\.ts$/, ""));
     const genPath = `${base}.dfy.gen`;
     const solutionPath = `${base}.dfy`;
-    if (!existsSync(genPath) || fileFacts(genPath).sha256 !== r.gen.sha256) {
+    if (
+      !existsSync(genPath) ||
+      fileFacts(genPath).sha256 !== r.gen.sha256 ||
+      !r.solution ||
+      !existsSync(solutionPath) ||
+      fileFacts(solutionPath).sha256 !== r.solution.sha256
+    ) {
+      stale.push(r.key);
+      continue;
+    }
+    // Pairs rejected before the context phase (currently, self-containment
+    // failures caused by `include`) have source hashes but no composed task.
+    // They cannot be emitted, so there is no scaffold to reconstruct.
+    if (!r.task && !r.admitted && r.causes.includes("gen-has-include")) continue;
+    let taskText: string;
+    try {
+      const names = r.context?.status === "passed" ? r.context.declarations.map(d => d.name) : [];
+      taskText = names.length > 0 ? scaffoldFromReport(genPath, solutionPath, names) : readFileSync(genPath, "utf-8");
+      if (!r.task || textFacts(taskText).sha256 !== r.task.sha256) {
+        stale.push(r.key);
+        continue;
+      }
+    } catch {
       stale.push(r.key);
       continue;
     }
@@ -363,6 +421,7 @@ export function corpusFromReport(repoRoot: string, reportPath: string): Corpus {
       relpath: r.relpath,
       genPath,
       solutionPath,
+      taskText,
       timeout: r.verifyOptions.timeLimit,
       flags: r.verifyOptions.flags,
     });

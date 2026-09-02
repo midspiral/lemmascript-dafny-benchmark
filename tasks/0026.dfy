@@ -6,6 +6,16 @@ datatype TToolResult = TToolResult(toolCallId: string, isError: bool)
 
 datatype TMsg = user | assistant(toolCalls: seq<TToolCall>) | tool(toolResults: seq<TToolResult>)
 
+// @benchmark-context begin pairs
+function pairs(calls: seq<TToolCall>, results: seq<TToolResult>): bool
+  decreases |calls|
+{
+  if (|results| != |calls|) then
+    false
+  else
+    ((|calls| == 0) || (if (results[0].toolCallId != calls[0].id) then false else pairs(calls[1..], results[1..])))
+}
+// @benchmark-context end pairs
 function makeResults(calls: seq<TToolCall>): seq<TToolResult>
   decreases |calls|
 {
@@ -21,6 +31,55 @@ lemma makeResults_ensures(calls: seq<TToolCall>)
 {
 }
 
+// @benchmark-context begin headOk
+function headOk(m: TMsg): bool
+{
+  (!m.tool?)
+}
+// @benchmark-context end headOk
+// @benchmark-context begin lastOk
+function lastOk(m: TMsg): bool
+{
+  match m {
+    case assistant(i_m_toolCalls) =>
+      (|i_m_toolCalls| == 0)
+    case _ =>
+      true
+  }
+}
+// @benchmark-context end lastOk
+// @benchmark-context begin okAdjacent
+function okAdjacent(a: TMsg, b: TMsg): bool
+{
+  match a {
+    case assistant(i_a_toolCalls) =>
+      if (|i_a_toolCalls| > 0) then
+        match b {
+          case tool(i_b_toolResults) =>
+            pairs(i_a_toolCalls, i_b_toolResults)
+          case _ =>
+            false
+        }
+      else
+        (!b.tool?)
+    case _ =>
+      (!b.tool?)
+  }
+}
+// @benchmark-context end okAdjacent
+// @benchmark-context begin wfFrom
+function wfFrom(msgs: seq<TMsg>): bool
+  decreases |msgs|
+{
+  ((|msgs| == 0) || (if (|msgs| == 1) then lastOk(msgs[0]) else (okAdjacent(msgs[0], msgs[1]) && wfFrom(msgs[1..]))))
+}
+// @benchmark-context end wfFrom
+// @benchmark-context begin wellFormed
+function wellFormed(msgs: seq<TMsg>): bool
+{
+  ((|msgs| == 0) || (headOk(msgs[0]) && wfFrom(msgs)))
+}
+// @benchmark-context end wellFormed
 function snapBack(msgs: seq<TMsg>, c: int): int
   requires (0 <= c)
   requires (c <= |msgs|)

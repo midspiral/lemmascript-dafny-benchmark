@@ -2,21 +2,27 @@
 
 ## Task
 
-Given a `.dfy.gen`, produce a `.dfy` that:
+Given an emitted task scaffold, produce a `.dfy` that:
 
-1. is **line additions only** relative to the `.dfy.gen`, with none of
+1. is **line additions only** relative to the scaffold, with none of
    the banned patterns in those additions, and no added precondition or
-   frame clause on a generated declaration; and
+   frame clause on an existing declaration; and
 2. verifies with zero errors and no disqualifying warning.
+
+The scaffold is normally the raw `.dfy.gen`. When that file names an omitted
+semantic function or predicate, it is the `.dfy.gen` plus the minimum
+resolver-demanded, explicitly marked definitions from the completed `.dfy`.
+[DESIGN_CONTEXT.md](DESIGN_CONTEXT.md) specifies that construction and, in
+particular, why reference-only helper lemmas and calls never enter the task.
 
 ## Validator
 
 Two checks, each returning `passed` / `failed` / `not-run`. Cheapest
 first; a CLI can stop at the first failure, a corpus mode can run both.
 
-**1. Additions-only.** `git diff` against the `.gen`. Reject any `-`
+**1. Additions-only.** `git diff` against the task. Reject any `-`
 line. Reject any `+` line matching a banned pattern, and any `+` line that
-weakens a generated declaration's contract (see *Frozen preconditions*
+weakens an existing declaration's contract (see *Frozen preconditions*
 below).
 
 ```ts
@@ -79,14 +85,14 @@ and rare.
 
 ### Frozen signatures
 
-Everything in this section is computed from the `.dfy.gen`, which is immutable.
-That is the point. If the regions were derived from the candidate, the candidate
-could move them — an unbalanced brace inside a comment, a string containing `{`,
-a declaration inserted to shift a boundary. Anchoring on the generated file
-removes the class rather than defending against each instance, and it costs
-nothing: the diff already carries generated-file line numbers.
+Everything in this section is computed from the task scaffold, which is
+immutable. That is the point. If the regions were derived from the candidate,
+the candidate could move them — an unbalanced brace inside a comment, a string
+containing `{`, a declaration inserted to shift a boundary. Anchoring on the
+task removes the class rather than defending against each instance, and it
+costs nothing: the diff already carries baseline line numbers.
 
-**Signature interval.** For each declaration in the `.dfy.gen`: from its
+**Signature interval.** For each declaration in the task scaffold: from its
 declaration keyword through the last line before its body opens, or through its
 last specification line when it has no body.
 
@@ -140,19 +146,18 @@ A line-prefix rule is not enough either, because
 +  ensures true requires false
 ```
 
-begins with an allowed keyword and still smuggles a precondition onto the
-generated declaration. Both are rejected above, for their own stated reasons.
+begins with an allowed keyword and still smuggles a precondition onto the task
+declaration. Both are rejected above, for their own stated reasons.
 
-**Corpus cost: zero.** Across all 33 reference solutions, 76 added lines land
-inside a generated signature — 55 `decreases`, 12 `ensures`, 9 inert — and every
-one is accepted. No added clause lands on a trusted declaration, so that
-restriction is free too. Two task files carry a generated `{:axiom}`
-*declaration* (`0034`, `0046`); three more contain `assume {:axiom}`
-*statements* inside bodies (`0029`, `0031`, `0063`), which are a different
-construct and not a signature at all.
+**Corpus cost at adoption: zero.** Across the then-33 reference solutions, 76
+added lines landed inside a generated signature — 55 `decreases`, 12 `ensures`,
+9 inert — and every one was accepted. No added clause landed on a trusted
+declaration, so that restriction was free too. Several of those historical task
+files carried generated axiom syntax; the semantic-context migration later
+removed the model-completion cases among them.
 
 Outside signature intervals, added `requires` / `reads` / `modifies` clauses are
-still rejected when they attach to a generated declaration; see *Notes on the
+still rejected when they attach to a task declaration; see *Notes on the
 token list*.
 
 **2. Verifies clean.**
@@ -330,8 +335,8 @@ lemma SlidingWindowBound(A: seq<int>, W: int, limit: int, s: int, p: int)
   ensures false
 ```
 
-The exception is safe because a candidate cannot put `ensures false` on a
-generated declaration: the signature rule rejects an added `ensures` on a
+The exception is safe because a candidate cannot put `ensures false` on a task
+declaration: the signature rule rejects an added `ensures` on a
 trusted one, and on a proved one the clause has to be discharged like any other.
 
 **This category was briefly dropped, and that was wrong.** The argument for
@@ -341,7 +346,7 @@ positives. Both halves were measured against reference solutions — which are
 honest, so they reveal the false-positive rate and say nothing about the
 false-negative rate. Three escapes were later found that it catches and nothing
 else does: the multiline `{:verify false}`, `decreases *` on a nonterminating
-loop, and `ensures false` on a generated `{:axiom}` declaration. Two of those now
+loop, and `ensures false` on a task `{:axiom}` declaration. Two of those now
 have their own defence; the category stays as the third.
 
 ### On the warning mechanics
@@ -370,7 +375,7 @@ every frozen contract clause, has a fixture naming it. A ban with no fixture
 fails the suite, so the list cannot grow past its own tests.
 
 Four fixtures cover the frozen contracts outside signature intervals:
-`requires`, `reads` and `modifies` bolted onto a generated declaration, plus
+`requires`, `reads` and `modifies` bolted onto a task declaration, plus
 `cheat-weakened-precondition-reordered`, which pins attribution to the nearest
 *preceding* declaration rather than to the enclosing run.
 
@@ -379,8 +384,8 @@ Five more cover the signature interval itself, and the suite asserts the
 `cheat-clause-continuation` (`|| true`), `cheat-clause-smuggle`
 (`ensures true requires false`), `cheat-frame-smuggle`, `cheat-decreases-wildcard`,
 and `cheat-ensures-on-trusted`. The last carries its own `.dfy.gen`, since the
-trusted declaration has to be in the generated file for its signature to be a
-generated one.
+trusted declaration has to be in the immutable baseline for its signature to
+be classified as existing.
 
 Two fixtures began as canaries for a known v0 gap rather than as banned
 patterns: a **bodyless `forall`** and a **bodyless loop with invariants**.
@@ -494,7 +499,7 @@ not a pass.
 
 `additions` carries deleted-line count and samples, the banned matches
 (pattern name, index into the added lines, the line), the weakened contracts
-(clause, index, line), the signature violations (which generated declaration,
+(clause, index, line), the signature violations (which task declaration,
 why, the line), added-line count, and added non-blank non-comment count. `verify` carries error count, of which timeouts, error samples,
 disqualifying warnings by category, contradiction warnings, other warnings,
 the argv used, and elapsed seconds. Both carry a `not-run` reason when they
@@ -509,7 +514,7 @@ No `.dfy.gen` currently uses `include`, so tasks are self-contained and
 the flat layout works:
 
 ```
-tasks/0001.dfy        # the .dfy.gen, renamed for viewing
+tasks/0001.dfy        # immutable scaffold, named for viewing
 metadata.json
 index.json
 reference-report.json
@@ -519,9 +524,10 @@ The generator **enforces** this rather than assuming it: any `.gen`
 containing `include` is skipped with a logged reason. Otherwise the first
 case study to gain one silently emits an unsolvable task.
 
-A task file is a **byte-for-byte** copy of its `.dfy.gen`. A candidate diffs
-against it, so a header comment identifying the task would show up as a line
-the candidate failed to add.
+A task file is the **byte-for-byte composed scaffold**. With no semantic
+context it equals `.dfy.gen`; otherwise it additionally contains only the
+selected marker blocks projected from the completed `.dfy`. A candidate diffs
+against that exact file, so neither generated text nor context can be changed.
 
 `tasks/` has **gaps**, by design. IDs are issued to every pair the generator
 sees, not only the admitted ones — see *Reentrancy*.
@@ -529,7 +535,8 @@ sees, not only the admitted ones — see *Reentrancy*.
 ## Generator
 
 Node.js. Walks the repo list from metadata, reads each case study's
-`LemmaScript-files.txt`, resolves `.ts` → `.dfy.gen` / `.dfy` pairs.
+`LemmaScript-files.txt`, resolves `.ts` → `.dfy.gen` / `.dfy` pairs, and composes
+the task scaffold before admission.
 
 **Reentrancy.** `index.json` maps a stable key `repo + relpath` to a
 monotonic ID. IDs are never reused or renumbered. Upstream deletions are
@@ -546,7 +553,7 @@ New IDs are minted in key order, so a first run on a clean index is
 reproducible.
 
 Three flags guard the destructive parts. `--update` refreshes a task whose
-upstream `.dfy.gen` has moved — that changes what the task *is*, so it does
+upstream composed scaffold has moved — that changes what the task *is*, so it does
 not happen quietly. `--prune` deletes task files that are no longer admitted;
 without it they are listed and left alone, so one flaky timeout cannot silently
 drop a task from the benchmark. `--dry-run` reports and writes nothing.
@@ -558,20 +565,24 @@ look deleted. Use `bin/reference-report.ts` for that.
 `metadata.json`, and `index.json` from an existing `reference-report.json`:
 0.2 seconds against 10 minutes, and byte-identical output. This is not a
 shortcut but the correct decomposition — everything emission needs is already
-in the report (file facts, added-line counts, verify options, reference
-timings, repo heads), plus each `.dfy.gen`'s path, which is `parentDir` +
-repo + relpath. Nothing about changing the shape of a JSON file requires
-asking Dafny 65 questions again.
+in the report (generated, task, and solution facts; selected context; added-line
+counts; verify options; reference timings; repo heads), plus the source paths,
+which are derived from `parentDir` + repo + relpath. Nothing about changing the
+shape of a JSON file requires asking Dafny 65 questions again.
 
 What keeps it honest is the `sha256` the report records per file. Before
-emitting, every `.dfy.gen` is re-hashed against it; a single mismatch means
-the report describes a corpus that no longer exists, and the run aborts
+emitting, every `.dfy.gen` and completed `.dfy` is re-hashed, the selected
+context is projected again, and its task hash is checked. A single mismatch
+means the report describes a corpus that no longer exists, and the run aborts
 rather than emit tasks nothing vouched for.
 
-**Admission gate.** Each `(gen, solution)` pair is run through the
-validator at generation time. Pairs that fail are excluded rather than
-emitted, so every task is known-solvable under exactly the constraints
-the harness enforces. Generator and validator share one code path.
+**Admission gate.** Each `(gen, solution)` pair first passes through the
+semantic-context builder. Dafny resolution starts at `gen`, selects only
+demanded marked functions and predicates (including their transitive semantic
+dependencies), and rejects unused markers. The resulting `(task, solution)`
+pair is then run through the validator. Pairs that fail are excluded rather
+than emitted, so every task is known-solvable under exactly the constraints the
+harness enforces. Generator and validator share one code path.
 
 Since the validator derives no per-task state, the gate is purely a
 filter — the reference solution is needed to admit a task, never to check
@@ -591,20 +602,21 @@ Aggregate: pairs seen, admitted, excluded by cause. A pair can trip more
 than one cause, so the per-cause counts sum to at least the excluded count
 rather than exactly to it.
 
-**The skeleton has to fail.** A pair becomes a task only if the reference
-passes both checks *and the `.dfy.gen` fails them*. Two sub-cases:
+**The scaffold has to fail.** A pair becomes a task only if the reference
+passes both checks *and the composed task fails verification*. Three sub-cases:
 
-- **`no-additions`** — the solution is byte-identical to its `.gen`, so there
+- **`no-additions`** — the solution is byte-identical to its task, so there
   was never anything to prove. A large share of the corpus: 26 of 65 pairs.
 - **`already-verifies`** — the reference author wrote proof the solver did not
-  need. Measured at 2 of the 35 pairs that otherwise qualified — leaving 33 —
-  with 35 and 6 added code lines respectively.
+  need. Two pairs currently have this cause.
+- **`already-verifies-after-context`** — supplying the omitted semantic model
+  was the entire generated obligation; later standalone reference theorems are
+  not part of the task. Five pairs currently have this cause.
 
-Both are excluded under their own cause rather than shipped as freebies. The
-second is the one that would otherwise corrupt the numbers: without it the
-empty submission scores 2/35, and every reported success rate is inflated by
-about six points. Only pairs that would otherwise be admitted pay for the extra
-Dafny run.
+All are excluded under their own cause rather than shipped as freebies. The
+last two are the ones that would otherwise corrupt the numbers: an empty
+submission would solve seven nominal tasks. Only pairs that would otherwise be
+admitted pay for the extra Dafny run.
 
 This is how the design gets falsified. Every ban and every disqualifying
 warning category is a guess that the reference solutions clear it. If a
@@ -615,7 +627,7 @@ and the breakdown by cause is what distinguishes those two readings.
 Excluded pairs stay listed with their cause rather than vanishing, so the
 report doubles as an upstream to-do list for the case studies.
 
-**Drift detection.** Store `sha256` of both the `.gen` and the solution.
+**Drift detection.** Store `sha256` of the `.gen`, composed task, and solution.
 
 ## Repos
 
@@ -681,11 +693,12 @@ than guessing:
 
 ## Metadata
 
-Per entry: benchmark ID, source repo + branch + relpath, `.dfy.gen` size,
-solution size, size diff, added-line count, sha256 of each file, and the
-task's **verify options** — the `--verification-time-limit` and extra Dafny
-flags from the case study's `LemmaScript-files.txt` entry. No derived
-baseline — the validator needs none.
+Per entry: benchmark ID, source repo + branch + relpath; facts for the original
+`.dfy.gen`, selected context declarations, composed task, and solution; proof
+size and added-line count measured from task to solution; and the task's
+**verify options** — the `--verification-time-limit` and extra Dafny flags from
+the case study's `LemmaScript-files.txt` entry. The emitted task itself remains
+the validator's baseline; metadata carries no derived classification state.
 
 The verify options are the one piece of per-task state the design does
 carry, and they have to be carried: without them `balanced-match`,
@@ -694,8 +707,8 @@ time at all, and the tasks would look impossible rather than hard. They are
 transcribed from the case study, not invented here, and they do not affect
 what Dafny will believe — only how long it looks and how it batches the
 work. `--standard-libraries` is deliberately *not* stored: it is sniffed
-from the candidate, since a candidate may reach for `Std.` when the `.gen`
-does not.
+from the candidate, since a candidate may reach for `Std.` when the task does
+not.
 
 Globally: the pinned Dafny version.
 
@@ -714,11 +727,11 @@ cheap.
   gain.
 - ~~**Are the original specs frozen?**~~ **Settled**: yes, in the direction
   that matters. `requires` / `reads` / `modifies` may not be added to a
-  generated declaration; `ensures` may, because it strengthens. See *Frozen
+  task declaration; `ensures` may, because it strengthens. See *Frozen
   preconditions*. The corpus cost of the rule was measured at zero before it
   was adopted.
 
-  The remaining sliver: **attributes** on generated declarations. A candidate
+  The remaining sliver: **attributes** on task declarations. A candidate
   cannot add `{:axiom}` or the other banned ones, but nothing stops
   `{:induction}`, `{:fuel}`, `{:opaque}` and friends. Those are proof hints
   rather than trust hatches, so allowing them looks right — but nobody has
@@ -728,21 +741,22 @@ cheap.
   vacuous in practice — such a lemma proves nothing, so leaving it unfilled
   gains a candidate nothing — so this stays a note rather than a hole.
 - **Three confirmed escapes, left open by choice.** Executable statements added
-  to a generated body (`return None;` and its family); continuations of a
-  generated expression outside a declaration signature (a `|| true` under a
-  generated predicate body makes every `ensures Safe(…)` trivial); and
+  to an existing body (`return None;` and its family); continuations of an
+  existing expression outside a declaration signature (a `|| true` under a
+  task predicate body makes every `ensures Safe(…)` trivial); and
   attributes split across lines, which the line-wise denylist cannot see.
 
   The first two need a parser-backed structural comparison — every node from the
-  `.dfy.gen` preserved, and the executable projections equal after erasing proof
-  material. Note that erasure alone is *not* sufficient: the predicate-body case
+  task scaffold preserved, and the executable projections equal after erasing
+  proof material. Note that erasure alone is *not* sufficient: the predicate-body case
   mutates ghost content, which an executable projection discards. Both halves
   are required.
 
   The third could be closed by comparing the attributes in the candidate against
-  those in the `.gen`, but six task files already contain a generated
-  `{:axiom}`, so a name-based comparison is blind exactly where it matters; a
-  counting version would work and has not been judged worth the machinery.
+  those in the scaffold, but task text can legitimately contain generated
+  `{:axiom}` syntax, so a name-based comparison is blind exactly where it
+  matters; a counting version would work and has not been judged worth the
+  machinery.
 
   These are documented in the README as limitations rather than defended
   against. See *What the validator does not catch*.

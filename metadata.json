@@ -5,11 +5,12 @@
     "`verify` is transcribed from the case study's LemmaScript-files.txt and is",
     "applied to reference and candidate alike. --standard-libraries is absent on",
     "purpose: it is sniffed from the candidate, which may reach for Std. when the",
-    "task skeleton does not."
+    "task scaffold does not. `gen` records the original LemmaScript output; `task`",
+    "records the emitted scaffold after demanded semantic context is added."
   ],
   "dafnyVersion": "4.11.0",
   "configSource": "midspiral/LemmaScript@main .github/workflows/ci.yml#case-studies-dafny",
-  "taskCount": 33,
+  "taskCount": 28,
   "tasks": [
     {
       "id": 5,
@@ -24,6 +25,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 6567,
+        "lines": 197,
+        "sha256": "255ca9288e6e1232d99ccb60cc7114d41e3fc1b299a58a95a81821d86ae183c8"
+      },
+      "task": {
         "bytes": 6567,
         "lines": 197,
         "sha256": "255ca9288e6e1232d99ccb60cc7114d41e3fc1b299a58a95a81821d86ae183c8"
@@ -56,6 +62,11 @@
         "lines": 1647,
         "sha256": "138abbb048d48b621b421d06f5de36b467f3610442324df45635924d1f559cdd"
       },
+      "task": {
+        "bytes": 51472,
+        "lines": 1647,
+        "sha256": "138abbb048d48b621b421d06f5de36b467f3610442324df45635924d1f559cdd"
+      },
       "solution": {
         "bytes": 55469,
         "lines": 1701,
@@ -64,7 +75,7 @@
       "sizeDiffBytes": 3997,
       "addedLines": 54,
       "addedCodeLines": 54,
-      "referenceVerifySeconds": 49
+      "referenceVerifySeconds": 52
     },
     {
       "id": 8,
@@ -86,14 +97,34 @@
         "lines": 191,
         "sha256": "982a3846b0ed053880778d6381a85416476b488ec57190b3e3aff889f57e6607"
       },
-      "solution": {
-        "bytes": 27897,
-        "lines": 857,
-        "sha256": "197ba952cca7f5435420f8c7341e8d710e6555dd12a7b5d630a1b41bf3cf903b"
+      "task": {
+        "bytes": 4844,
+        "lines": 201,
+        "sha256": "f2fdb7f182fff0b93a017ebad7011665829a6479b2c0ac81de1c6f8e11b37aab"
       },
-      "sizeDiffBytes": 23402,
-      "addedLines": 666,
-      "addedCodeLines": 575,
+      "context": {
+        "declarations": [
+          {
+            "name": "ExpressionsAgree",
+            "kind": "predicate",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 10,
+            "addedCodeLines": 8,
+            "sha256": "d2ae7e2d2d348c2af599c1ce1ae6474d978d302438325f99766379323d572c1f"
+          }
+        ],
+        "addedLines": 10,
+        "addedCodeLines": 8
+      },
+      "solution": {
+        "bytes": 27985,
+        "lines": 859,
+        "sha256": "a4761c9229dd2759df73bc417192e5f755683368a54a08a46ce52868420fb47c"
+      },
+      "sizeDiffBytes": 23141,
+      "addedLines": 658,
+      "addedCodeLines": 567,
       "referenceVerifySeconds": 18
     },
     {
@@ -113,14 +144,70 @@
         "lines": 148,
         "sha256": "4826234ed3225e5282311b4db4e9806a1a6cb38c663a2bc825d16f5627b44912"
       },
-      "solution": {
-        "bytes": 21883,
-        "lines": 493,
-        "sha256": "f1254e1ea0b055e2c297324539194bd59872405298ef7cbd6cdf6036b6826ce0"
+      "task": {
+        "bytes": 5478,
+        "lines": 178,
+        "sha256": "bd1aee01e846543ab7f2762dc365e44f0a456c0b02194c08e16dbff8d1beb0c2"
       },
-      "sizeDiffBytes": 17577,
-      "addedLines": 345,
-      "addedCodeLines": 257,
+      "context": {
+        "declarations": [
+          {
+            "name": "hasEdge",
+            "kind": "predicate",
+            "ghost": false,
+            "abstract": false,
+            "addedLines": 6,
+            "addedCodeLines": 4,
+            "sha256": "5a035aaa88582a242b929c9c48cea8ebfdfd1939d52f7f5f6af607f906e161bd"
+          },
+          {
+            "name": "isPath",
+            "kind": "predicate",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 6,
+            "addedCodeLines": 4,
+            "sha256": "25d1ed9fec55e642f1bbe8163ff6bb2efe9298428a483351d90ad862bd2c4051"
+          },
+          {
+            "name": "reach",
+            "kind": "predicate",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 6,
+            "addedCodeLines": 4,
+            "sha256": "16101cbf0c5b2465c7530ebdee09f06426c7562170af79c8864e5135958ba8f2"
+          },
+          {
+            "name": "directViolation",
+            "kind": "predicate",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 6,
+            "addedCodeLines": 4,
+            "sha256": "29b619df3c0309bed52251020d49f234fd14cc63a1e2138fa960782faf900bf7"
+          },
+          {
+            "name": "reachViolation",
+            "kind": "predicate",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 6,
+            "addedCodeLines": 4,
+            "sha256": "df80366a12c925c9f1ef31c613e54c6b941bfa3f1f673aae81cb5212eb1e8ef6"
+          }
+        ],
+        "addedLines": 30,
+        "addedCodeLines": 20
+      },
+      "solution": {
+        "bytes": 22407,
+        "lines": 506,
+        "sha256": "bb472ced468b06db238084b4e9f4c2c6ef8fb84c24876a3fe6bf97c1cb67921e"
+      },
+      "sizeDiffBytes": 16929,
+      "addedLines": 328,
+      "addedCodeLines": 237,
       "referenceVerifySeconds": 12
     },
     {
@@ -140,6 +227,11 @@
         "lines": 231,
         "sha256": "542e9c7d33b442b7c5fab054c67ee46f6f03acd5d7c50d14cdc8627b28d9e793"
       },
+      "task": {
+        "bytes": 9437,
+        "lines": 231,
+        "sha256": "542e9c7d33b442b7c5fab054c67ee46f6f03acd5d7c50d14cdc8627b28d9e793"
+      },
       "solution": {
         "bytes": 12398,
         "lines": 311,
@@ -148,7 +240,7 @@
       "sizeDiffBytes": 2961,
       "addedLines": 80,
       "addedCodeLines": 66,
-      "referenceVerifySeconds": 11
+      "referenceVerifySeconds": 12
     },
     {
       "id": 18,
@@ -163,6 +255,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 1746,
+        "lines": 36,
+        "sha256": "d98b0640ede1c2d059d59cf8e1b1655a6360bcc5ec08c252edaa094473cb9c46"
+      },
+      "task": {
         "bytes": 1746,
         "lines": 36,
         "sha256": "d98b0640ede1c2d059d59cf8e1b1655a6360bcc5ec08c252edaa094473cb9c46"
@@ -194,6 +291,11 @@
         "lines": 95,
         "sha256": "7ede3f2f13167ac8679469874f1b0d82d04ea41a970a319f7cb4b9c673dfeb49"
       },
+      "task": {
+        "bytes": 3456,
+        "lines": 95,
+        "sha256": "7ede3f2f13167ac8679469874f1b0d82d04ea41a970a319f7cb4b9c673dfeb49"
+      },
       "solution": {
         "bytes": 5119,
         "lines": 136,
@@ -217,6 +319,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 3334,
+        "lines": 70,
+        "sha256": "e0ff11da82f01ee72240b3946856a6ea07519e25a2ff603171b8612210dd424d"
+      },
+      "task": {
         "bytes": 3334,
         "lines": 70,
         "sha256": "e0ff11da82f01ee72240b3946856a6ea07519e25a2ff603171b8612210dd424d"
@@ -248,6 +355,11 @@
         "lines": 149,
         "sha256": "5d5943af297b5f097a3a250f0902e21398254d95035a21ede5519c6cdd9207d8"
       },
+      "task": {
+        "bytes": 5772,
+        "lines": 149,
+        "sha256": "5d5943af297b5f097a3a250f0902e21398254d95035a21ede5519c6cdd9207d8"
+      },
       "solution": {
         "bytes": 7414,
         "lines": 191,
@@ -271,6 +383,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 9967,
+        "lines": 243,
+        "sha256": "7dc8122f81df1916d10cc6a5c4dd1f2d139c6ee294d2de4c8c90ccf2c572c769"
+      },
+      "task": {
         "bytes": 9967,
         "lines": 243,
         "sha256": "7dc8122f81df1916d10cc6a5c4dd1f2d139c6ee294d2de4c8c90ccf2c572c769"
@@ -302,6 +419,11 @@
         "lines": 190,
         "sha256": "4ea1b98589c30cf83d0a5e0fc1f10d7bba98b2da7ff918d0288677e60297e0c0"
       },
+      "task": {
+        "bytes": 4294,
+        "lines": 190,
+        "sha256": "4ea1b98589c30cf83d0a5e0fc1f10d7bba98b2da7ff918d0288677e60297e0c0"
+      },
       "solution": {
         "bytes": 8169,
         "lines": 320,
@@ -329,6 +451,11 @@
         "lines": 191,
         "sha256": "917fb69b39613d5ca7fefe3eaac31ceb76eeb14803311452eac3d35fbf6b2bb4"
       },
+      "task": {
+        "bytes": 4878,
+        "lines": 191,
+        "sha256": "917fb69b39613d5ca7fefe3eaac31ceb76eeb14803311452eac3d35fbf6b2bb4"
+      },
       "solution": {
         "bytes": 11582,
         "lines": 367,
@@ -337,33 +464,6 @@
       "sizeDiffBytes": 6704,
       "addedLines": 176,
       "addedCodeLines": 154,
-      "referenceVerifySeconds": 1
-    },
-    {
-      "id": 25,
-      "file": "tasks/0025.dfy",
-      "key": "midspiral/henri-lemmascript:src/permissions.ts",
-      "repo": "midspiral/henri-lemmascript",
-      "branch": "main",
-      "relpath": "src/permissions.ts",
-      "license": "MIT",
-      "head": "a901c5a30df520a6b0eb881a828e486fb1ed6030",
-      "verify": {
-        "flags": []
-      },
-      "gen": {
-        "bytes": 4343,
-        "lines": 127,
-        "sha256": "7deed7bf769b62d6ccb2d5c01d2bbb5b9d437069d902e03423e894e708a4918a"
-      },
-      "solution": {
-        "bytes": 9542,
-        "lines": 251,
-        "sha256": "972a23406120368e6cc6c857399a605ae729f1d1657997b0412e6c155e4b6b77"
-      },
-      "sizeDiffBytes": 5199,
-      "addedLines": 124,
-      "addedCodeLines": 90,
       "referenceVerifySeconds": 1
     },
     {
@@ -383,14 +483,79 @@
         "lines": 210,
         "sha256": "0149339c0ee5c51d605bab875b5a0223106070056c7beae2307b9a60852678a6"
       },
-      "solution": {
-        "bytes": 8674,
-        "lines": 339,
-        "sha256": "defb209dff791aff036a54cab5c983d74579c00f4a89980345e94d8f1aec17cd"
+      "task": {
+        "bytes": 6188,
+        "lines": 269,
+        "sha256": "ad38f468a4127034bbb9acf2fcba61c59bff42e39f92759aa0d79365cb33c11d"
       },
-      "sizeDiffBytes": 3995,
-      "addedLines": 129,
-      "addedCodeLines": 117,
+      "context": {
+        "declarations": [
+          {
+            "name": "pairs",
+            "kind": "function",
+            "ghost": false,
+            "abstract": false,
+            "addedLines": 10,
+            "addedCodeLines": 8,
+            "sha256": "142833598ec17a570bbe4f8c22497ae177808808efd6ade93e8e45dd2dcc8be8"
+          },
+          {
+            "name": "headOk",
+            "kind": "function",
+            "ghost": false,
+            "abstract": false,
+            "addedLines": 6,
+            "addedCodeLines": 4,
+            "sha256": "926e36ab8c27f7428cc1dcd63244f05c7c2716c3d29e0ff000cce1aa3f23364a"
+          },
+          {
+            "name": "lastOk",
+            "kind": "function",
+            "ghost": false,
+            "abstract": false,
+            "addedLines": 11,
+            "addedCodeLines": 9,
+            "sha256": "6e945268f2befa3c6dec2413deb0ee1cf571d29d2f972e55132c6d391fa46031"
+          },
+          {
+            "name": "okAdjacent",
+            "kind": "function",
+            "ghost": false,
+            "abstract": false,
+            "addedLines": 19,
+            "addedCodeLines": 17,
+            "sha256": "e0ddd652e520d8ad1430c8abec47b61218805ab099f9c4814619bc0348b85527"
+          },
+          {
+            "name": "wfFrom",
+            "kind": "function",
+            "ghost": false,
+            "abstract": false,
+            "addedLines": 7,
+            "addedCodeLines": 5,
+            "sha256": "a75a285162f1c206dd70239fc2f36c0a76b02249ecb29a9086470c99bfe64aa5"
+          },
+          {
+            "name": "wellFormed",
+            "kind": "function",
+            "ghost": false,
+            "abstract": false,
+            "addedLines": 6,
+            "addedCodeLines": 4,
+            "sha256": "ee16c3ec1a105439babc1a9ca7c4594d102618ee46683e07ab98531bc6d0e2ec"
+          }
+        ],
+        "addedLines": 59,
+        "addedCodeLines": 47
+      },
+      "solution": {
+        "bytes": 9096,
+        "lines": 351,
+        "sha256": "fd9bd62d7149a88378ae6e2150911cf5742bea2a7c686ce26330485d5c8240de"
+      },
+      "sizeDiffBytes": 2908,
+      "addedLines": 82,
+      "addedCodeLines": 70,
       "referenceVerifySeconds": 1
     },
     {
@@ -401,11 +566,16 @@
       "branch": "lemmascript",
       "relpath": "src/middleware/ip-restriction/matcher.verified.ts",
       "license": "MIT",
-      "head": "72750fa7783352d4c9765ab427175840d513147c",
+      "head": "6380debf1ee44f55ebcbba2e24c153654ff2c8c3",
       "verify": {
         "flags": []
       },
       "gen": {
+        "bytes": 4343,
+        "lines": 150,
+        "sha256": "5dbc5532cd7821bbdcc02bf1d79031b162ac067b969e2f4ae0e9ee7cdc3d81e1"
+      },
+      "task": {
         "bytes": 4343,
         "lines": 150,
         "sha256": "5dbc5532cd7821bbdcc02bf1d79031b162ac067b969e2f4ae0e9ee7cdc3d81e1"
@@ -421,60 +591,6 @@
       "referenceVerifySeconds": 6
     },
     {
-      "id": 29,
-      "file": "tasks/0029.dfy",
-      "key": "midspiral/hono-lemmascript:src/middleware/serve-static/index.ts",
-      "repo": "midspiral/hono-lemmascript",
-      "branch": "lemmascript",
-      "relpath": "src/middleware/serve-static/index.ts",
-      "license": "MIT",
-      "head": "72750fa7783352d4c9765ab427175840d513147c",
-      "verify": {
-        "flags": []
-      },
-      "gen": {
-        "bytes": 526,
-        "lines": 17,
-        "sha256": "c1cecde198114753c3605f3d65f4bdc75cf47b29117bc94780df32b928d4be89"
-      },
-      "solution": {
-        "bytes": 613,
-        "lines": 20,
-        "sha256": "ba4893fee9fc83d46c18399d2dfe87a37639bf74910c781e4d15f81f79cc77ac"
-      },
-      "sizeDiffBytes": 87,
-      "addedLines": 3,
-      "addedCodeLines": 2,
-      "referenceVerifySeconds": 1
-    },
-    {
-      "id": 31,
-      "file": "tasks/0031.dfy",
-      "key": "midspiral/hono-lemmascript:src/utils/filepath.ts",
-      "repo": "midspiral/hono-lemmascript",
-      "branch": "lemmascript",
-      "relpath": "src/utils/filepath.ts",
-      "license": "MIT",
-      "head": "72750fa7783352d4c9765ab427175840d513147c",
-      "verify": {
-        "flags": []
-      },
-      "gen": {
-        "bytes": 953,
-        "lines": 28,
-        "sha256": "ed99d7c53f33de9ce1dc420c173da051c14e217ae7359d3217dd80f16cda16b0"
-      },
-      "solution": {
-        "bytes": 999,
-        "lines": 30,
-        "sha256": "e5609529e02b85dd7c99d514de74239496b0ae6eaeaf9ceaba1c0b218c72cf4c"
-      },
-      "sizeDiffBytes": 46,
-      "addedLines": 2,
-      "addedCodeLines": 1,
-      "referenceVerifySeconds": 1
-    },
-    {
       "id": 32,
       "file": "tasks/0032.dfy",
       "key": "midspiral/hono-lemmascript:src/utils/ipaddr.verified.ts",
@@ -482,11 +598,16 @@
       "branch": "lemmascript",
       "relpath": "src/utils/ipaddr.verified.ts",
       "license": "MIT",
-      "head": "72750fa7783352d4c9765ab427175840d513147c",
+      "head": "6380debf1ee44f55ebcbba2e24c153654ff2c8c3",
       "verify": {
         "flags": []
       },
       "gen": {
+        "bytes": 4367,
+        "lines": 165,
+        "sha256": "61ea8510d5ff593f995b2fdaacd57c33261fcc4977eaf330d4c02af5e80c5cf7"
+      },
+      "task": {
         "bytes": 4367,
         "lines": 165,
         "sha256": "61ea8510d5ff593f995b2fdaacd57c33261fcc4977eaf330d4c02af5e80c5cf7"
@@ -518,42 +639,35 @@
         "lines": 63,
         "sha256": "3afee231fcb095de650e6871856775833c2a3919679d8769818391784dca8d28"
       },
-      "solution": {
-        "bytes": 13671,
-        "lines": 321,
-        "sha256": "2371c1604d1b63ae720dbee2152537e9119d5aacfd202c877602d34a7f121494"
+      "task": {
+        "bytes": 2428,
+        "lines": 73,
+        "sha256": "d8ecefd3d72cf47246a0ddbae9cda8335159699a316f0f06a82dacf9f20604a7"
       },
-      "sizeDiffBytes": 11517,
-      "addedLines": 258,
-      "addedCodeLines": 185,
+      "context": {
+        "declarations": [
+          {
+            "name": "CountIn",
+            "kind": "function",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 10,
+            "addedCodeLines": 8,
+            "sha256": "890def624ea3e547d2af95fe1a468c53a5683bcc42a0b6f7eb6a3899dceabc94"
+          }
+        ],
+        "addedLines": 10,
+        "addedCodeLines": 8
+      },
+      "solution": {
+        "bytes": 13741,
+        "lines": 323,
+        "sha256": "8a38f9e5d43fc9140dc8a5b958ab08fb4c6b7240e7b3d0a2efde70f0186e8149"
+      },
+      "sizeDiffBytes": 11313,
+      "addedLines": 250,
+      "addedCodeLines": 177,
       "referenceVerifySeconds": 10
-    },
-    {
-      "id": 34,
-      "file": "tasks/0034.dfy",
-      "key": "midspiral/infisical-lemmascript:backend/src/lib/casl/glob-subset.ts",
-      "repo": "midspiral/infisical-lemmascript",
-      "branch": "lemmascript",
-      "relpath": "backend/src/lib/casl/glob-subset.ts",
-      "license": "MIT",
-      "head": "f441627041489c259d752b1bc1a98d422f07a190",
-      "verify": {
-        "flags": []
-      },
-      "gen": {
-        "bytes": 1909,
-        "lines": 75,
-        "sha256": "fe560c8e25f7fea887bdf93bb69012e3fdf3871a44e7fae669de13ffe83954c8"
-      },
-      "solution": {
-        "bytes": 9566,
-        "lines": 238,
-        "sha256": "4f1cfd6a50a1222de393a2905642a5a67e554ee40fa698cfa148012a8e6cb4ce"
-      },
-      "sizeDiffBytes": 7657,
-      "addedLines": 163,
-      "addedCodeLines": 122,
-      "referenceVerifySeconds": 1
     },
     {
       "id": 41,
@@ -563,11 +677,16 @@
       "branch": "lemmascript",
       "relpath": "packages/opencode/src/agent/subagent-permissions.ts",
       "license": "MIT",
-      "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
+      "head": "40a8452d6702437b586629520f3a27208a18a097",
       "verify": {
         "flags": []
       },
       "gen": {
+        "bytes": 1948,
+        "lines": 26,
+        "sha256": "88ddd3a6d66fd096a3357db8eada7566bbd1e4e77882dda43e654b866b5f11c8"
+      },
+      "task": {
         "bytes": 1948,
         "lines": 26,
         "sha256": "88ddd3a6d66fd096a3357db8eada7566bbd1e4e77882dda43e654b866b5f11c8"
@@ -580,34 +699,7 @@
       "sizeDiffBytes": 1391,
       "addedLines": 31,
       "addedCodeLines": 24,
-      "referenceVerifySeconds": 5
-    },
-    {
-      "id": 46,
-      "file": "tasks/0046.dfy",
-      "key": "midspiral/opencode-lemmascript:packages/opencode/src/util/wildcard.ts",
-      "repo": "midspiral/opencode-lemmascript",
-      "branch": "lemmascript",
-      "relpath": "packages/opencode/src/util/wildcard.ts",
-      "license": "MIT",
-      "head": "09acc16ab1fabda6bf5b585b706aa7d80e5d5db6",
-      "verify": {
-        "flags": []
-      },
-      "gen": {
-        "bytes": 866,
-        "lines": 33,
-        "sha256": "14b8f96a6c92cebfb6b65509edfdf95b332f3acd20e4a93f03e0c944bd46297e"
-      },
-      "solution": {
-        "bytes": 1422,
-        "lines": 45,
-        "sha256": "5af2671e359f0f694f68d0247c6e83c85ac36564c77722751afd27242a274cf0"
-      },
-      "sizeDiffBytes": 556,
-      "addedLines": 12,
-      "addedCodeLines": 7,
-      "referenceVerifySeconds": 1
+      "referenceVerifySeconds": 6
     },
     {
       "id": 53,
@@ -622,6 +714,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 17342,
+        "lines": 685,
+        "sha256": "d9902838397f9d8157d164c0bccd537bfb25b15a4af5638d71a52bef4957b25e"
+      },
+      "task": {
         "bytes": 17342,
         "lines": 685,
         "sha256": "d9902838397f9d8157d164c0bccd537bfb25b15a4af5638d71a52bef4957b25e"
@@ -653,6 +750,11 @@
         "lines": 72,
         "sha256": "348d26c156bf2dde7b5fda27e5af228b2b21ae26425154905c127d87568f5c78"
       },
+      "task": {
+        "bytes": 1984,
+        "lines": 72,
+        "sha256": "348d26c156bf2dde7b5fda27e5af228b2b21ae26425154905c127d87568f5c78"
+      },
       "solution": {
         "bytes": 3858,
         "lines": 122,
@@ -676,6 +778,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 28753,
+        "lines": 1086,
+        "sha256": "d40bf63ed30cc2c91798f47b56043df2a2a1ee64b28ec8e664aecf73dc44c924"
+      },
+      "task": {
         "bytes": 28753,
         "lines": 1086,
         "sha256": "d40bf63ed30cc2c91798f47b56043df2a2a1ee64b28ec8e664aecf73dc44c924"
@@ -707,6 +814,11 @@
         "lines": 72,
         "sha256": "d5ce634f1d52d33d13a5eeb136c45a609e5f6a6ba31f1e670eea829fe6e8fc68"
       },
+      "task": {
+        "bytes": 1965,
+        "lines": 72,
+        "sha256": "d5ce634f1d52d33d13a5eeb136c45a609e5f6a6ba31f1e670eea829fe6e8fc68"
+      },
       "solution": {
         "bytes": 3740,
         "lines": 121,
@@ -730,6 +842,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 17750,
+        "lines": 659,
+        "sha256": "4d213dae2f1cbe54ca85c1ab367331564258d78576676b9aaf2bf5c96a5992a7"
+      },
+      "task": {
         "bytes": 17750,
         "lines": 659,
         "sha256": "4d213dae2f1cbe54ca85c1ab367331564258d78576676b9aaf2bf5c96a5992a7"
@@ -761,6 +878,11 @@
         "lines": 812,
         "sha256": "46994db971eb4a9d68d9af1d1367e7ef86e0d872a5cad62bdb1e10ee2234a820"
       },
+      "task": {
+        "bytes": 19437,
+        "lines": 812,
+        "sha256": "46994db971eb4a9d68d9af1d1367e7ef86e0d872a5cad62bdb1e10ee2234a820"
+      },
       "solution": {
         "bytes": 21444,
         "lines": 868,
@@ -779,7 +901,7 @@
       "branch": "main",
       "relpath": "src/games/g2048/engine.ts",
       "license": "MIT",
-      "head": "8c908fa28b58dd45f11191fcc47c240c4fd6f99b",
+      "head": "3e088eb7ae911b264cff6c3864aa2fdfd83145d2",
       "verify": {
         "flags": []
       },
@@ -788,14 +910,61 @@
         "lines": 227,
         "sha256": "dff5860c4fd5bdec6abf5797095fea74358e1569f48c7b49c3728e571fc3a878"
       },
-      "solution": {
-        "bytes": 11042,
-        "lines": 361,
-        "sha256": "2cb673062207677e8f773d42983587c7e24ebe59f3dd4ddec5ed27f891e83756"
+      "task": {
+        "bytes": 7080,
+        "lines": 259,
+        "sha256": "a8fb88e89855aeb3fd262f47ea3334bf3e619cef55b9e99370ed10b75ef10991"
       },
-      "sizeDiffBytes": 4841,
-      "addedLines": 134,
-      "addedCodeLines": 105,
+      "context": {
+        "declarations": [
+          {
+            "name": "sumTo",
+            "kind": "function",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 7,
+            "addedCodeLines": 5,
+            "sha256": "3a529ff4c59c55ec22cc281f766fd83e801b5a6e12c837ca91eccaad0b50c078"
+          },
+          {
+            "name": "nzTo",
+            "kind": "function",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 7,
+            "addedCodeLines": 5,
+            "sha256": "3083afc076581f116532497caea81b0bb917527ac80b3f9024388b8242275bab"
+          },
+          {
+            "name": "colSumTo",
+            "kind": "function",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 9,
+            "addedCodeLines": 7,
+            "sha256": "1463ad86309bb7d59baad3b6e8806625a576d2c4ce66aef6220c8ca86ff17b33"
+          },
+          {
+            "name": "cell",
+            "kind": "function",
+            "ghost": true,
+            "abstract": false,
+            "addedLines": 9,
+            "addedCodeLines": 7,
+            "sha256": "ca5cb426c2be0b169f4fa74a6955a50c5d619a5b877536804f554e439c3d1f15"
+          }
+        ],
+        "addedLines": 32,
+        "addedCodeLines": 24
+      },
+      "solution": {
+        "bytes": 11308,
+        "lines": 369,
+        "sha256": "780ee64861b03e0eb46385c54850fb1de1cff067bcc1460a8ca8446bffb0c110"
+      },
+      "sizeDiffBytes": 4228,
+      "addedLines": 110,
+      "addedCodeLines": 81,
       "referenceVerifySeconds": 1
     },
     {
@@ -806,11 +975,16 @@
       "branch": "main",
       "relpath": "src/platform/replay_core.ts",
       "license": "MIT",
-      "head": "8c908fa28b58dd45f11191fcc47c240c4fd6f99b",
+      "head": "3e088eb7ae911b264cff6c3864aa2fdfd83145d2",
       "verify": {
         "flags": []
       },
       "gen": {
+        "bytes": 3838,
+        "lines": 84,
+        "sha256": "fdedb1f818f06c595e5204b80031be94311968b436dd74d1eebc3d728a1f1ad6"
+      },
+      "task": {
         "bytes": 3838,
         "lines": 84,
         "sha256": "fdedb1f818f06c595e5204b80031be94311968b436dd74d1eebc3d728a1f1ad6"
@@ -842,6 +1016,11 @@
         "lines": 93,
         "sha256": "610cd281d52c43f8695046052b2dbe19ff26ac7591814271035fd425f4fbdaae"
       },
+      "task": {
+        "bytes": 5021,
+        "lines": 93,
+        "sha256": "610cd281d52c43f8695046052b2dbe19ff26ac7591814271035fd425f4fbdaae"
+      },
       "solution": {
         "bytes": 5630,
         "lines": 108,
@@ -850,7 +1029,7 @@
       "sizeDiffBytes": 609,
       "addedLines": 15,
       "addedCodeLines": 14,
-      "referenceVerifySeconds": 6
+      "referenceVerifySeconds": 5
     },
     {
       "id": 64,
@@ -865,6 +1044,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 3381,
+        "lines": 114,
+        "sha256": "b17b602fea70e5a8dd618feebf2715065e34e04752a966734c3fe0f7e7440f53"
+      },
+      "task": {
         "bytes": 3381,
         "lines": 114,
         "sha256": "b17b602fea70e5a8dd618feebf2715065e34e04752a966734c3fe0f7e7440f53"
@@ -892,6 +1076,11 @@
         "flags": []
       },
       "gen": {
+        "bytes": 1122,
+        "lines": 44,
+        "sha256": "06382274dee3d0b18efca9e3f85e3ed1be69818ddda130ebd03a7c74b3e23f81"
+      },
+      "task": {
         "bytes": 1122,
         "lines": 44,
         "sha256": "06382274dee3d0b18efca9e3f85e3ed1be69818ddda130ebd03a7c74b3e23f81"

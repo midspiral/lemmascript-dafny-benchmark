@@ -145,6 +145,9 @@ export interface Pair {
   relpath: string;
   genPath: string;
   solutionPath: string;
+  /** The composed immutable scaffold emitted as the benchmark task. Populated
+   *  by the corpus context phase; equal to `.dfy.gen` when no context is used. */
+  taskText?: string;
   timeout?: number;
   flags: string[];
   /** Present when the pair cannot be formed at all. */

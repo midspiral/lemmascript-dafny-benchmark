@@ -31,6 +31,10 @@ each task's recorded licence matches the config; and — the important one — t
 stray edit to a task file would silently change every verdict for that task,
 because it is what candidate diffs are taken against.
 
+For a context-bearing task it also checks that metadata and the report agree on
+the composed task facts and on every selected semantic declaration. This keeps
+the raw generated-file record distinct from the actual candidate baseline.
+
 Regenerating would catch all of that too, and costs ten minutes and a Dafny
 install. This costs a second.
 
@@ -49,6 +53,10 @@ cheating `.dfy` per banned mechanism and per disqualifying warning, each
 asserting *the reason* it is rejected rather than merely that it fails. Seven
 more assert the opposite direction — that legitimate work still passes, because
 a validator tested only against attacks drifts toward rejecting everything.
+The semantic-context fixtures separately pin direct and transitive selection,
+the unused-marker over-inclusion guard, eligible declaration kinds, bodyless
+abstractions, and the rule that a helper lemma called only by the reference
+proof stays candidate work.
 
 Two smoke tests ride along:
 
@@ -67,8 +75,9 @@ Two smoke tests ride along:
 
 A separate workflow, [`regenerate.yml`](.github/workflows/regenerate.yml).
 
-Clones every case study, re-verifies every reference solution, regenerates all
-four artifacts, and uploads the report as an artifact.
+Clones every case study, reconstructs and resolves each task scaffold,
+re-verifies every reference solution, regenerates all four artifacts, and
+uploads the report as an artifact.
 
 It **reports its diff rather than failing on it**. The per-task verification
 limits are wall-clock, so admission depends on machine load — one task passes

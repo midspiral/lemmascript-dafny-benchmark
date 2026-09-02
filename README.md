@@ -9,28 +9,31 @@ LemmaScript compiles annotated TypeScript to Dafny. That compilation
 produces a `.dfy.gen` — the specifications and the skeleton, but not the
 proofs — which a human then completes into a verifying `.dfy`.
 
-Each benchmark task is one such completion. Given a `.dfy.gen`, produce a
-`.dfy` that:
+Each benchmark task is one such completion. Usually the task is the generated
+file unchanged. If that file names a semantic function or predicate whose
+definition exists only in the completed `.dfy`, the generator first supplies
+the minimum resolver-demanded definitions as immutable context. Given the
+resulting task scaffold, produce a `.dfy` that:
 
 * **verifies**;
-* is **line additions only** relative to the `.dfy.gen` — nothing
+* is **line additions only** relative to the task scaffold — nothing
   removed, nothing edited;
 * **adds no axioms**, whether through `{:axiom}`, `assume`, an
   unimplemented lemma, or any other route by which Dafny will accept a
   claim it hasn't proven;
-* **leaves the generated contracts alone**. New helper lemmas may carry
+* **leaves the task contracts alone**. New helper lemmas may carry
   whatever `requires` they need, but a precondition may not be bolted onto a
-  generated declaration. Adding `ensures` to one is fine — that is more to
-  prove, not less;
+  declaration already in the task. Adding `ensures` to one is fine — that is
+  more to prove, not less;
 * is **proof only**. Additions may introduce ghost declarations, proof
   statements, proof annotations, and the specifications allowed above. They may
   not add executable behaviour — returns, assignments, executable calls,
   control flow — and may not change the meaning of syntax already present,
-  whether by attaching an attribute or modifier to a generated declaration or by
+  whether by attaching an attribute or modifier to a task declaration or by
   adding tokens that continue an existing expression.
 
 The last three are what make the benchmark meaningful. A bodyless lemma
-verifies vacuously, and `requires false` under every generated declaration
+verifies vacuously, and `requires false` under every task declaration
 discharges every postcondition at once; without those constraints, a
 one-line transformation solves every task.
 
@@ -86,12 +89,12 @@ npm run check -- 5 my-attempt.dfy       # add --json for a machine-readable verd
 ```
 
 To pick one, `npm run list-tasks` prints the corpus banded by how much proof the
-reference solution needed — 1 to 575 lines, median 54:
+reference solution needed — 1 to 567 lines, median 60:
 
 ```
-small (1–10 proof lines) — 6 tasks
+small (1–10 proof lines) — 3 tasks
 medium (11–50)           — 9 tasks
-large (51–150)           — 11 tasks
+large (51–150)           — 9 tasks
 very large (151+)        — 7 tasks
 ```
 
@@ -104,22 +107,32 @@ best one available short of solving the tasks. `--markdown` emits the full table
 Each case study repository carries a `LemmaScript-files.txt` listing the
 TypeScript files it compiles. For each of those, LemmaScript emits a
 `.dfy.gen`, and the repository also contains the completed `.dfy` beside
-it. That pair — generated skeleton and human-written completion — is a
-task and its reference solution.
+it. That pair — generated skeleton and human-written completion — is the input
+from which a task and its reference solution are constructed.
+
+Before validating the reference, the generator asks Dafny to resolve the raw
+`.dfy.gen`. An unresolved function or predicate may be supplied from an
+explicitly marked declaration in the completed `.dfy`; resolving again finds
+any transitive semantic dependencies. Every marked block must be requested,
+and only functions and predicates are eligible. Lemmas, lemma calls added to
+method bodies, invariants, assertions, and definitions reached only from the
+reference proof remain absent for the candidate to invent or avoid. See
+[DESIGN_CONTEXT.md](DESIGN_CONTEXT.md) for the exact boundary and marker format.
 
 A generator script walks the configured case study repositories, collects
 every such pair, and emits:
 
-* **`tasks/`** — one flat folder containing every admitted `.dfy.gen`,
-  renamed to `NNNN.dfy` so they can be read and verified without ceremony,
-  and copied byte for byte so the diff a candidate is judged on is clean.
+* **`tasks/`** — one flat folder containing every admitted immutable scaffold,
+  renamed to `NNNN.dfy` so it can be read and verified without ceremony. A
+  scaffold is the `.dfy.gen` plus any minimal demanded semantic context,
+  projected in completed-file order.
   The numbering has gaps: IDs go to every pair the generator sees, not only
   the ones that became tasks.
 * **`metadata.json`** — what benchmark number `0123.dfy` corresponds to:
   which repository, which path, which branch, and the Dafny options that
-  task is verified with. Plus the size of the original `.dfy.gen`, the size
-  of the solution, the difference between them, and the count of added
-  non-blank non-comment lines, which is the better difficulty proxy.
+  task is verified with. It records separate facts for the original `.dfy.gen`,
+  selected context, emitted task, and solution. Proof size is measured from the
+  task to the solution, excluding context lines.
 * **`index.json`** — the key-to-number map, and the only stateful file here.
   Everything else can be regenerated from scratch.
 * **`reference-report.json`** — whether each reference solution passes
@@ -129,8 +142,8 @@ The generator is **reentrant**. Benchmark numbers are assigned once and
 never reused, so a second run appends new entries after the existing ones
 rather than renumbering, and a pair that disappears upstream is tombstoned
 rather than dropped. Changing what an existing task *is* — refreshing a task
-whose `.dfy.gen` moved, or deleting one that stopped being admitted — takes
-an explicit `--update` or `--prune`.
+whose generated input or selected context moved, or deleting one that stopped
+being admitted — takes an explicit `--update` or `--prune`.
 
 ## The reference report
 
@@ -151,11 +164,12 @@ budgets are too tight, and what each one costs the benchmark.
 
 ## Validation
 
-Two checks, run against the `.dfy.gen` and against Dafny — nothing else:
+Two checks, run against the immutable task scaffold and against Dafny — nothing
+else:
 
-1. The diff against the `.dfy.gen` contains no deletions, no added line reaches
+1. The diff against the task contains no deletions, no added line reaches
    for one of Dafny's trust escape hatches, and the specifications the
-   generated file already states are left alone. Inside a generated
+   task already states are left alone. Inside an existing
    declaration's signature a candidate may add only a complete `ensures` or
    `decreases` clause — and an `ensures` only where the declaration is actually
    proved, never on an axiom, whose postconditions Dafny assumes. That is what
@@ -171,8 +185,9 @@ The last has one exception: a lemma whose postcondition is literally
 *inside* a proof are ignored entirely — that is what proof by contradiction
 looks like to the verifier, and nine files in the corpus rely on it.
 
-All regions are computed from the `.dfy.gen`, never from the candidate, so no
-addition can move the boundary it is judged against.
+All regions are computed from the task scaffold, never from the candidate, so
+no addition can move the boundary it is judged against. Selected semantic
+context is therefore frozen by the same rule as generated text.
 
 Each task carries the verification options its case study uses — a time
 limit and any extra Dafny flags, taken from `LemmaScript-files.txt` — and
@@ -204,7 +219,7 @@ the cheats a model is likely to reach for. It does not make gaming impossible,
 and it cannot: "this candidate only added proof" is a property of the *parsed*
 program, and the validator checks text.
 
-Three known escapes, each reproduced against Dafny 4.11.0 on a real task:
+Three known escapes, each reproduced against Dafny 4.11.0 on a corpus input:
 
 **Executable statements added to a generated body.** A candidate may insert
 statements into a method the generator wrote:
@@ -220,7 +235,7 @@ statements into a method the generator wrote:
 The method now always returns `None`, the specification's `None` branch is
 trivially true, and it verifies. Nothing was deleted, no banned token appears,
 and Dafny emits no diagnostic at all. It needs a specification with a trivially
-satisfiable branch — six of the 33 tasks have one — but the general form is
+satisfiable branch — four current task files contain such branches — but the general form is
 unrestricted: an early return, an assignment, a conditional, a loop, a call.
 
 **Continuations of a generated expression outside a declaration signature.**
@@ -271,9 +286,10 @@ case study's CI, not from the task's meaning — but two candidates that spent v
 different amounts of solver time are not directly comparable.
 
 Closing the first two properly means a parser-backed structural comparison:
-every node originating in the `.dfy.gen` preserved unchanged, and the executable
-projections of the two programs equal after erasing proof material. That is real
-work maintained against Dafny's internals, and it is not currently planned.
+every node originating in the task scaffold preserved unchanged, and the
+executable projections of the two programs equal after erasing proof material.
+That is real work maintained against Dafny's internals, and it is not currently
+planned.
 
 Two consequences for anyone using this benchmark. **Publish the diff alongside
 any result** — it is already computed, and `|| true` is obvious to a human
@@ -288,7 +304,7 @@ npm ci
 npm run generate             # the whole benchmark: tasks/, metadata.json, index.json, report
 npm run reference-report     # just the report, leaving the benchmark alone
 npm test                     # the fixture suite (needs Dafny)
-npm run check-artifacts      # tasks/, metadata.json and index.json agree (no Dafny)
+npm run check-artifacts      # emitted artifacts agree (no Dafny)
 ```
 
 Both clone any missing case study as a sibling; pass `--no-clone` to work with
@@ -296,7 +312,7 @@ what's already there and `--jobs=N` to change how many verifications run at
 once. Keep `--jobs` low: the per-task time limits are wall-clock, so a loaded
 machine can turn a passing proof into a reported timeout.
 
-`generate` will not overwrite a task whose upstream `.dfy.gen` has moved, or
+`generate` will not overwrite a task whose upstream scaffold has moved, or
 delete one that stopped being admitted, unless you ask — `--update` and
 `--prune` respectively, and `--dry-run` to see what it would do. Only
 `reference-report` takes `--only=<substring>`; a partial walk cannot produce a
@@ -304,14 +320,16 @@ coherent benchmark.
 
 `--from-report` rebuilds `tasks/`, `metadata.json`, and `index.json` from the
 report already on disk, in about a fifth of a second instead of ten minutes.
-It re-hashes every `.dfy.gen` against the report first and refuses if any has
-moved, so it can't emit tasks from a stale run.
+It re-hashes every `.dfy.gen` and completed `.dfy`, reconstructs context, and
+checks the recorded task hash before emitting. Any mismatch makes it refuse a
+stale run.
 
-`check-artifacts` is the cheap guard: it asserts that `tasks/`, `metadata.json`
-and `index.json` are three consistent views of one thing, and that every task
-file still hashes to what metadata records — a stray edit there would silently
-change every verdict for that task. It needs no Dafny and no case studies, so
-CI runs it on every push, while a full regeneration runs weekly and on demand.
+`check-artifacts` is the cheap guard: it asserts that `tasks/`, `metadata.json`,
+`index.json`, and the report are four consistent views of one thing, and that
+every task file still hashes to what metadata records — a stray edit there
+would silently change every verdict for that task. It needs no Dafny and no
+case studies, so CI runs it on every push, while a full regeneration runs
+weekly and on demand.
 [CI.md](CI.md) explains what each job checks and why the split exists.
 
 See [DESIGN.md](DESIGN.md) for the reasoning, the exact token list, and
@@ -324,10 +342,11 @@ adopt procedure each rule went through.
 This repository is MIT — see [LICENSE](LICENSE). That covers the validator, the
 generator, the fixtures, and the metadata.
 
-It does **not** cover `tasks/`. Each task file is a Dafny skeleton compiled from
-TypeScript in another repository and is a derived work of it, governed by that
-repository's licence. [`tasks/ATTRIBUTION.md`](tasks/ATTRIBUTION.md) is generated
-alongside the tasks and maps every one of them to its upstream and licence.
+It does **not** cover `tasks/`. Each task file is a Dafny scaffold derived from
+TypeScript and, where present, completed Dafny in another repository. It is
+governed by that repository's licence. [`tasks/ATTRIBUTION.md`](tasks/ATTRIBUTION.md)
+is generated alongside the tasks and maps every one of them to its upstream
+and licence.
 
 Every repository that contributes a task is MIT. A case study whose licence
 cannot ship under MIT is excluded in `config/repos.json` rather than quietly
@@ -355,10 +374,14 @@ commit pinning is more machinery than this needs right now.
 ## Status
 
 The validator, the reference report, and the emitted benchmark are all in place:
-**33 tasks**, drawn from 65 candidate pairs across 27 configured case studies.
-Seventeen of those repositories contribute a task; the rest contribute pairs
+**28 tasks**, drawn from 65 candidate pairs across 27 configured case studies.
+Sixteen of those repositories contribute a task; the rest contribute pairs
 that were all excluded, overwhelmingly because the generated skeleton already
 verified and there was no proof to complete.
+
+Ten pairs need semantic context. Five remain genuine proof tasks after receiving
+it; five already verify and are reported as `already-verifies-after-context`
+rather than shipped as model-completion exercises.
 
 Two things a reader should know up front.
 

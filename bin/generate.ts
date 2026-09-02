@@ -5,7 +5,7 @@
  *
  * Four artifacts, all from one pass:
  *
- *   tasks/NNNN.dfy         each admitted `.dfy.gen`, byte for byte
+ *   tasks/NNNN.dfy         each admitted immutable task scaffold
  *   metadata.json          one entry per task
  *   index.json             key → benchmark ID, the only stateful file
  *   reference-report.json  every pair, admitted or not, with its cause
@@ -16,15 +16,16 @@
  * Usage:
  *   generate [--no-clone] [--jobs=N] [--update] [--prune] [--dry-run] [--from-report]
  *
- *   --update       refresh tasks whose upstream `.dfy.gen` has changed
+ *   --update       refresh tasks whose composed upstream scaffold has changed
  *   --prune        delete task files that are no longer admitted
  *   --dry-run      report what would be written, write nothing
  *   --from-report  emit from the existing reference-report.json instead of
  *                  re-validating. Emission derives everything it needs from the
  *                  report, so changing the shape of metadata.json has no business
  *                  costing 65 re-verifications. The recorded sha256 of every
- *                  `.dfy.gen` is re-checked first: if a checkout has moved, the
- *                  report no longer describes the corpus and this refuses to run.
+ *                  `.dfy.gen`, completed `.dfy`, and composed task is re-checked
+ *                  first: if a checkout has moved, the report no longer describes
+ *                  the corpus and this refuses to run.
  */
 
 import { writeFileSync } from "node:fs";

@@ -48,14 +48,14 @@ if (!task) {
   process.exit(2);
 }
 
-const genPath = path.join(repoRoot, task.file);
+const taskPath = path.join(repoRoot, task.file);
 const candidatePath = path.resolve(candidateArg);
 if (!existsSync(candidatePath)) {
   console.error(`Candidate not found: ${candidatePath}`);
   process.exit(2);
 }
 
-const result = await validate(genPath, candidatePath, {
+const result = await validate(taskPath, candidatePath, {
   timeLimit: task.verify.timeLimit,
   extraFlags: task.verify.flags,
   expectedVersion: metadata.dafnyVersion,
@@ -70,7 +70,7 @@ if (boolFlag("json")) {
   console.log(`  additions-only  ${a.status}`);
   if (a.deletedLines) console.log(`    ${a.deletedLines} deleted line(s): ${a.deletedSamples[0]?.trim()}`);
   for (const m of a.bannedMatches) console.log(`    banned ${m.pattern}: ${m.text.trim()}`);
-  for (const w of a.weakenedContracts) console.log(`    ${w.clause} added to a generated declaration: ${w.text.trim()}`);
+  for (const w of a.weakenedContracts) console.log(`    ${w.clause} added to a task declaration: ${w.text.trim()}`);
   for (const v of a.signatureViolations) {
     console.log(`    in the signature of \`${v.declaration}\` (line ${v.declarationLine}): ${v.why}`);
     console.log(`      ${v.text.trim()}`);

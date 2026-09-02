@@ -1,22 +1,26 @@
 # AGENTS.md
 
 Guidance for AI coding agents working on this repository. The reasoning lives in
-[DESIGN.md](DESIGN.md), the usage in [README.md](README.md), and the case-study
-to-do list in [UPSTREAM.md](UPSTREAM.md), and what CI checks in [CI.md](CI.md).
+[DESIGN.md](DESIGN.md), semantic-context construction in
+[DESIGN_CONTEXT.md](DESIGN_CONTEXT.md), the usage in [README.md](README.md), the
+case-study to-do list in [UPSTREAM.md](UPSTREAM.md), and what CI checks in
+[CI.md](CI.md).
 This file collects what is easy to get wrong if you only read those — mostly
 things that were got wrong once already.
 
 ## Orientation
 
-A benchmark of Dafny proof-completion tasks. A task is a `.dfy.gen` that
-LemmaScript compiled from TypeScript; solving it means adding lines until it
-verifies, without weakening what it claims.
+A benchmark of Dafny proof-completion tasks. A task is an immutable scaffold:
+the `.dfy.gen` that LemmaScript compiled from TypeScript plus, where needed,
+the minimum resolver-demanded semantic definitions from the completed `.dfy`.
+Solving it means adding proof lines until it verifies, without weakening what
+it claims.
 
 Four emitted artifacts, all derived except one:
 
 | file | |
 |---|---|
-| `tasks/NNNN.dfy` | byte-identical copy of a `.dfy.gen` |
+| `tasks/NNNN.dfy` | emitted immutable scaffold |
 | `metadata.json` | one entry per task |
 | `reference-report.json` | every pair, admitted or not, with its cause |
 | `index.json` | **the only stateful file** — key → benchmark number |
@@ -49,8 +53,8 @@ Keep `--jobs` at 3 or lower. The per-task time limits are wall-clock, so a
 loaded machine turns passing proofs into reported timeouts — one task passes
 with a one-second margin.
 
-Never hand-edit `tasks/`, `metadata.json`, or `index.json`. `check-artifacts`
-will catch you, but regenerate instead.
+Never hand-edit `tasks/`, `metadata.json`, `reference-report.json`, or
+`index.json`. `check-artifacts` will catch you, but regenerate instead.
 
 ## Traps
 
@@ -77,15 +81,30 @@ will not notice — it runs against the repo's own sources. CI has a smoke test
 for this; keep it.
 
 **Anything that lets the candidate influence its own classification is a bug.**
-The regions come from the `.dfy.gen` for exactly this reason, and an exception
-to that rule was shipped once: added declarations were allowed to "end" a
-generated signature, which let `+lemma Injected(…)` capture the generated
-declaration's clauses and body and leave the generated one claiming nothing. If
-you find yourself special-casing what the candidate wrote, stop.
+The regions come from the emitted task scaffold for exactly this reason, and an
+exception to that rule was shipped once: added declarations were allowed to
+"end" a task signature, which let `+lemma Injected(…)` capture the existing
+declaration's clauses and body and leave it claiming nothing. If you find
+yourself special-casing what the candidate wrote, stop.
 
 **A new check that cannot run must fail closed.** Prefer a recorded cause over
-silently admitting. `skeleton-not-checked` exists because the first version of
-that rule admitted on a check that never executed.
+silently admitting. `task-not-checked` exists because the first version of that
+rule admitted on a check that never executed.
+
+**Semantic context is not proof convenience.** A context block in a completed
+`.dfy` must use paired `@benchmark-context begin/end Name` comments, wrap one
+complete top-level function or predicate, and occupy only lines added relative
+to `.dfy.gen`. Dafny resolution starting at the raw generated file must request
+its name; every marked block not reached by that transitive walk rejects the
+pair as `unused-context`. Never mark a lemma, a lemma call inserted into a
+method, an invariant, or a definition used only by reference-proof additions.
+Those are exactly the choices a candidate is meant to reinvent.
+
+The projection keeps each context block at its position in the completed file.
+That position must remain top-level after all unmarked proof additions are
+removed. If `context-not-resolved` reports a parse error, move the definition to
+a projection-safe top-level position in the completed `.dfy`; do not import the
+surrounding proof braces to make it parse.
 
 ## Changing a validator rule
 

@@ -165,6 +165,16 @@ method reachable(cards: seq<int>) returns (res: set<int>)
   return out;
 }
 
+// @benchmark-context begin ExpressionsAgree
+ghost predicate ExpressionsAgree(L: seq<int>, R: seq<int>)
+{
+  exists eL: Expr, eR: Expr ::
+    multiset(leaves(eL)) == multiset(L) &&
+    multiset(leaves(eR)) == multiset(R) &&
+    evalExpr(eL).ok? && evalExpr(eR).ok? &&
+    evalExpr(eL).v == evalExpr(eR).v
+}
+// @benchmark-context end ExpressionsAgree
 method canEqualize(L: seq<int>, R: seq<int>) returns (res: bool)
   requires (|L| >= 1)
   requires (|R| >= 1)

@@ -6,7 +6,7 @@
  * renumbered — everything else is derived and can be regenerated from scratch.
  */
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import type { Corpus, FileFacts, PairReport } from "./corpus.js";
 import type { RepoEntry } from "./pairs.js";
@@ -102,6 +102,13 @@ export interface TaskMetadata {
   /** Applied identically to the reference solution and to a candidate. */
   verify: { timeLimit?: number; flags: string[] };
   gen: FileFacts;
+  /** The emitted immutable scaffold. Equal to `gen` when no context is needed. */
+  task: FileFacts;
+  context?: {
+    declarations: NonNullable<PairReport["context"]>["declarations"];
+    addedLines: number;
+    addedCodeLines: number;
+  };
   solution: FileFacts;
   sizeDiffBytes: number;
   addedLines: number;
@@ -131,8 +138,17 @@ export function buildMetadata(corpus: Corpus, ids: Map<string, number>): { tasks
         head: headFor.get(r.repo),
         verify: { timeLimit: r.verifyOptions.timeLimit, flags: r.verifyOptions.flags },
         gen: r.gen!,
+        task: r.task!,
+        context:
+          r.context?.status === "passed"
+            ? {
+                declarations: r.context.declarations,
+                addedLines: r.context.addedLines,
+                addedCodeLines: r.context.addedCodeLines,
+              }
+            : undefined,
         solution: r.solution!,
-        sizeDiffBytes: r.solution!.bytes - r.gen!.bytes,
+        sizeDiffBytes: r.solution!.bytes - r.task!.bytes,
         addedLines: r.additions!.addedLines,
         addedCodeLines: r.additions!.addedCodeLines,
         referenceVerifySeconds: r.verify!.seconds,
@@ -147,7 +163,8 @@ export function buildMetadata(corpus: Corpus, ids: Map<string, number>): { tasks
       "`verify` is transcribed from the case study's LemmaScript-files.txt and is",
       "applied to reference and candidate alike. --standard-libraries is absent on",
       "purpose: it is sniffed from the candidate, which may reach for Std. when the",
-      "task skeleton does not.",
+      "task scaffold does not. `gen` records the original LemmaScript output; `task`",
+      "records the emitted scaffold after demanded semantic context is added.",
     ],
     dafnyVersion: corpus.config.dafnyVersion,
     configSource: corpus.config.source,
@@ -165,9 +182,9 @@ export interface EmitResult {
 }
 
 /**
- * Copy each admitted `.dfy.gen` into `tasks/` under its benchmark ID, byte for
- * byte — a candidate diffs against this file, so a header comment of our own
- * would show up as a line it failed to add.
+ * Emit each admitted immutable scaffold under its benchmark ID. A scaffold is
+ * the `.dfy.gen` plus any demanded semantic-context declarations selected from
+ * the reference solution; candidate diffs are measured against this exact text.
  */
 export function emitTasks(
   tasksDir: string,
@@ -182,21 +199,23 @@ export function emitTasks(
   for (const task of tasks) {
     const name = taskFileName(task.id);
     const dest = path.join(tasksDir, name);
-    const src = corpus.pairs.get(task.key)!.genPath;
+    const scaffold = corpus.pairs.get(task.key)?.taskText;
+    if (scaffold === undefined) throw new Error(`no composed task scaffold for ${task.key}`);
+    const bytes = Buffer.from(scaffold);
 
     if (!existsSync(dest)) {
-      copyFileSync(src, dest);
+      writeFileSync(dest, bytes);
       result.written++;
       continue;
     }
-    if (readFileSync(dest).equals(readFileSync(src))) continue;
-    // The upstream .gen moved under an existing task. Refreshing changes what
-    // the task *is*, so it takes --update rather than happening quietly.
+    if (readFileSync(dest).equals(bytes)) continue;
+    // The composed scaffold moved under an existing task. Refreshing changes
+    // what the task *is*, so it takes --update rather than happening quietly.
     if (!opts.update) {
       result.drifted.push({ file: name, key: task.key });
       continue;
     }
-    copyFileSync(src, dest);
+    writeFileSync(dest, bytes);
     result.refreshed++;
   }
 
@@ -229,8 +248,10 @@ export function buildAttribution(tasks: TaskMetadata[], repos: RepoEntry[]): str
   const lines = [
     "# Attribution",
     "",
-    "Every file in this directory is a Dafny skeleton that LemmaScript compiled",
-    "from TypeScript in the repository named below, and is a derived work of it.",
+    "Every file in this directory is a Dafny task scaffold: a skeleton that",
+    "LemmaScript compiled from TypeScript, plus any minimal semantic context",
+    "selected from the completed Dafny file in the repository named below.",
+    "Each task is a derived work of that upstream repository.",
     "The upstream licence governs the task file; this repository's own licence",
     "covers the validator, the generator, and the metadata.",
     "",

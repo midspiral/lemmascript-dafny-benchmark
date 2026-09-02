@@ -1,11 +1,11 @@
 # Semantic context in benchmark tasks
 
-Status: proposed design. This document describes a new corpus-construction
-phase; it does not describe the current implementation.
+Status: implemented in September 2026. The implementation lives in
+`src/context.ts`; focused boundary fixtures live in `test/context.test.ts`.
 
 ## Problem
 
-The benchmark currently treats a LemmaScript pair as:
+The benchmark previously treated a LemmaScript pair as:
 
 ```text
 task       = foo.dfy.gen
@@ -25,7 +25,7 @@ ensures ExpressionsAgree(L, R) ==> res
 ```
 
 but `ExpressionsAgree` is defined only in the completed `equality.dfy`. The
-current task therefore does not resolve, and a candidate is asked to supply the
+raw task therefore does not resolve, and a candidate is asked to supply the
 meaning of the central property before proving it. That is not a well-posed
 proof-completion task.
 
@@ -35,8 +35,8 @@ same-file helper that is omitted from the derived model. The completed `.dfy`
 then adds the helper and, sometimes, helpers used by that helper. All of those
 definitions are context.
 
-An audit of the current 33 emitted tasks found 10 whose `.dfy.gen` has
-unresolved identifiers. Four of those tasks become already verified after the
+An audit of the pre-context 33-task corpus found 10 whose `.dfy.gen` has
+unresolved identifiers. Five of those tasks become already verified after the
 missing semantic definitions are supplied. They are model-completion examples,
 not proof-completion examples, and should not be benchmark tasks.
 
@@ -248,6 +248,13 @@ additions-only completion of the emitted task, so the same validator can score
 the reference and candidates. Dafny permits forward references, but preserving
 the author's order avoids needless drift and keeps diffs intelligible.
 
+An additions-only proof can insert braces that make a later declaration
+top-level in `R` even though the corresponding generated closing brace occurs
+after it. Removing those proof additions then nests the declaration in `T`.
+The resolver deliberately rejects that projection; the declaration must be
+moved to a projection-safe top-level position in the completed `.dfy`. Importing
+the surrounding proof braces would violate minimality.
+
 The context phase is intended for generated files that parse far enough for
 Dafny to report resolution errors. If a generated file contains an intentional
 syntactic expression hole, resolution cannot serve as the dependency oracle.
@@ -287,7 +294,7 @@ delete it, redefine it, add a precondition to it, or weaken it.
 
 ## Reporting and metadata
 
-The report should distinguish four artifacts:
+The report distinguishes four artifacts:
 
 ```text
 gen       original .dfy.gen facts
@@ -304,8 +311,10 @@ Useful context-specific causes include:
 
 - `unresolved-context-name` — resolution requests a name with no marked block;
 - `unused-context` — a marked declaration is not in the demanded closure;
-- `invalid-context-kind` — a block contains an ineligible declaration;
-- `invalid-context-content` — a block contains proof or trust material;
+- `invalid-context` — a marker is malformed, or its block contains an
+  ineligible declaration, proof, contract fact, or trust material;
+- `context-not-checked` — Dafny resolution or context construction could not
+  run, and the pair therefore fails closed;
 - `context-not-resolved` — the composed scaffold still does not resolve;
 - `already-verifies-after-context` — context was the entire completion.
 
@@ -363,6 +372,8 @@ verify, so these pairs also cease to be benchmark tasks.
 
 ## Migration
 
+Completed for the September 2026 regeneration:
+
 1. Add context-phase fixtures before touching corpus artifacts.
 2. Mark the minimal declarations in each currently affected case study.
 3. Generate a context audit for all pairs and review every selected name.
@@ -379,9 +390,9 @@ identifies the precise instance used by a run. Results across the migration
 must therefore report task hashes and should not be compared as if the inputs
 were byte-identical.
 
-## Required fixtures
+## Boundary fixtures
 
-At minimum, the implementation needs fixtures for:
+The focused suite pins the behavior that defines the boundary:
 
 - one directly requested predicate;
 - a two- or three-step transitive definition closure;
@@ -389,16 +400,18 @@ At minimum, the implementation needs fixtures for:
 - a marked helper lemma rejected;
 - a marked definition with `ensures` rejected;
 - an allowed bodyless predicate recorded as abstract;
-- a bodyless lemma or method rejected;
-- unbalanced, nested, mismatched, and modified-generated-line markers;
 - a requested name with no marked definition;
-- a scaffold that resolves but already verifies;
-- a candidate attempting to alter context;
-- stale `.dfy.gen` and stale `.dfy` rejection in `--from-report` mode.
+- unbalanced or mismatched markers rejected;
+- generated lines rejected when a marker attempts to capture them;
+- deletion of selected context rejected by the normal additions-only check;
+- a reference-only lemma call and its helper both left outside the scaffold.
 
 Every rejection fixture must assert its specific cause. Acceptance fixtures
 must demonstrate both direct and transitive context without including a proof
-helper.
+helper. The existing additions-only fixtures separately establish that a
+candidate cannot alter any line of the emitted scaffold, including context.
+The artifact and `--from-report` checks cover task hashes and stale source
+rejection at the pipeline level.
 
 ## Decision summary
 
