@@ -209,7 +209,7 @@ export interface ValidationResult {
 export function gitDiff(genPath: string, candidatePath: string, fullContext = false): string {
   const ctx = fullContext ? ["-U1000000"] : [];
   try {
-    return execFileSync("git", ["diff", "--no-index", "--no-color", ...ctx, "--", genPath, candidatePath], {
+    return execFileSync("git", ["diff", "--no-index", "--minimal", "--no-color", ...ctx, "--", genPath, candidatePath], {
       encoding: "utf-8",
       stdio: ["ignore", "pipe", "ignore"],
       maxBuffer: 256 * 1024 * 1024,
