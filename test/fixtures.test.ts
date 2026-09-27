@@ -31,8 +31,8 @@ const genFor = (n: string) => {
 
 type Expectation =
   | { kind: "banned"; patterns: string[] }
-  | { kind: "weakened"; clause: string }
-  | { kind: "signature"; why: RegExp }
+  | { kind: "weakened"; clause: string; verifies?: boolean }
+  | { kind: "signature"; why: RegExp; verifies?: boolean }
   | { kind: "warning"; category: WarningCategory }
   | { kind: "deletion" }
   | { kind: "accepted" };
@@ -69,6 +69,7 @@ const cases: Record<string, Expectation> = {
   // the one that matters: it discharges every postcondition at once, and a
   // generated lemma nothing calls has no caller to break.
   "cheat-weakened-precondition": { kind: "weakened", clause: "requires" },
+  "cheat-added-precondition": { kind: "weakened", clause: "requires", verifies: true },
   "cheat-weakened-reads": { kind: "weakened", clause: "reads" },
   "cheat-weakened-modifies": { kind: "weakened", clause: "modifies" },
   // Pins the attribution rule as *nearest preceding declaration*, not "some
@@ -82,14 +83,16 @@ const cases: Record<string, Expectation> = {
 
   // Additions inside a generated declaration's signature. Each rejection
   // reason is asserted, so a fixture cannot pass for the wrong cause.
-  "cheat-clause-continuation": { kind: "signature", why: /does not begin an/ },
+  "cheat-clause-continuation": { kind: "signature", why: /does not begin an/, verifies: true },
   "cheat-clause-smuggle": { kind: "signature", why: /contributes a `requires`/ },
   "cheat-frame-smuggle": { kind: "signature", why: /contributes a `modifies`/ },
   "cheat-decreases-wildcard": { kind: "signature", why: /wildcard/ },
   "cheat-ensures-on-trusted": { kind: "signature", why: /trusted declaration/ },
   // An added declaration inside a generated signature captures that
   // declaration's clauses and body, leaving the generated one claiming nothing.
-  "cheat-declaration-inside-signature": { kind: "signature", why: /does not begin an/ },
+  "cheat-declaration-inside-signature": { kind: "signature", why: /original signature is not preserved/, verifies: true },
+  "cheat-transplanted-contract": { kind: "signature", why: /original signature is not preserved/, verifies: true },
+  "cheat-transplanted-body": { kind: "signature", why: /original body is not preserved/, verifies: true },
 
   "cheat-deletion": { kind: "deletion" },
 
@@ -118,6 +121,11 @@ const cases: Record<string, Expectation> = {
   "ok-added-ensures": { kind: "accepted" },
   "ok-added-decreases": { kind: "accepted" },
   "ok-signature-comment": { kind: "accepted" },
+  "ok-helper-after": { kind: "accepted" },
+  "ok-helper-before": { kind: "accepted" },
+  "ok-primed-helper": { kind: "accepted" },
+  "ok-signature-match-braces": { kind: "accepted" },
+  "ok-body-literal-braces": { kind: "accepted" },
 };
 
 let failures = 0;
@@ -180,12 +188,13 @@ for (const [name, want] of Object.entries(cases)) {
       );
       break;
     case "weakened":
-      check(name, !r.passed && weakened.includes(want.clause), `expected weakened:${want.clause}; got ${summary}`);
+      check(name, !r.passed && weakened.includes(want.clause) &&
+        (!want.verifies || r.verify.status === "passed"), `expected weakened:${want.clause}; got ${summary}`);
       break;
     case "signature":
       check(
         name,
-        !r.passed && sigWhy.some(w => want.why.test(w)),
+        !r.passed && sigWhy.some(w => want.why.test(w)) && (!want.verifies || r.verify.status === "passed"),
         `expected a signature violation matching ${want.why}; got ${summary}`,
       );
       break;

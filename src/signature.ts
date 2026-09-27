@@ -1,13 +1,4 @@
-/**
- * Signature intervals of the generated program, and what may be added inside
- * one.
- *
- * Everything here is computed from the immutable task scaffold. That is the
- * point: if the regions were derived from the candidate, the candidate could
- * move them — an unbalanced brace in a comment, a string containing `{`, a
- * declaration inserted to shift the boundary. Anchoring on the task removes
- * the whole class rather than defending against each instance.
- */
+/** Declaration boundaries and signature permissions for the emitted scaffold format. */
 
 /** Anything a specification clause can hang off. */
 const DECLARATION =
@@ -16,7 +7,7 @@ const DECLARATION =
 /** The same declaration prefix, with the callable kind and name captured.
  * Attributes may sit between the kind and name (`function {:axiom} f`). */
 const DECLARATION_HEADER =
-  /^\s*(?:@\w+(?:\([^)]*\))?\s+)*(ghost\s+)?(?:twostate\s+|least\s+|greatest\s+|opaque\s+)?(lemma|function|method|predicate|constructor|iterator)\s+(?:\{\s*:[^{}]*\}\s*)*([A-Za-z_]\w*)\b/;
+  /^\s*(?:@\w+(?:\([^)]*\))?\s+)*(ghost\s+)?(?:twostate\s+|least\s+|greatest\s+|opaque\s+)?(lemma|function|method|predicate|constructor|iterator)\s+(?:\{\s*:[^{}]*\}\s*)*([A-Za-z_][\w']*)(?=\s|[<(])/;
 
 /**
  * A declaration whose postconditions Dafny *assumes* rather than proves. Adding
@@ -43,7 +34,7 @@ export interface LexState {
 }
 
 /**
- * The line with comments and string literals removed, advancing `state` across
+ * The line with comments and quoted literals removed, advancing `state` across
  * lines so a block comment or an unterminated string is tracked.
  */
 export function scrub(line: string, state: LexState): string {
@@ -72,6 +63,12 @@ export function scrub(line: string, state: LexState): string {
     if (c === '"') {
       state.str = true;
       continue;
+    }
+    // Character literals can contain braces too. Match a complete literal,
+    // rather than treating every apostrophe as a quote (x' is an identifier).
+    if (c === "'") {
+      const literal = /^'(?:\\u[0-9a-fA-F]{4}|\\.|[^'\\])'/u.exec(line.slice(i));
+      if (literal) { i += literal[0].length - 1; continue; }
     }
     out += c;
   }
@@ -112,17 +109,23 @@ export interface TopLevelDeclaration extends DeclarationHeader {
   start: number;
   end: number;
   abstract: boolean;
+  /** First body line, including its opening brace; null for a bodyless declaration. */
+  bodyStart: number | null;
+  /** Baseline trust is preserved even if a candidate adds an implementation. */
+  trusted: boolean;
 }
 
 /**
  * Locate complete top-level callable declarations in source order.
  *
- * This deliberately shares the lexer and attribute handling used for frozen
- * signatures. It is used only to recover declarations explicitly named by the
- * benchmark's context manifest; Dafny resolution remains the authority on
- * whether any recovered declaration is actually needed.
+ * This shares the lexer and attribute handling used for frozen signatures.
+ * The supported scaffold form puts a body's opening brace on its own line,
+ * or on the declaration line for an inline definition. Specification braces
+ * (sets, matches, and attributes) do not establish body ownership.
+ * Strict mode rejects unsupported headers and incomplete boundaries.
+ * Dafny remains the authority on syntax and resolution.
  */
-export function topLevelDeclarations(text: string): TopLevelDeclaration[] {
+export function topLevelDeclarations(text: string, strict = false): TopLevelDeclaration[] {
   const lines = text.split("\n");
   const state: LexState = { block: false, str: false };
   const declarations: TopLevelDeclaration[] = [];
@@ -131,7 +134,8 @@ export function topLevelDeclarations(text: string): TopLevelDeclaration[] {
     | (DeclarationHeader & {
         start: number;
         lastCode: number;
-        bodyOpened: boolean;
+        bodyStart: number | null;
+        trusted: boolean;
       })
     | null = null;
 
@@ -143,7 +147,9 @@ export function topLevelDeclarations(text: string): TopLevelDeclaration[] {
       ghost: open.ghost,
       start: open.start,
       end,
-      abstract: !open.bodyOpened,
+      abstract: open.bodyStart === null,
+      bodyStart: open.bodyStart,
+      trusted: open.trusted || open.bodyStart === null,
     });
     open = null;
   };
@@ -154,16 +160,30 @@ export function topLevelDeclarations(text: string): TopLevelDeclaration[] {
     const code = scrub(raw, state);
     const body = code.replace(ATTRIBUTE_GROUP, "");
     const header = depth === 0 ? declarationHeader(code) : null;
+    if (strict && depth === 0 && beginsDeclaration(code) && !header) {
+      throw new Error(`unsupported declaration header at line ${n}: ${raw.trim()}`);
+    }
+
+    if (strict && header && /\b(requires|ensures|reads|modifies|decreases)\b/.test(body.split("{")[0]) && body.includes("{")) {
+      throw new Error(`unsupported inline contract/body boundary at line ${n}`);
+    }
 
     // A second header at depth zero ends a preceding bodyless declaration.
     if (header) {
       if (open) close(open.lastCode);
-      open = { ...header, start: n, lastCode: n, bodyOpened: false };
+      open = { ...header, start: n, lastCode: n, bodyStart: null, trusted: TRUSTED_ATTRIBUTE.test(code) };
     } else if (open && code.trim() !== "") {
       open.lastCode = n;
     }
 
-    if (open && body.includes("{")) open.bodyOpened = true;
+    // Generated signatures put the body brace on its own line (or on a
+    // one-line declaration). Braces in a specification expression, such as
+    // `ensures (match x { ... })`, must not end the declaration. In particular,
+    // an expression with balanced braces is not a complete callable body.
+    if (open && open.bodyStart === null && depth === 0 &&
+        (body.trimStart().startsWith("{") || (header && body.includes("{")))) {
+      open.bodyStart = n;
+    }
 
     for (const ch of body) {
       if (ch === "{") depth++;
@@ -174,79 +194,14 @@ export function topLevelDeclarations(text: string): TopLevelDeclaration[] {
     // legally put one between its signature and opening brace. A bodyless
     // declaration therefore ends only at the next top-level callable (handled
     // above) or at EOF, never merely at a blank line.
-    if (open?.bodyOpened && depth === 0) close(n);
+    if (open && open.bodyStart !== null && depth === 0) close(n);
   }
 
+  if (strict && (state.str || state.block || (open?.bodyStart != null && depth !== 0))) {
+    throw new Error("unterminated declaration body, string, or comment");
+  }
   if (open) close(open.lastCode);
   return declarations;
-}
-
-export interface SignatureInterval {
-  /** 1-based line of the declaration keyword in the task scaffold. */
-  start: number;
-  /** 1-based line of the last specification line, before the body opens. */
-  end: number;
-  /** Postconditions are assumed, not proved. */
-  trusted: boolean;
-  /** For diagnostics. */
-  text: string;
-}
-
-/**
- * The signature interval of every declaration in the task scaffold: from
- * its declaration keyword through the last line before its body opens, or
- * through its last specification line when it has no body.
- */
-export function signatureIntervals(genText: string): SignatureInterval[] {
-  const lines = genText.split("\n");
-  const state: LexState = { block: false, str: false };
-  const intervals: SignatureInterval[] = [];
-  let depth = 0;
-  let open: SignatureInterval | null = null;
-
-  const close = (end: number, bodied: boolean) => {
-    if (!open) return;
-    open.end = end;
-    // A declaration whose body never opened is trusted for the same reason an
-    // {:axiom} one is: its postconditions are exposed to callers with no
-    // implementation proof behind them.
-    if (!bodied) open.trusted = true;
-    if (open.end >= open.start) intervals.push(open);
-    open = null;
-  };
-
-  lines.forEach((raw, i) => {
-    const n = i + 1;
-    const code = scrub(raw, state);
-    // Attributes are stripped before any brace counting: their braces are not
-    // body braces, and a one-line body must still be recognised as a body.
-    const body = code.replace(ATTRIBUTE_GROUP, "");
-
-    if (depth === 0 && DECLARATION.test(code)) {
-      close(n - 1, true);
-      open = { start: n, end: n, trusted: TRUSTED_ATTRIBUTE.test(code), text: code.trim() };
-      // The body opened on the declaration line itself, so there is no line on
-      // which a clause could be inserted, and the declaration is not bodyless.
-      if (body.includes("{")) {
-        open.end = n - 1;
-        open = null;
-      }
-    }
-
-    let d = 0;
-    for (const ch of body) {
-      if (ch === "{") d++;
-      else if (ch === "}") d--;
-    }
-    const before = depth;
-    depth += d;
-
-    if (open && before === 0 && depth > 0) close(n - 1, true);
-    else if (open && depth === 0 && code.trim() === "") close(n - 1, false);
-  });
-  close(lines.length, false);
-
-  return intervals;
 }
 
 export type ClauseVerdict = { ok: true; kind: string } | { ok: false; why: string };

@@ -86,12 +86,12 @@ and rare.
 
 ### Frozen signatures
 
-Everything in this section is computed from the task scaffold, which is
-immutable. That is the point. If the regions were derived from the candidate,
-the candidate could move them — an unbalanced brace inside a comment, a string
-containing `{`, a declaration inserted to shift a boundary. Anchoring on the
-task removes the class rather than defending against each instance, and it
-costs nothing: the diff already carries baseline line numbers.
+The immutable scaffold determines clause permissions and trust. Each original
+declaration has a unique counterpart of the same kind and name, in the same
+order. Its original signature and body remain unchanged line subsequences
+within that counterpart's signature and body. New helpers cannot capture them.
+[DESIGN_VALIDATOR.md](DESIGN_VALIDATOR.md) defines the comparison, supported
+source forms, and error handling.
 
 **Signature interval.** For each declaration in the task scaffold: from its
 declaration keyword through the last line before its body opens, or through its

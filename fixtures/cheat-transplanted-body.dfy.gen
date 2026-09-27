@@ -1,0 +1,4 @@
+function Value(): int
+{
+  1
+}

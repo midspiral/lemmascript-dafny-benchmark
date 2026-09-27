@@ -1,0 +1,4 @@
+lemma Main(x: int)
+  ensures x >= 0
+{
+}

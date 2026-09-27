@@ -1,7 +1,8 @@
 # AGENTS.md
 
 Guidance for AI coding agents working on this repository. The reasoning lives in
-[DESIGN.md](DESIGN.md), semantic-context construction in
+[DESIGN.md](DESIGN.md), validator behavior in
+[DESIGN_VALIDATOR.md](DESIGN_VALIDATOR.md), semantic-context construction in
 [DESIGN_CONTEXT.md](DESIGN_CONTEXT.md), the usage in [README.md](README.md), the
 case-study to-do list in [UPSTREAM.md](UPSTREAM.md), and what CI checks in
 [CI.md](CI.md).
@@ -80,12 +81,11 @@ without adding it there breaks every attempt directory, and the fixture suite
 will not notice — it runs against the repo's own sources. CI has a smoke test
 for this; keep it.
 
-**Anything that lets the candidate influence its own classification is a bug.**
-The regions come from the emitted task scaffold for exactly this reason, and an
-exception to that rule was shipped once: added declarations were allowed to
-"end" a task signature, which let `+lemma Injected(…)` capture the existing
-declaration's clauses and body and leave it claiming nothing. If you find
-yourself special-casing what the candidate wrote, stop.
+**Clause permissions and trust come from the immutable scaffold.** Candidate
+declarations establish correspondence only: each original signature and body
+must remain within its matching declaration. An added helper cannot capture
+an original contract or body. Preserve the ownership attack fixtures whenever
+changing this comparison.
 
 **A new check that cannot run must fail closed.** Prefer a recorded cause over
 silently admitting. `task-not-checked` exists because the first version of that

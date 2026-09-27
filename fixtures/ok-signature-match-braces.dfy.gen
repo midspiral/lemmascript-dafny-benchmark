@@ -1,0 +1,6 @@
+datatype Box = Box(x: int)
+
+lemma Main(b: Box)
+  ensures (match b { case Box(x) => x == x })
+{
+}

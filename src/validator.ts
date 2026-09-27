@@ -14,7 +14,7 @@
 
 import { execFileSync, spawn } from "node:child_process";
 import { copyFileSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { devNull, tmpdir } from "node:os";
 import path from "node:path";
 import {
   declarationKeyword,
@@ -25,18 +25,17 @@ import {
   type WeakenedContract,
 } from "./banned.js";
 import {
-  beginsDeclaration,
   isInert,
   judgeSignatureLine,
   scrub,
-  signatureIntervals,
+  topLevelDeclarations,
   type LexState,
 } from "./signature.js";
 
 export type CheckStatus = "passed" | "failed" | "not-run";
 
 export interface SignatureViolation {
-  /** 1-based line of the task declaration the addition lands in. */
+  /** 1-based line of the original task declaration. */
   declarationLine: number;
   /** The declaration, for the message. */
   declaration: string;
@@ -55,9 +54,7 @@ export interface AdditionsCheck {
   /** Added `requires` / `reads` / `modifies` clauses attached to a task
    *  declaration outside its signature interval. */
   weakenedContracts: WeakenedContract[];
-  /** Added lines inside a task declaration's signature that are not an
-   *  allowed clause. This is what stops `|| true` from continuing an existing
-   *  postcondition into something trivial. */
+  /** Disallowed signature additions or original text outside its declaration. */
   signatureViolations: SignatureViolation[];
   addedLines: number;
   /** Added lines that are neither blank nor a whole-line `//` comment. */
@@ -202,28 +199,36 @@ export interface ValidationResult {
   diff: string;
 }
 
-/** `git diff --no-index`, whose exit status is 1 when the files differ.
- *  `context` is Infinity for the analysis pass: the classification needs every
- *  generated line present, since an added line is located by the generated line
- *  it follows. The compact diff is kept separately, for reporting. */
+/** Compare exact text. Full context is required for source-position checks. */
 export function gitDiff(genPath: string, candidatePath: string, fullContext = false): string {
   const ctx = fullContext ? ["-U1000000"] : [];
   try {
-    return execFileSync("git", ["diff", "--no-index", "--minimal", "--no-color", ...ctx, "--", genPath, candidatePath], {
+    const output = execFileSync("git", ["diff", "--no-index", "--minimal", "--no-color",
+      "--no-ext-diff", "--no-textconv", "--text", ...ctx, "--", genPath, candidatePath], {
       encoding: "utf-8",
-      stdio: ["ignore", "pipe", "ignore"],
+      stdio: ["ignore", "pipe", "pipe"],
+      env: { ...process.env, GIT_CONFIG_GLOBAL: devNull,
+        GIT_CONFIG_SYSTEM: devNull, GIT_CONFIG_NOSYSTEM: "1" },
       maxBuffer: 256 * 1024 * 1024,
     });
+    if (output !== "") throw new Error("git diff reported identical files with unexpected output");
+    return output;
   } catch (e: any) {
-    if (e?.stdout != null) return typeof e.stdout === "string" ? e.stdout : e.stdout.toString("utf-8");
-    throw e;
+    // Exit 1 denotes a completed comparison with differences. A process or
+    // buffer error must not be accepted merely because it contains stdout.
+    if (e?.status === 1 && e?.signal == null && e?.code == null &&
+        typeof e.stdout === "string" && e.stdout.startsWith("diff --git ")) return e.stdout;
+    const detail = typeof e?.stderr === "string" ? e.stderr.trim() : "";
+    throw new Error(`git diff failed (exit ${e?.status ?? "unavailable"}): ${detail || e?.message || e}`);
   }
 }
 
 export function checkAdditionsOnly(genPath: string, candidatePath: string): { check: AdditionsCheck; diff: string } {
   let diff: string;
+  let fullDiff: string;
   try {
     diff = gitDiff(genPath, candidatePath);
+    fullDiff = gitDiff(genPath, candidatePath, true);
   } catch (e: any) {
     return {
       diff: "",
@@ -245,13 +250,29 @@ export function checkAdditionsOnly(genPath: string, candidatePath: string): { ch
   const deleted = lines.filter(l => l.startsWith("-") && !l.startsWith("---"));
   const added = lines.filter(l => l.startsWith("+") && !l.startsWith("+++")).map(l => l.slice(1));
 
-  const bannedMatches = scanAddedLines(added);
-  const weakenedContracts = findWeakenedContracts(lines);
-  const signatureViolations = findSignatureViolations(genPath, candidatePath);
   const addedCodeLines = added.filter(l => {
     const t = l.trim();
     return t !== "" && !t.startsWith("//");
   }).length;
+
+  const bannedMatches = scanAddedLines(added);
+  const weakenedContracts = findWeakenedContracts(fullDiff.split("\n"));
+  let signatureViolations: SignatureViolation[];
+  try {
+    signatureViolations = findDeclarationViolations(genPath, candidatePath);
+  } catch (e: any) {
+    return {
+      diff,
+      check: {
+        status: "not-run",
+        notRunReason: `could not compare scaffold declarations: ${e?.message ?? e}`,
+        deletedLines: deleted.length,
+        deletedSamples: deleted.slice(0, 5),
+        bannedMatches, weakenedContracts, signatureViolations: [],
+        addedLines: added.length, addedCodeLines,
+      },
+    };
+  }
 
   const clean =
     deleted.length === 0 &&
@@ -273,77 +294,68 @@ export function checkAdditionsOnly(genPath: string, candidatePath: string): { ch
   };
 }
 
-/**
- * Added lines that land inside a task declaration's signature and are not
- * one of the two clauses a candidate may add there.
- *
- * An added line is located by the task line it follows, which is why the
- * analysis pass uses a full-context diff. The intervals themselves come from
- * the immutable scaffold, so no addition can move the boundary it is being
- * judged against.
- */
-function findSignatureViolations(genPath: string, candidatePath: string): SignatureViolation[] {
-  const intervals = signatureIntervals(readFileSync(genPath, "utf-8"));
-  if (intervals.length === 0) return [];
-
+/** Preserve each original signature and body inside its matching declaration. */
+function findDeclarationViolations(genPath: string, candidatePath: string): SignatureViolation[] {
+  const genText = readFileSync(genPath, "utf-8");
+  const candidateText = readFileSync(candidatePath, "utf-8");
+  const originalLines = genText.split("\n");
+  const candidateLines = candidateText.split("\n");
+  const originals = topLevelDeclarations(genText, true);
+  const candidates = topLevelDeclarations(candidateText, true);
   const found: SignatureViolation[] = [];
-  const state: LexState = { block: false, str: false };
-  let genLine = 0;
-
-  for (const raw of gitDiff(genPath, candidatePath, true).split("\n")) {
-    if (raw.startsWith("@@") || raw.startsWith("+++") || raw.startsWith("---")) continue;
-    if (raw.startsWith("diff ") || raw.startsWith("index ") || raw.startsWith("\\")) continue;
-    if (raw.startsWith(" ")) {
-      genLine++;
-      continue;
-    }
-    if (!raw.startsWith("+")) continue;
-
-    const text = raw.slice(1);
-    const interval = intervals.find(iv => genLine >= iv.start && genLine <= iv.end);
-    if (!interval) continue;
-    if (isInert(text)) continue;
-
-    // A declaration may not *begin* inside a task signature. Allowing it let
-    // an added `lemma Injected(…)` capture the existing declaration's clauses
-    // and body, leaving the existing one bodyless with no
-    // specification at all — it would then claim nothing, and say so silently,
-    // because a bodyless declaration without an `ensures` produces no warning.
-    // Helpers remain legal at real declaration boundaries, which is where every
-    // reference solution puts them.
-    const code = scrub(text, state).trim();
-    const verdict = judgeSignatureLine(code, interval.trusted);
-    if (!verdict.ok) {
+  let previousEnd = 0;
+  for (const original of originals) {
+    const reject = (why: string, text = originalLines[original.start - 1]) => {
       found.push({
-        declarationLine: interval.start,
-        declaration: interval.text.slice(0, 72),
-        why: verdict.why,
+        declarationLine: original.start,
+        declaration: originalLines[original.start - 1].trim().slice(0, 72),
+        why,
         text,
       });
+    };
+    const matches = candidates.filter(candidate => candidate.kind === original.kind && candidate.name === original.name);
+    if (matches.length !== 1 || matches[0].start <= previousEnd) {
+      reject("original declaration has no unique counterpart in its original order");
+      continue;
+    }
+    const candidate = matches[0];
+    previousEnd = candidate.end;
+    const originalEnd = original.bodyStart === null ? original.end : original.bodyStart - 1;
+    const candidateEnd = candidate.bodyStart === null ? candidate.end : candidate.bodyStart - 1;
+    const signature = originalLines.slice(original.start - 1, originalEnd);
+    let next = 0;
+    const state: LexState = { block: false, str: false };
+    for (const text of candidateLines.slice(candidate.start - 1, candidateEnd)) {
+      const code = scrub(text, state).trim();
+      if (next < signature.length && text === signature[next]) {
+        next++;
+      } else if (!isInert(text)) {
+        const verdict = judgeSignatureLine(code, original.trusted);
+        if (!verdict.ok) reject(verdict.why, text);
+      }
+    }
+    if (next !== signature.length) {
+      reject("original signature is not preserved inside its declaration", signature[next]);
+    }
+    if (original.bodyStart !== null) {
+      if (candidate.bodyStart === null) {
+        reject("original body is not preserved inside its declaration");
+        continue;
+      }
+      // Preserve body lines within this declaration, independently of its signature.
+      const body = originalLines.slice(original.bodyStart - 1, original.end);
+      let bodyNext = 0;
+      for (const text of candidateLines.slice(candidate.bodyStart - 1, candidate.end)) {
+        if (bodyNext < body.length && text === body[bodyNext]) bodyNext++;
+      }
+      if (bodyNext !== body.length) reject("original body is not preserved inside its declaration", body[bodyNext]);
     }
   }
   return found;
 }
 
-/**
- * Added `requires` / `reads` / `modifies` clauses that belong to a *generated*
- * declaration.
- *
- * A clause is attributed to the nearest declaration keyword *preceding* it in
- * the candidate, and is allowed only when that keyword is itself on an added
- * line — i.e. the clause is part of a helper the candidate wrote. Order
- * matters: "somewhere in the same run of added lines" would let a clause
- * borrow the keyword of a helper declared after it.
- *
- * Why this and not the vacuous-proof warning it replaces: adding `requires
- * false` to a generated lemma discharges its postcondition outright, and a
- * generated lemma nothing calls has no caller to break. On a *new* helper the
- * same clause is inert — Dafny makes every call site discharge it from
- * generated context the candidate cannot weaken, so an uncallable helper
- * proves nothing. The syntactic rule therefore covers the case the semantic
- * one existed for, and covers ordinary weakening too, which the warning never
- * saw.
- */
+/** Reject added preconditions/frames unless the preceding declaration is a new helper.
+ *  Full diff context preserves unchanged declaration headers between additions. */
 function findWeakenedContracts(diffLines: string[]): WeakenedContract[] {
   const found: WeakenedContract[] = [];
   let addedIndex = 0;

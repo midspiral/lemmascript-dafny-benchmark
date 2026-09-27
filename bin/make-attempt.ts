@@ -92,7 +92,7 @@ console.log(\`additions-only  \${a.status}\`);
 if (a.deletedLines) console.log(\`  \${a.deletedLines} line(s) removed or modified: \${a.deletedSamples[0]?.trim()}\`);
 for (const m of a.bannedMatches) console.log(\`  banned (\${m.pattern}): \${m.text.trim()}\`);
 for (const w of a.weakenedContracts) console.log(\`  \${w.clause} added to a task declaration: \${w.text.trim()}\`);
-for (const v of a.signatureViolations) console.log(\`  in the signature of a task declaration (line \${v.declarationLine}): \${v.why}\n    \${v.text.trim()}\`);
+for (const v of a.signatureViolations) console.log(\`  in task declaration (line \${v.declarationLine}): \${v.why}\n    \${v.text.trim()}\`);
 if (a.status === "not-run") console.log(\`  \${a.notRunReason}\`);
 if (a.status === "passed") console.log(\`  +\${a.addedLines} lines (\${a.addedCodeLines} code)\`);
 

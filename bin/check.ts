@@ -72,7 +72,7 @@ if (boolFlag("json")) {
   for (const m of a.bannedMatches) console.log(`    banned ${m.pattern}: ${m.text.trim()}`);
   for (const w of a.weakenedContracts) console.log(`    ${w.clause} added to a task declaration: ${w.text.trim()}`);
   for (const v of a.signatureViolations) {
-    console.log(`    in the signature of \`${v.declaration}\` (line ${v.declarationLine}): ${v.why}`);
+    console.log(`    in task declaration \`${v.declaration}\` (line ${v.declarationLine}): ${v.why}`);
     console.log(`      ${v.text.trim()}`);
   }
   if (a.status === "not-run") console.log(`    ${a.notRunReason}`);

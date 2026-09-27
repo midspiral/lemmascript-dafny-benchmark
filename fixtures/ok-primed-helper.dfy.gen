@@ -1,0 +1,4 @@
+lemma Main()
+  ensures true
+{
+}

@@ -189,9 +189,12 @@ The last has one exception: a lemma whose postcondition is literally
 *inside* a proof are ignored entirely — that is what proof by contradiction
 looks like to the verifier, and nine files in the corpus rely on it.
 
-All regions are computed from the task scaffold, never from the candidate, so
-no addition can move the boundary it is judged against. Selected semantic
-context is therefore frozen by the same rule as generated text.
+The scaffold determines frozen text and clause permissions. The validator
+matches original declarations to candidate declarations and preserves each
+signature and body under its original owner. Git checks whole-file additions;
+it does not assign signature ownership. Selected semantic context is frozen
+by the same rule. Git or declaration-scanning errors prevent PASS.
+See [DESIGN_VALIDATOR.md](DESIGN_VALIDATOR.md) for the comparison and error rules.
 
 Each task carries the verification options its case study uses — a time
 limit and any extra Dafny flags, taken from `LemmaScript-files.txt` — and
